@@ -12,5 +12,11 @@ router = APIRouter(prefix="/v1/webhooks", tags=["webhooks"])
 
 @router.post("/sms")
 async def sms_webhook(request: Request, db: Session = Depends(get_db)) -> dict:
-    payload = await request.json()
+    # Twilio posts status callbacks as application/x-www-form-urlencoded; the
+    # mock provider posts JSON. Accept both and hand a plain dict to the provider.
+    content_type = request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        payload = await request.json()
+    else:
+        payload = dict(await request.form())
     return ingest_sms_webhook(db, get_message_provider(), payload)

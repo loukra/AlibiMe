@@ -51,6 +51,8 @@ class Settings(BaseSettings):
     twilio_auth_token: str | None = None
     twilio_verify_service_sid: str | None = None
     twilio_messaging_service_sid: str | None = None
+    twilio_sms_from_number: str | None = None
+    twilio_status_callback_url: str | None = None
     vapi_api_key: str | None = None
     revenuecat_webhook_secret: str | None = None
     sentry_dsn: str | None = None

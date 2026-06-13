@@ -159,6 +159,44 @@ Notes:
   surfaces as `provider_unavailable` (503, retryable); an invalid number on
   `/v1/auth/phone/start` surfaces as `invalid_phone_number` (422).
 
+### Twilio Messaging (real SMS)
+
+`TwilioMessagingProvider` (`app/providers/messaging/twilio_sms.py`) sends
+one-way outbound SMS via Twilio Programmable Messaging. Account setup + config:
+
+1. Same Twilio account; reuse **Account SID** and **Auth Token**.
+2. Choose a sender, one of:
+   - Console > **Messaging** > **Services** > create a Service -> its SID
+     (starts with `MG`) — recommended, or
+   - keep/buy an SMS-capable phone number (E.164, e.g. `+18885550000`).
+3. In `.env`, set:
+   ```
+   MESSAGE_PROVIDER=twilio_messaging
+   TWILIO_ACCOUNT_SID=ACxxxxxxxx...
+   TWILIO_AUTH_TOKEN=your_auth_token
+   # one of:
+   TWILIO_MESSAGING_SERVICE_SID=MGxxxxxxxx...
+   # TWILIO_SMS_FROM_NUMBER=+18885550000
+   ```
+4. Restart the API and the **worker** (`make worker` dispatches SMS requests).
+
+Delivery status (→ **Completed**):
+- The send alone gets a request to `provider_accepted`. To advance to
+  `delivered`/`completed`, Twilio must post status callbacks to
+  `POST /v1/webhooks/sms`, which means this app needs a public URL.
+- Expose it (e.g. `ngrok http 8000`) and set
+  `TWILIO_STATUS_CALLBACK_URL=https://<public-host>/v1/webhooks/sms`.
+- Twilio sends callbacks form-encoded; the webhook route accepts both
+  form-encoded (Twilio) and JSON (mock). Without a public callback URL the
+  request stays at `provider_accepted` and reconciliation sweeps it after the
+  inflight timeout.
+
+Notes:
+- Trial Twilio accounts can only text numbers verified in the console.
+- `make test` forces `MESSAGE_PROVIDER=mock`, so the suite never calls Twilio.
+- Failures map to the error envelope: 5xx/429 → `provider_unavailable`
+  (retryable, 1 pre-send retry); 4xx (e.g. invalid number) → hard failure.
+
 ## Layout
 
 ```
