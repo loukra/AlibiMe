@@ -197,6 +197,44 @@ Notes:
 - Failures map to the error envelope: 5xx/429 → `provider_unavailable`
   (retryable, 1 pre-send retry); 4xx (e.g. invalid number) → hard failure.
 
+### Vapi (real voice calls)
+
+`VapiVoiceProvider` (`app/providers/voice/vapi.py`) places outbound calls via
+Vapi against a pre-configured Assistant and Vapi phone number.
+
+1. Create a Vapi account: https://dashboard.vapi.ai
+2. **API Keys** → copy a private key → `VAPI_API_KEY`.
+3. **Assistants** → create one (voice + system prompt; this is where the bounded
+   call behavior lives) → its id → `VAPI_ASSISTANT_ID`.
+4. **Phone Numbers** → import/buy a number to call *from* → its id →
+   `VAPI_PHONE_NUMBER_ID`.
+5. In `.env`, set:
+   ```
+   VOICE_PROVIDER=vapi
+   VAPI_API_KEY=...
+   VAPI_ASSISTANT_ID=...
+   VAPI_PHONE_NUMBER_ID=...
+   ```
+6. Restart the API and the **worker** (`make worker` dispatches call requests).
+
+The template's opening line + variables are passed as `assistantOverrides`;
+`max_duration_seconds` caps call length.
+
+Call status (ringing → in progress → **Completed**):
+- Vapi posts events to a **Server URL** you configure (Assistant or account
+  level). Point it at `<public-host>/v1/webhooks/voice` (use `ngrok http 8000`
+  locally), and set a **Server URL Secret** → `VAPI_WEBHOOK_SECRET`.
+- Vapi echoes that secret as the `X-Vapi-Secret` header; the webhook rejects any
+  request whose secret doesn't match (403) when `VOICE_PROVIDER=vapi` and the
+  secret is set. Mock/local modes skip the check so `simulate` keeps working.
+- Without a public Server URL the call still happens but status stays at
+  `provider_accepted`; reconciliation sweeps it after the inflight timeout.
+
+Notes:
+- `make test` forces `VOICE_PROVIDER=mock`, so the suite never calls Vapi.
+- Failures map to the error envelope: 5xx/429 → `provider_unavailable`
+  (retryable, 1 pre-dial retry); 4xx → hard failure.
+
 ## Layout
 
 ```

@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     twilio_sms_from_number: str | None = None
     twilio_status_callback_url: str | None = None
     vapi_api_key: str | None = None
+    vapi_assistant_id: str | None = None
+    vapi_phone_number_id: str | None = None
+    vapi_webhook_secret: str | None = None
     revenuecat_webhook_secret: str | None = None
     sentry_dsn: str | None = None
     otel_exporter_otlp_endpoint: str | None = None
