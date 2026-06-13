@@ -29,20 +29,27 @@ The source of truth for behavior is [`BACKEND_SPEC.md`](./BACKEND_SPEC.md).
 
 ## Quick start (local, SQLite, all-mock)
 
+First-time setup — one command (deps + config + DB schema + seed data):
+
 ```bash
 cd backend
-make install          # create .venv (py3.11) and install deps
-make env              # cp .env.example .env
-make migrate          # alembic upgrade head  (creates the schema)
-make seed             # seed plans + templates (en/de) + mock sender identity
-make test             # run the full test suite (62 tests)
+make bootstrap
 ```
 
-Run the API and worker (two terminals):
+Then configure-and-run the API (idempotent; safe to run every time):
 
 ```bash
-make api              # uvicorn on :8000  (http://localhost:8000/docs)
+make start            # migrate + seed, then uvicorn on :8000 (http://localhost:8000/docs)
+```
+
+Other useful targets:
+
+```bash
+make test             # run the full test suite (62 tests)
 make worker           # scheduler + dispatch + reconciliation + cleanup loop
+make api              # serve only (assumes the DB is already set up)
+make setup            # prepare the DB only (migrate + seed), no server
+make clean            # drop the local SQLite DB
 ```
 
 ### End-to-end by hand (mock OTP code is always `123456`)
