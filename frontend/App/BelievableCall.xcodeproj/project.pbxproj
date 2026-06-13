@@ -1,0 +1,186 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		100000000000000000000F2 /* BelievableCall in Frameworks */ = {isa = PBXBuildFile; productRef = 100000000000000000000F1 /* BelievableCall */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		100000000000000000000E1 /* BelievableCallApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BelievableCallApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		100000000000000000000D1 /* BelievableCall */ = {isa = PBXFileSystemSynchronizedRootGroup; path = BelievableCall; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		100000000000000000000C2 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (
+				100000000000000000000F2 /* BelievableCall in Frameworks */,
+			); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		100000000000000000000D2 = {isa = PBXGroup; children = (
+				100000000000000000000D1 /* BelievableCall */,
+				100000000000000000000D4 /* Info.plist */,
+				100000000000000000000D3 /* Products */,
+			); sourceTree = "<group>"; };
+		100000000000000000000D3 /* Products */ = {isa = PBXGroup; children = (
+				100000000000000000000E1 /* BelievableCallApp.app */,
+			); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXFileReference section */
+		100000000000000000000D4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXNativeTarget section */
+		100000000000000000000B1 /* BelievableCallApp */ = {isa = PBXNativeTarget; buildConfigurationList = 100000000000000000000B2 /* Build configuration list for PBXNativeTarget "BelievableCallApp" */; buildPhases = (
+				100000000000000000000C1 /* Sources */,
+				100000000000000000000C2 /* Frameworks */,
+				100000000000000000000C3 /* Resources */,
+			); buildRules = (); dependencies = (); fileSystemSynchronizedGroups = (
+				100000000000000000000D1 /* BelievableCall */,
+			); name = BelievableCallApp; packageProductDependencies = (
+				100000000000000000000F1 /* BelievableCall */,
+			); productName = BelievableCallApp; productReference = 100000000000000000000E1 /* BelievableCallApp.app */; productType = "com.apple.product-type.application"; };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		100000000000000000000A1 /* Project object */ = {isa = PBXProject; attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1700;
+				LastUpgradeCheck = 1700;
+				TargetAttributes = {
+					100000000000000000000B1 = {
+						CreatedOnToolsVersion = 17.0;
+					};
+				};
+			}; buildConfigurationList = 100000000000000000000A2 /* Build configuration list for PBXProject "BelievableCall" */; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (
+				en,
+				Base,
+			); mainGroup = 100000000000000000000D2; minimizedProjectReferenceProxies = 1; packageReferences = (
+				100000000000000000000F3 /* XCLocalSwiftPackageReference ".." */,
+			); preferredProjectObjectVersion = 77; productRefGroup = 100000000000000000000D3 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (
+				100000000000000000000B1 /* BelievableCallApp */,
+			); };
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		100000000000000000000C3 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		100000000000000000000C1 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		100000000000000000000A3 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			}; name = Debug; };
+		100000000000000000000A4 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			}; name = Release; };
+		100000000000000000000B3 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BelievableCall;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.believablecall.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			}; name = Debug; };
+		100000000000000000000B4 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BelievableCall;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.believablecall.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			}; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		100000000000000000000A2 /* Build configuration list for PBXProject "BelievableCall" */ = {isa = XCConfigurationList; buildConfigurations = (
+				100000000000000000000A3 /* Debug */,
+				100000000000000000000A4 /* Release */,
+			); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		100000000000000000000B2 /* Build configuration list for PBXNativeTarget "BelievableCallApp" */ = {isa = XCConfigurationList; buildConfigurations = (
+				100000000000000000000B3 /* Debug */,
+				100000000000000000000B4 /* Release */,
+			); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		100000000000000000000F3 /* XCLocalSwiftPackageReference ".." */ = {isa = XCLocalSwiftPackageReference; relativePath = ".."; };
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		100000000000000000000F1 /* BelievableCall */ = {isa = XCSwiftPackageProductDependency; productName = BelievableCall; };
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 100000000000000000000A1 /* Project object */;
+}

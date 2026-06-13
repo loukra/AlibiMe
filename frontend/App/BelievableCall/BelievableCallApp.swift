@@ -1,11 +1,11 @@
-#if os(iOS)
 import SwiftUI
+import BelievableCall
 
-/// iOS app entry point. Builds the live environment (Keychain session storage,
-/// real APIClient against the backend) and hands the root model to `RootView`.
+/// iOS app entry point. The whole app lives in the `BelievableCall` Swift
+/// package; this target is the thin runnable shell that hosts it.
 ///
 /// The backend base URL defaults to the local dev server. For a device build,
-/// set `BC_BACKEND_URL` in the scheme's environment, or change the default here.
+/// set `BC_BACKEND_URL` in the scheme's environment, or change the default.
 @main
 struct BelievableCallApp: App {
     @State private var app: AppModel = {
@@ -15,12 +15,9 @@ struct BelievableCallApp: App {
         return AppModel(env: .live(baseURL: baseURL))
     }()
 
-    @Environment(\.scenePhase) private var scenePhase
-
     var body: some Scene {
         WindowGroup {
             RootView(app: app)
         }
     }
 }
-#endif

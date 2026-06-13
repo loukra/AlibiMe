@@ -85,12 +85,30 @@ the app's own networking layer.
 
 ## Running the app on a device / simulator
 
-Open `Package.swift` in Xcode and run the `BelievableCall` scheme on an iOS
-target. Building for iOS requires the iOS platform component
-(Xcode → Settings → Components, or `xcodebuild -downloadPlatform iOS`).
+The package is a *library* (all the reusable code + tests). To run on a
+simulator/device, open the thin app target that wraps it:
 
-The backend base URL defaults to `http://127.0.0.1:8000`. Override it with the
+```
+open frontend/App/BelievableCall.xcodeproj
+```
+
+Select the **BelievableCall** scheme + an iOS simulator and press Run.
+(Opening `Package.swift` directly only builds the library — there's no app to
+launch, which is why pressing Run there does nothing.)
+
+The backend base URL defaults to `http://127.0.0.1:8000` (the app's `Info.plist`
+allows local HTTP via `NSAllowsLocalNetworking`). Override it with the
 `BC_BACKEND_URL` environment variable in the run scheme for device builds.
+
+Layout of the app target:
+
+```
+App/
+├── BelievableCall.xcodeproj      # iOS app project (depends on ../ package)
+├── Info.plist                    # ATS local-networking exception
+└── BelievableCall/
+    └── BelievableCallApp.swift    # @main — builds AppModel + RootView
+```
 
 ## Test coverage summary
 

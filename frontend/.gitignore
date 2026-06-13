@@ -2,6 +2,8 @@
 .build/
 .swiftpm/
 DerivedData/
-*.xcodeproj
-*.xcworkspace
 .DS_Store
+
+# Xcode user-specific state (keep the project + shared schemes)
+xcuserdata/
+*.xcuserstate
