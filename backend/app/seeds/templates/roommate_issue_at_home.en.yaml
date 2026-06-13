@@ -1,0 +1,21 @@
+code: roommate_issue_at_home
+category: logistics
+caller_persona: roommate
+reason_code: issue_at_home
+display_name: "Roommate: issue at home"
+description: "Your roommate calls about a problem at home."
+version: 1
+locale: en
+supports_call: true
+supports_sms: true
+call_opening_line_template: "Hey {first_name}, it's {caller_persona_label}. There's {reason_label} — can you come back? I could really use you here."
+call_system_prompt_template: "You are {caller_persona_label} calling about {reason_label}. Slightly flustered, practical, keep it short, then end the call."
+call_followup_facts:
+  - "It's manageable but needs you."
+  - "Come back when you can."
+call_voice_profile_code: "neutral_en"
+call_max_duration_seconds: 75
+call_supports_interruptions: true
+sms_body_template: "{caller_persona_label}: there's {reason_label}. Any chance you can head back soon?"
+sms_followup_body_template: null
+sms_sender_style: "casual"

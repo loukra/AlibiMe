@@ -1,0 +1,21 @@
+code: boss_travel_assignment
+category: work
+caller_persona: boss
+reason_code: travel_assignment_abroad
+display_name: "Chef: dringender Reiseauftrag"
+description: "Dein Chef ruft wegen einer dringenden Reise an."
+version: 1
+locale: de
+supports_call: true
+supports_sms: true
+call_opening_line_template: "Hallo {first_name}, hier ist {caller_persona_label}. Tut mir leid, dass ich so spät anrufe, aber ich brauche dich heute Abend im Flieger — {reason_label}."
+call_system_prompt_template: "Du bist {caller_persona_label} und rufst wegen {reason_label} an. Sei bestimmt, aber höflich, halte es unter einer Minute und beende dann das Gespräch."
+call_followup_facts:
+  - "Der Flug geht heute Abend."
+  - "Die Personalabteilung schickt die Details per E-Mail."
+call_voice_profile_code: "neutral_de"
+call_max_duration_seconds: 90
+call_supports_interruptions: true
+sms_body_template: "Hier ist {caller_persona_label} — dringend: {reason_label}. Kannst du mich so schnell wie möglich zurückrufen?"
+sms_followup_body_template: null
+sms_sender_style: "professional"

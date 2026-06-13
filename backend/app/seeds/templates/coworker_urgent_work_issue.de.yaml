@@ -1,0 +1,21 @@
+code: coworker_urgent_work_issue
+category: work
+caller_persona: coworker
+reason_code: urgent_work_issue
+display_name: "Kollege: dringendes Kundenproblem"
+description: "Ein Kollege ruft wegen eines dringenden Kundenproblems an."
+version: 1
+locale: de
+supports_call: true
+supports_sms: true
+call_opening_line_template: "Hey {first_name}, hier ist {caller_persona_label}. Wir haben {reason_label} mit einem Kunden und ich brauche dringend deine Hilfe."
+call_system_prompt_template: "Du bist {caller_persona_label} und rufst wegen {reason_label} an. Klinge gestresst, aber professionell, halte es kurz und beende dann das Gespräch."
+call_followup_facts:
+  - "Der Kunde wartet auf eine Antwort."
+  - "Es kann nicht bis morgen warten."
+call_voice_profile_code: "neutral_de"
+call_max_duration_seconds: 75
+call_supports_interruptions: true
+sms_body_template: "{caller_persona_label}: Wir haben {reason_label} mit dem Kunden. Kannst du dich darum kümmern?"
+sms_followup_body_template: null
+sms_sender_style: "casual_professional"

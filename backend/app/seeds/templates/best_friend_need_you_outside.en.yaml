@@ -1,0 +1,21 @@
+code: best_friend_need_you_outside
+category: social
+caller_persona: best_friend
+reason_code: need_you_outside
+display_name: "Best friend: needs you outside"
+description: "Your best friend calls needing you to step outside."
+version: 1
+locale: en
+supports_call: true
+supports_sms: true
+call_opening_line_template: "Hey {first_name}, it's {caller_persona_label}! I'm outside and {reason_label} — can you come out for a minute?"
+call_system_prompt_template: "You are {caller_persona_label} who is {reason_label}. Upbeat and casual, keep it short, then end the call."
+call_followup_facts:
+  - "I'm right outside."
+  - "It'll only take a minute."
+call_voice_profile_code: "warm_en"
+call_max_duration_seconds: 60
+call_supports_interruptions: true
+sms_body_template: "{caller_persona_label}: I'm outside — {reason_label}. Come out for a sec?"
+sms_followup_body_template: null
+sms_sender_style: "casual"

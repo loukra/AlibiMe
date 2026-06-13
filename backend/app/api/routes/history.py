@@ -1,0 +1,61 @@
+from __future__ import annotations
+
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.api.deps import CurrentContext, get_current_context, get_db
+from app.db.models.artifact import RequestArtifact
+from app.db.models.enums import Channel
+from app.db.models.request import Request
+from app.db.models.template import Template
+from app.domain.requests import service as requests_service
+from app.schemas.history import HistoryItem, HistoryResponse
+
+router = APIRouter(prefix="/v1/history", tags=["history"])
+
+
+@router.get("", response_model=HistoryResponse)
+def get_history(
+    ctx: CurrentContext = Depends(get_current_context),
+    db: Session = Depends(get_db),
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+) -> HistoryResponse:
+    rows = db.execute(
+        select(Request, Template.display_name)
+        .join(Template, Template.id == Request.template_id)
+        .where(Request.user_id == ctx.user.id)
+        .order_by(Request.created_at.desc())
+        .limit(limit + 1)
+        .offset(offset)
+    ).all()
+
+    has_more = len(rows) > limit
+    rows = rows[:limit]
+
+    items: list[HistoryItem] = []
+    for req, template_label in rows:
+        duration = None
+        if req.channel == Channel.call.value:
+            attempt = requests_service.latest_call_attempt(db, req.id)
+            duration = attempt.duration_seconds if attempt else None
+        artifact = (
+            db.query(RequestArtifact).filter(RequestArtifact.request_id == req.id).first()
+        )
+        preview = None
+        if artifact:
+            preview = artifact.delivered_message_preview or artifact.summary_text
+        items.append(
+            HistoryItem(
+                request_id=str(req.id),
+                channel=req.channel,
+                template_label=template_label,
+                requested_at=req.requested_at,
+                final_status=req.status,
+                duration_seconds=duration,
+                delivered_preview=preview,
+            )
+        )
+
+    return HistoryResponse(items=items, limit=limit, offset=offset, has_more=has_more)

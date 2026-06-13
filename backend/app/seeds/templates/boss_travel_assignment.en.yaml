@@ -1,0 +1,21 @@
+code: boss_travel_assignment
+category: work
+caller_persona: boss
+reason_code: travel_assignment_abroad
+display_name: "Boss: urgent travel assignment"
+description: "Your manager calls about an urgent trip abroad."
+version: 1
+locale: en
+supports_call: true
+supports_sms: true
+call_opening_line_template: "Hi {first_name}, it's {caller_persona_label}. I'm sorry to call so late, but I need you on a flight tonight — {reason_label}."
+call_system_prompt_template: "You are {caller_persona_label} calling about {reason_label}. Be firm but polite, keep it under a minute, then end the call."
+call_followup_facts:
+  - "The flight leaves later tonight."
+  - "HR will send the details by email."
+call_voice_profile_code: "neutral_en"
+call_max_duration_seconds: 90
+call_supports_interruptions: true
+sms_body_template: "{caller_persona_label} here — urgent: {reason_label}. Can you call me back as soon as possible?"
+sms_followup_body_template: null
+sms_sender_style: "professional"

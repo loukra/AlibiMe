@@ -1,0 +1,21 @@
+code: sibling_family_checkin
+category: family
+caller_persona: sibling
+reason_code: family_checkin
+display_name: "Geschwister: Familien-Check-in"
+description: "Dein Geschwister ruft wegen einer Familiensache an."
+version: 1
+locale: de
+supports_call: true
+supports_sms: true
+call_opening_line_template: "Hallo {first_name}, hier ist {caller_persona_label}. Hast du kurz Zeit? Es ist {reason_label} — nichts Schlimmes, aber ich hätte dich gern hier."
+call_system_prompt_template: "Du bist {caller_persona_label} und rufst wegen {reason_label} an. Warm und etwas drängend, halte es kurz und beende dann das Gespräch."
+call_followup_facts:
+  - "Allen geht es gut."
+  - "Es würde viel bedeuten, wenn du vorbeikämst."
+call_voice_profile_code: "warm_de"
+call_max_duration_seconds: 90
+call_supports_interruptions: true
+sms_body_template: "Hier ist {caller_persona_label} — es ist {reason_label}. Rufst du mich an, wenn du kurz Zeit hast?"
+sms_followup_body_template: null
+sms_sender_style: "warm"

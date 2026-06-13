@@ -1,0 +1,19 @@
+code: safety_checkin
+category: safety
+caller_persona: best_friend
+reason_code: safety_checkin
+display_name: "Sicherheits-Check-in (SMS)"
+description: "Eine freundliche Check-in-Nachricht, die dir einen Grund gibt, zu gehen."
+version: 1
+locale: de
+supports_call: false
+supports_sms: true
+call_opening_line_template: null
+call_system_prompt_template: null
+call_followup_facts: null
+call_voice_profile_code: null
+call_max_duration_seconds: null
+call_supports_interruptions: false
+sms_body_template: "Hey {first_name}, mache nur ein {reason_label}. Schreib mir zurück, wenn du kannst, damit ich weiß, dass alles okay ist."
+sms_followup_body_template: "Habe noch nichts von dir gehört — alles in Ordnung?"
+sms_sender_style: "warm"

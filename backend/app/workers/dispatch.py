@@ -1,0 +1,289 @@
+"""Dispatch due requests through provider adapters.
+
+Claim model (durable scheduler):
+  1. Poll due `requests` (status=scheduled, execute_at<=now).
+  2. Claim with FOR UPDATE SKIP LOCKED and flip to `dispatching` (committed),
+     so no other worker double-dispatches.
+  3. Dispatch each claimed request via the channel adapter in its own txn.
+
+Credit policy:
+  - reserve at dispatch
+  - capture on provider acceptance
+  - release on pre-dispatch failure (so internal failures don't burn credits)
+
+Retry policy:
+  - only pre-dispatch transient failures, at most 1 retry per request.
+  - never re-dispatch once a human-facing outcome happened.
+"""
+from __future__ import annotations
+
+import uuid
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.core.clock import utcnow
+from app.core.errors import InsufficientCredits
+from app.core.logging import get_logger
+from app.db.models.attempts import CallAttempt, MessageAttempt
+from app.db.models.enums import (
+    CallAttemptStatus,
+    Channel,
+    MessageAttemptStatus,
+    RequestStatus,
+    ServiceIdentityStatus,
+)
+from app.db.models.phone import PhoneNumber
+from app.db.models.request import Request
+from app.db.models.service_identity import ServiceIdentity
+from app.db.models.template import Template, TemplateVersion
+from app.db.models.user import User
+from app.domain.billing import credits
+from app.domain.templates.service import build_request_plan_snapshot
+from app.providers.factory import get_message_provider, get_voice_provider
+from app.providers.messaging.base import MessageProvider
+from app.providers.types import (
+    ProviderError,
+    RequestPlan,
+    TransientProviderError,
+)
+from app.providers.voice.base import VoiceProvider
+from app.core.security import decrypt_phone
+
+logger = get_logger("worker.dispatch")
+
+MAX_PREDISPATCH_RETRIES = 1
+
+
+def _supports_skip_locked(db: Session) -> bool:
+    return db.bind.dialect.name == "postgresql"
+
+
+def claim_due_requests(db: Session, now=None, batch_size: int = 20) -> list[uuid.UUID]:
+    now = now or utcnow()
+    stmt = (
+        select(Request)
+        .where(
+            Request.status == RequestStatus.scheduled.value,
+            Request.execute_at <= now,
+        )
+        .order_by(Request.execute_at)
+        .limit(batch_size)
+    )
+    if _supports_skip_locked(db):
+        stmt = stmt.with_for_update(skip_locked=True)
+    rows = db.execute(stmt).scalars().all()
+    ids = []
+    for req in rows:
+        req.status = RequestStatus.dispatching.value
+        req.updated_at = now
+        ids.append(req.id)
+    db.commit()
+    return ids
+
+
+def _select_service_identity(db: Session, channel: str) -> ServiceIdentity | None:
+    stmt = select(ServiceIdentity).where(
+        ServiceIdentity.status == ServiceIdentityStatus.active.value
+    )
+    if channel == Channel.call.value:
+        stmt = stmt.where(ServiceIdentity.capability_outbound_voice.is_(True))
+    else:
+        stmt = stmt.where(ServiceIdentity.capability_outbound_sms.is_(True))
+    return db.execute(stmt.order_by(ServiceIdentity.created_at)).scalars().first()
+
+
+def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None) -> RequestPlan:
+    template = db.get(Template, request.template_id)
+    version = db.get(TemplateVersion, request.template_version_id)
+    user = db.get(User, request.user_id)
+    phone = db.get(PhoneNumber, request.primary_phone_number_id)
+    target_e164 = decrypt_phone(phone.phone_e164_encrypted)
+
+    snapshot = build_request_plan_snapshot(
+        template=template,
+        version=version,
+        channel=request.channel,
+        locale=user.locale,
+        first_name=user.display_name,
+        service_identity_value=identity.identity_value if identity else None,
+        service_identity_type=identity.identity_type if identity else None,
+        target_phone_number_id=str(phone.id),
+    )
+    request.request_plan_snapshot_json = snapshot
+
+    return RequestPlan(
+        request_id=str(request.id),
+        channel=request.channel,
+        template_code=snapshot["template_code"],
+        template_version=snapshot["template_version"],
+        locale=snapshot["locale"],
+        caller_persona=snapshot["caller_persona"],
+        reason_code=snapshot["reason_code"],
+        rendered_opening_line=snapshot.get("rendered_opening_line"),
+        rendered_sms_body=snapshot.get("rendered_sms_body"),
+        allowed_followup_facts=snapshot.get("allowed_followup_facts", []),
+        call_system_prompt=snapshot.get("call_system_prompt"),
+        voice_profile_code=snapshot.get("voice_profile_code"),
+        max_duration_seconds=snapshot.get("max_duration_seconds"),
+        supports_interruptions=snapshot.get("supports_interruptions", False),
+        service_identity_value=snapshot.get("service_identity_value"),
+        service_identity_type=snapshot.get("service_identity_type"),
+        target_phone_e164=target_e164,
+        target_phone_number_id=snapshot["target_phone_number_id"],
+        user_first_name=user.display_name,
+    )
+
+
+def _fail_request(db: Session, request: Request, code: str, message: str) -> None:
+    if request.credits_reserved:
+        credits.release(db, request.user_id, request.credit_cost_units, request.id)
+        request.credits_reserved = False
+    request.status = RequestStatus.failed.value
+    request.last_error_code = code
+    request.last_error_message = message[:500]
+    request.updated_at = utcnow()
+
+
+def dispatch_one(
+    db: Session,
+    request_id: uuid.UUID,
+    voice_provider: VoiceProvider | None = None,
+    message_provider: MessageProvider | None = None,
+) -> str:
+    request = db.get(Request, request_id)
+    if request is None or request.status != RequestStatus.dispatching.value:
+        return "skipped"
+
+    # Reserve credits at dispatch time.
+    if not request.credits_reserved:
+        try:
+            credits.reserve(db, request.user_id, request.credit_cost_units, request.id)
+            request.credits_reserved = True
+        except InsufficientCredits:
+            _fail_request(db, request, "insufficient_credits", "No credits at dispatch.")
+            db.commit()
+            return "failed"
+
+    identity = _select_service_identity(db, request.channel)
+    if identity is None:
+        _fail_request(db, request, "provider_unavailable", "No active service identity.")
+        db.commit()
+        return "failed"
+    request.service_identity_id = identity.id
+
+    plan = _build_plan(db, request, identity)
+
+    if request.channel == Channel.call.value:
+        provider = voice_provider or get_voice_provider()
+        outcome = _dispatch_call(db, request, plan, provider)
+    else:
+        provider = message_provider or get_message_provider()
+        outcome = _dispatch_sms(db, request, plan, provider)
+
+    db.commit()
+    return outcome
+
+
+def _next_attempt_no(db: Session, model, request_id: uuid.UUID) -> int:
+    existing = db.execute(
+        select(model).where(model.request_id == request_id)
+    ).scalars().all()
+    return len(existing) + 1
+
+
+def _dispatch_call(db: Session, request: Request, plan: RequestPlan, provider: VoiceProvider) -> str:
+    attempts_made = 0
+    while attempts_made <= MAX_PREDISPATCH_RETRIES:
+        attempt = CallAttempt(
+            request_id=request.id,
+            attempt_no=_next_attempt_no(db, CallAttempt, request.id),
+            provider=provider.name,
+            status=CallAttemptStatus.provider_requested.value,
+            started_at=utcnow(),
+        )
+        db.add(attempt)
+        db.flush()
+        try:
+            result = provider.create_outbound_call(plan)
+        except TransientProviderError as exc:
+            attempt.status = CallAttemptStatus.failed_pre_dial.value
+            attempt.ended_reason = "transient_error"
+            attempts_made += 1
+            if attempts_made > MAX_PREDISPATCH_RETRIES:
+                _fail_request(db, request, "provider_unavailable", str(exc))
+                return "failed"
+            continue  # retry pre-dispatch
+        except ProviderError as exc:
+            attempt.status = CallAttemptStatus.failed_pre_dial.value
+            attempt.ended_reason = "rejected"
+            _fail_request(db, request, "provider_unavailable", str(exc))
+            return "failed"
+
+        # Accepted by provider.
+        attempt.provider_call_id = result.provider_call_id
+        attempt.provider_status = result.status
+        attempt.status = result.status  # e.g. "queued"
+        attempt.estimated_cost_minor = result.estimated_cost_minor
+        credits.capture(db, request.user_id, request.id)
+        request.status = RequestStatus.provider_accepted.value
+        request.updated_at = utcnow()
+        return "dispatched"
+    return "failed"
+
+
+def _dispatch_sms(db: Session, request: Request, plan: RequestPlan, provider: MessageProvider) -> str:
+    attempts_made = 0
+    while attempts_made <= MAX_PREDISPATCH_RETRIES:
+        attempt = MessageAttempt(
+            request_id=request.id,
+            attempt_no=_next_attempt_no(db, MessageAttempt, request.id),
+            provider=provider.name,
+            status=MessageAttemptStatus.provider_requested.value,
+            queued_at=utcnow(),
+        )
+        db.add(attempt)
+        db.flush()
+        try:
+            result = provider.send_sms(plan)
+        except TransientProviderError as exc:
+            attempt.status = MessageAttemptStatus.failed_pre_send.value
+            attempt.failure_reason = "transient_error"
+            attempts_made += 1
+            if attempts_made > MAX_PREDISPATCH_RETRIES:
+                _fail_request(db, request, "provider_unavailable", str(exc))
+                return "failed"
+            continue
+        except ProviderError as exc:
+            attempt.status = MessageAttemptStatus.failed_pre_send.value
+            attempt.failure_reason = "rejected"
+            _fail_request(db, request, "provider_unavailable", str(exc))
+            return "failed"
+
+        attempt.provider_message_id = result.provider_message_id
+        attempt.provider_status = result.status
+        attempt.status = result.status
+        attempt.estimated_cost_minor = result.estimated_cost_minor
+        credits.capture(db, request.user_id, request.id)
+        request.status = RequestStatus.provider_accepted.value
+        request.updated_at = utcnow()
+        return "dispatched"
+    return "failed"
+
+
+def run_once(
+    db: Session,
+    *,
+    voice_provider: VoiceProvider | None = None,
+    message_provider: MessageProvider | None = None,
+    now=None,
+    batch_size: int = 20,
+) -> list[str]:
+    """Claim and dispatch one batch. Returns per-request outcomes."""
+    ids = claim_due_requests(db, now=now, batch_size=batch_size)
+    outcomes = []
+    for rid in ids:
+        outcomes.append(
+            dispatch_one(db, rid, voice_provider=voice_provider, message_provider=message_provider)
+        )
+    return outcomes

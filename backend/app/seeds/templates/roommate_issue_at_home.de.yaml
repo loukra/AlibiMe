@@ -1,0 +1,21 @@
+code: roommate_issue_at_home
+category: logistics
+caller_persona: roommate
+reason_code: issue_at_home
+display_name: "Mitbewohner: Problem zu Hause"
+description: "Dein Mitbewohner ruft wegen eines Problems zu Hause an."
+version: 1
+locale: de
+supports_call: true
+supports_sms: true
+call_opening_line_template: "Hey {first_name}, hier ist {caller_persona_label}. Es gibt {reason_label} — kannst du zurückkommen? Ich könnte dich hier echt gebrauchen."
+call_system_prompt_template: "Du bist {caller_persona_label} und rufst wegen {reason_label} an. Etwas aufgeregt, praktisch, halte es kurz und beende dann das Gespräch."
+call_followup_facts:
+  - "Es ist machbar, aber ich brauche dich."
+  - "Komm zurück, wenn du kannst."
+call_voice_profile_code: "neutral_de"
+call_max_duration_seconds: 75
+call_supports_interruptions: true
+sms_body_template: "{caller_persona_label}: Es gibt {reason_label}. Kannst du bald zurückkommen?"
+sms_followup_body_template: null
+sms_sender_style: "casual"
