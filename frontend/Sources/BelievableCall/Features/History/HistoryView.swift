@@ -18,7 +18,10 @@ public struct HistoryView: View {
             }
             .background(Theme.background.ignoresSafeArea())
             .navigationTitle("History")
-            .task { if vm.items.isEmpty { await vm.load() } }
+            // Refresh whenever the tab becomes visible (e.g. after scheduling a
+            // request on Home), in addition to pull-to-refresh. Existing rows
+            // stay on screen while the reload runs, so there's no flash.
+            .onAppear { Task { await vm.load() } }
         }
     }
 

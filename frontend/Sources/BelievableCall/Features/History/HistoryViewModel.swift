@@ -25,6 +25,7 @@ public final class HistoryViewModel {
     public var isEmpty: Bool { items.isEmpty && !isLoading }
 
     public func load() async {
+        guard !isLoading else { return }  // avoid overlapping reloads (e.g. onAppear + pull)
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
