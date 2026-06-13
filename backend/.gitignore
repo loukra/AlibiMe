@@ -1,0 +1,4 @@
+# Local SQLite dev databases (data, not source)
+*.db
+# Local CLI/TUI saved session
+.bc_app_session.json
