@@ -11,6 +11,8 @@ from app.core import rate_limit
 from app.core.clock import utcnow
 from app.core.config import settings
 from app.core.errors import (
+    InvalidPhoneNumber,
+    ProviderUnavailable,
     SessionExpired,
     Unauthorized,
     ValidationFailed,
@@ -31,6 +33,7 @@ from app.db.models.user_session import UserSession
 from app.domain.billing.entitlements import grant_free_test_allowance
 from app.domain.phone import assert_supported_line_type, normalize_phone
 from app.providers.otp.base import OtpProvider
+from app.providers.types import ProviderRejected, TransientProviderError
 
 _MAX_CONFIRM_ATTEMPTS = 6
 
@@ -49,7 +52,12 @@ def start_phone_verification(
     phone_hash = hash_phone(normalized.e164)
     rate_limit.check_and_increment(db, rate_limit.OTP_START, phone_hash)
 
-    start = provider.start_verification(normalized.e164, locale)
+    try:
+        start = provider.start_verification(normalized.e164, locale)
+    except TransientProviderError as exc:
+        raise ProviderUnavailable(str(exc)) from exc
+    except ProviderRejected as exc:
+        raise InvalidPhoneNumber(str(exc)) from exc
 
     verification = OtpVerification(
         provider=provider.name,
@@ -171,8 +179,16 @@ def confirm_phone_verification(
     if verification.attempts >= _MAX_CONFIRM_ATTEMPTS:
         raise ValidationFailed("Too many attempts for this verification.")
 
+    try:
+        result = provider.confirm_verification(verification.provider_verification_id, code)
+    except TransientProviderError as exc:
+        raise ProviderUnavailable(str(exc)) from exc
+    except ProviderRejected as exc:
+        verification.attempts += 1
+        db.commit()
+        raise ValidationFailed("The verification code is incorrect.") from exc
+
     verification.attempts += 1
-    result = provider.confirm_verification(verification.provider_verification_id, code)
     if not result.success:
         db.commit()
         raise ValidationFailed("The verification code is incorrect.")

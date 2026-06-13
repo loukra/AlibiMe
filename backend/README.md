@@ -131,6 +131,34 @@ MESSAGE_PROVIDER=twilio_messaging
 The real adapters (`TwilioVerifyProvider`, `VapiVoiceProvider`,
 `TwilioMessagingProvider`) implement the same interfaces as the mocks.
 
+### Twilio Verify (real OTP)
+
+`TwilioVerifyProvider` (`app/providers/otp/twilio_verify.py`) is implemented
+and ready to use — only account setup + config is needed:
+
+1. Create a Twilio account: https://www.twilio.com/try-twilio
+2. Console > Account > **Account SID** and **Auth Token**.
+3. Console > **Verify** > **Services** > create a new Service -> its SID
+   (starts with `VA`).
+4. In `.env`, set:
+   ```
+   OTP_PROVIDER=twilio_verify
+   TWILIO_ACCOUNT_SID=ACxxxxxxxx...
+   TWILIO_AUTH_TOKEN=your_auth_token
+   TWILIO_VERIFY_SERVICE_SID=VAxxxxxxxx...
+   ```
+5. Restart the API (`make api` / `make start`).
+
+Notes:
+- Trial Twilio accounts can only send to phone numbers verified in the
+  console — verify your own test number there first.
+- `make test` always forces `OTP_PROVIDER=mock` (see `tests/conftest.py`), so
+  the test suite never calls Twilio and the mock code `123456` keeps working
+  for CI regardless of `.env`.
+- Provider failures map to the standard error envelope: a Twilio outage
+  surfaces as `provider_unavailable` (503, retryable); an invalid number on
+  `/v1/auth/phone/start` surfaces as `invalid_phone_number` (422).
+
 ## Layout
 
 ```
