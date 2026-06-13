@@ -2,7 +2,7 @@ VENV := .venv
 PY := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 
-.PHONY: venv install env test api worker seed migrate revision fmt clean
+.PHONY: venv install env test api worker seed migrate revision fmt clean cli demo
 
 venv:
 	python3.11 -m venv $(VENV)
@@ -25,6 +25,13 @@ worker: env
 
 seed: env
 	$(PY) -m app.seeds.seed
+
+# CLI: pass args via `make cli args="templates"` or run the script directly.
+cli:
+	$(PY) scripts/cli.py $(args)
+
+demo:
+	$(PY) scripts/cli.py demo
 
 migrate: env
 	$(VENV)/bin/alembic upgrade head
