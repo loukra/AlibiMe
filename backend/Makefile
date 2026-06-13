@@ -33,6 +33,15 @@ cli:
 demo:
 	$(PY) scripts/cli.py demo
 
+# Interactive TUI "app" (arrow-key menus, schedule + receive a call).
+app:
+	$(PY) scripts/app.py
+
+# Open the TUI in a brand-new macOS Terminal window.
+app-window:
+	osascript -e 'tell application "Terminal" to do script "cd \"$(CURDIR)\" && .venv/bin/python scripts/app.py"' \
+	          -e 'tell application "Terminal" to activate'
+
 migrate: env
 	$(VENV)/bin/alembic upgrade head
 

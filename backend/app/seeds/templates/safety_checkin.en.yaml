@@ -15,6 +15,6 @@ call_followup_facts: null
 call_voice_profile_code: null
 call_max_duration_seconds: null
 call_supports_interruptions: false
-sms_body_template: "Hey {first_name}, just doing a {reason_label}. Text me back when you can so I know you're good."
+sms_body_template: "Hey {first_name}, just doing {reason_label}. Text me back when you can so I know you're good."
 sms_followup_body_template: "Still haven't heard from you — everything okay?"
 sms_sender_style: "warm"

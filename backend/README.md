@@ -69,6 +69,35 @@ curl -s localhost:8000/v1/requests -H "Authorization: Bearer <token>" \
 The worker dispatches due requests through the mock provider; mock voice/SMS
 lifecycle events can be posted to `/v1/webhooks/voice` and `/v1/webhooks/sms`.
 
+## Interactive terminal app (mimics the frontend)
+
+`scripts/app.py` is a keyboard-driven TUI that behaves like the iOS app: sign
+in with your phone number, schedule a believable call/text, then watch it
+**ring on screen** and read the caller's script. It talks to the API over HTTP
+and embeds the dispatch + provider-webhook simulation, so a scheduled call
+actually fires without running a separate worker.
+
+```bash
+make api          # terminal 1 — the backend must be running
+make app          # terminal 2 — launch the TUI
+# or open it in its own macOS window:
+make app-window
+```
+
+Navigate with the arrow keys / Enter. The mock OTP code is `123456`.
+
+## CLI (scriptable API client)
+
+`scripts/cli.py` is a non-interactive client for scripting/testing:
+
+```bash
+python scripts/cli.py demo          # full all-mock flow end to end
+python scripts/cli.py signup --phone +491701234567
+python scripts/cli.py create --template boss_travel_assignment --channel call
+python scripts/cli.py dispatch      # run one local worker tick
+python scripts/cli.py simulate <request_id>
+```
+
 ## Using PostgreSQL instead of SQLite
 
 ```bash

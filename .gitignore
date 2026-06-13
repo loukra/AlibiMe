@@ -19,8 +19,9 @@ htmlcov/
 # Alembic local artifacts
 *.sqlite3
 
-# CLI session token cache
+# CLI / app session token cache
 .bc_cli_session.json
+.bc_app_session.json
 
 # iOS / Xcode
 *.xcodeproj/*
