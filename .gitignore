@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Alembic local artifacts
+*.sqlite3
+
+# iOS / Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+*.xcworkspace/
+DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+Pods/
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
