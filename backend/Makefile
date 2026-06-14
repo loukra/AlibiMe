@@ -2,7 +2,7 @@ VENV := .venv
 PY := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 
-.PHONY: venv install env test api worker seed migrate revision fmt clean cli demo \
+.PHONY: venv install env test api api-lan worker seed migrate revision fmt clean cli demo \
         bootstrap setup start sync-senders
 
 venv:
@@ -34,6 +34,13 @@ test:
 
 api: env
 	$(VENV)/bin/uvicorn app.main:app --reload --port 8000
+
+# Serve on all interfaces so a physical iPhone on the same Wi-Fi can reach it.
+# Point the app at the printed URL via the BC_BACKEND_URL scheme env var.
+api-lan: env
+	@ip=$$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null); \
+	echo "Serving on http://$$ip:8000  -> set BC_BACKEND_URL to this in the Xcode scheme"
+	$(VENV)/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 worker: env
 	$(PY) -m app.workers.run
