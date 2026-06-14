@@ -10,6 +10,12 @@ Requires (env vars, from the Twilio console):
     - ``TWILIO_MESSAGING_SERVICE_SID`` — a Messaging Service SID (starts "MG...")
     - ``TWILIO_SMS_FROM_NUMBER``       — a Twilio phone number in E.164
 
+Sender selection: when the dispatcher resolved a bound sender line (the normal
+case), the message is sent with that line's number as an **explicit From**, so
+the recipient always sees the same number bound to the persona. The env sender
+above is only the fallback used when no bound line is available. Keep the sender
+pool in sync with Twilio via ``python -m app.admin.sync_sender_lines``.
+
 Optional:
 - ``TWILIO_STATUS_CALLBACK_URL`` — public URL of this app's ``/v1/webhooks/sms``
   so Twilio posts delivery-status updates (sent/delivered/failed). Without it,
@@ -76,14 +82,18 @@ class TwilioMessagingProvider(MessageProvider):
             raise ProviderRejected("Template produced no SMS body.")
 
         data: dict[str, str] = {"To": plan.target_phone_e164, "Body": plan.rendered_sms_body}
-        # Prefer a Messaging Service; fall back to a fixed From number, then to
-        # the service identity selected by the dispatcher.
-        if self._messaging_service_sid:
-            data["MessagingServiceSid"] = self._messaging_service_sid
+        # Send with an *explicit From* equal to the bound sender line, so the
+        # number the recipient sees is always the same one that was bound for the
+        # persona (and may be saved as a contact). A Messaging Service can rotate
+        # which number it sends from, which would break that continuity — so the
+        # bound line wins. Fall back to a fixed From, then a Messaging Service,
+        # only when no bound line is available.
+        if plan.service_identity_value:
+            data["From"] = plan.service_identity_value
         elif self._from_number:
             data["From"] = self._from_number
-        elif plan.service_identity_value:
-            data["From"] = plan.service_identity_value
+        elif self._messaging_service_sid:
+            data["MessagingServiceSid"] = self._messaging_service_sid
         else:
             raise ProviderRejected("No Twilio sender (messaging service or from number) available.")
         if self._status_callback:

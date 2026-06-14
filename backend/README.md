@@ -65,6 +65,25 @@ is a pure convenience layer on top of it — continuity never depends on it.
 - The own-number delivery invariant is unchanged: `sender_*` is the *from*
   side; delivery still only ever goes to the user's verified primary number.
 
+### Keeping the sender pool in sync with Twilio
+
+`service_identities` is a local mirror of Twilio's number inventory. Twilio owns
+which numbers exist; this backend mirrors them so bindings/snapshots/contacts
+show real numbers. After adding/removing/rotating Twilio numbers:
+
+```bash
+make sync-senders        # python -m app.admin.sync_sender_lines
+```
+
+It upserts the Messaging Service's numbers (or all account numbers) into the
+pool, disables ones that vanished (their bindings then reallocate on next send),
+and stops using the mock seed line for SMS once a real SMS number exists.
+
+To guarantee the recipient always sees the bound number, SMS is sent with that
+number as an **explicit `From`** (a Messaging Service can otherwise rotate the
+sender). The env sender (`TWILIO_MESSAGING_SERVICE_SID` / `TWILIO_SMS_FROM_NUMBER`)
+is only the fallback used when no bound line is resolved.
+
 ## Quick start (local, SQLite, all-mock)
 
 First-time setup — one command (deps + config + DB schema + seed data):
@@ -83,7 +102,7 @@ make start            # migrate + seed, then uvicorn on :8000 (http://localhost:
 Other useful targets:
 
 ```bash
-make test             # run the full test suite (114 tests)
+make test             # run the full test suite (119 tests)
 make worker           # scheduler + dispatch + reconciliation + cleanup loop
 make api              # serve only (assumes the DB is already set up)
 make setup            # prepare the DB only (migrate + seed), no server

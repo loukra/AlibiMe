@@ -3,7 +3,7 @@ PY := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 
 .PHONY: venv install env test api worker seed migrate revision fmt clean cli demo \
-        bootstrap setup start
+        bootstrap setup start sync-senders
 
 venv:
 	python3.11 -m venv $(VENV)
@@ -40,6 +40,11 @@ worker: env
 
 seed: env
 	$(PY) -m app.seeds.seed
+
+# Mirror Twilio's number inventory into the local sender-line pool. Run after
+# adding/removing/rotating Twilio numbers (requires Twilio creds in .env).
+sync-senders: env
+	$(PY) -m app.admin.sync_sender_lines
 
 # CLI: pass args via `make cli args="templates"` or run the script directly.
 cli:

@@ -85,6 +85,24 @@ def test_send_success_maps_result(twilio_creds, monkeypatch):
     assert captured["auth"] == ("AC_test", "tok_test")
 
 
+def test_send_uses_bound_line_as_explicit_from(twilio_creds, monkeypatch):
+    """When the dispatcher resolved a sender line, send with it as an explicit
+    From — even though a Messaging Service is configured — so the recipient sees
+    the bound number (continuity with the saved contact)."""
+    captured = {}
+
+    def fake_post(url, auth=None, data=None, timeout=None):
+        captured["data"] = data
+        return FakeResponse(201, {"sid": "SM77", "status": "queued"})
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+    plan = _plan()
+    plan.service_identity_value = "+19998887777"  # the bound sender line
+    TwilioMessagingProvider().send_sms(plan)
+    assert captured["data"]["From"] == "+19998887777"
+    assert "MessagingServiceSid" not in captured["data"]
+
+
 def test_send_uses_from_number_when_no_messaging_service(monkeypatch):
     monkeypatch.setattr(settings, "twilio_account_sid", "AC_test")
     monkeypatch.setattr(settings, "twilio_auth_token", "tok_test")
