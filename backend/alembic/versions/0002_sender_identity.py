@@ -57,36 +57,28 @@ def upgrade() -> None:
     )
 
     # templates: persona fields (added nullable + backfilled for existing rows).
-    tmpl_cols = _columns("templates")
     if "templates" in _inspector().get_table_names():
-        if "sender_persona_key" not in tmpl_cols:
-            op.add_column(
-                "templates",
-                sa.Column("sender_persona_key", sa.String(length=48), nullable=True),
-            )
-            op.execute(
-                "UPDATE templates SET sender_persona_key = caller_persona "
-                "WHERE sender_persona_key IS NULL"
-            )
-        if "sender_display_name" not in tmpl_cols:
-            op.add_column(
-                "templates",
-                sa.Column("sender_display_name", sa.String(length=120), nullable=True),
-            )
-            op.execute(
-                "UPDATE templates SET sender_display_name = display_name "
-                "WHERE sender_display_name IS NULL"
-            )
-        if "supports_contact_save" not in tmpl_cols:
-            op.add_column(
-                "templates",
-                sa.Column(
-                    "supports_contact_save",
-                    sa.Boolean(),
-                    nullable=False,
-                    server_default=sa.true(),
-                ),
-            )
+        _add_column_if_missing(
+            "templates", sa.Column("sender_persona_key", sa.String(length=48), nullable=True)
+        )
+        _add_column_if_missing(
+            "templates", sa.Column("sender_display_name", sa.String(length=120), nullable=True)
+        )
+        _add_column_if_missing(
+            "templates",
+            sa.Column(
+                "supports_contact_save", sa.Boolean(), nullable=False, server_default=sa.true()
+            ),
+        )
+        # Backfill unconditionally (NULL-only) so a partially-applied run repairs.
+        op.execute(
+            "UPDATE templates SET sender_persona_key = caller_persona "
+            "WHERE sender_persona_key IS NULL"
+        )
+        op.execute(
+            "UPDATE templates SET sender_display_name = display_name "
+            "WHERE sender_display_name IS NULL"
+        )
 
     # user_sender_bindings: the new core table.
     if "user_sender_bindings" not in _inspector().get_table_names():
@@ -128,15 +120,16 @@ def upgrade() -> None:
         )
 
     # requests: sender binding ref + immutable snapshot.
-    _add_column_if_missing(
-        "requests",
-        sa.Column(
-            "sender_binding_id",
-            sa.Uuid(),
-            sa.ForeignKey("user_sender_bindings.id"),
-            nullable=True,
-        ),
-    )
+    # SQLite cannot ALTER TABLE ADD COLUMN with an inline FOREIGN KEY, so add a
+    # plain column there (fresh SQLite DBs still get the FK via create_all in the
+    # 0001 baseline); keep the real FK on Postgres.
+    if "sender_binding_id" not in _columns("requests"):
+        fk = [] if op.get_bind().dialect.name == "sqlite" else [
+            sa.ForeignKey("user_sender_bindings.id")
+        ]
+        op.add_column(
+            "requests", sa.Column("sender_binding_id", sa.Uuid(), *fk, nullable=True)
+        )
     _add_column_if_missing(
         "requests", sa.Column("sender_persona_key", sa.String(length=48), nullable=True)
     )
