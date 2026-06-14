@@ -114,6 +114,34 @@ final class SaveContactTests: XCTestCase {
         XCTAssertEqual(links.state(forBinding: "b1")?.contactStatus, .denied)
     }
 
+    func testSaveButtonPresentsSheetWhilePromptStillShowing() async {
+        // Regression: the alert's "Save" button calls beginSaveContact(for:)
+        // with the captured sender while pendingSenderPrompt is still set. It
+        // must present the sheet and must NOT be recorded as a skip.
+        let links = InMemoryContactLinkStore()
+        let vm = makeVM(request: MockRequestService(created: smsRequest()),
+                        contacts: MockContactsService(status: .authorized), contactLinks: links)
+        await vm.load()
+        vm.selectChannel(.text)
+        await vm.send()
+        let sender = vm.pendingSenderPrompt!  // prompt is showing
+        await vm.beginSaveContact(for: sender)
+        XCTAssertEqual(vm.contactSheetSender?.bindingID, "b1")
+        XCTAssertNil(vm.pendingSenderPrompt)
+        XCTAssertNotEqual(links.state(forBinding: "b1")?.contactStatus, .notNow)
+    }
+
+    func testMarkPromptSkippedRecordsNotNow() async {
+        let links = InMemoryContactLinkStore()
+        let vm = makeVM(request: MockRequestService(created: smsRequest()), contactLinks: links)
+        await vm.load()
+        vm.selectChannel(.text)
+        await vm.send()
+        vm.markPromptSkipped(for: vm.pendingSenderPrompt!)
+        XCTAssertNil(vm.pendingSenderPrompt)
+        XCTAssertEqual(links.state(forBinding: "b1")?.contactStatus, .notNow)
+    }
+
     func testSkipRecordsNotNow() async {
         let links = InMemoryContactLinkStore()
         let vm = makeVM(request: MockRequestService(created: smsRequest()), contactLinks: links)

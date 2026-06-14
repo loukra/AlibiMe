@@ -61,17 +61,20 @@ private struct SaveContactFlowModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            // 1. Soft, non-blocking suggestion.
+            // 1. Soft, non-blocking suggestion. The button actions use the
+            // captured `sender` (not `pendingSenderPrompt`) so the alert's own
+            // dismissal — which clears `pendingSenderPrompt` — can't race the
+            // Save action and turn a "Save" into a no-op.
             .alert(
                 "Save this sender as a contact?",
                 isPresented: Binding(
                     get: { vm.pendingSenderPrompt != nil },
-                    set: { if !$0 { vm.skipContactPrompt() } }
+                    set: { if !$0 { vm.pendingSenderPrompt = nil } }
                 ),
                 presenting: vm.pendingSenderPrompt
             ) { sender in
-                Button("Save Contact") { Task { await vm.acceptContactPrompt() } }
-                Button("Not now", role: .cancel) { vm.skipContactPrompt() }
+                Button("Save Contact") { Task { await vm.beginSaveContact(for: sender) } }
+                Button("Not now", role: .cancel) { vm.markPromptSkipped(for: sender) }
             } message: { sender in
                 Text("Future texts from \(sender.displayName ?? "this sender") can come from the same sender. You can save this contact now or skip it.")
             }

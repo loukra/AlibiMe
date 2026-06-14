@@ -238,12 +238,21 @@ public final class HomeViewModel {
     /// User tapped "Not now" on the soft prompt (or it was auto-dismissed).
     public func skipContactPrompt() {
         guard let sender = pendingSenderPrompt else { return }
+        markPromptSkipped(for: sender)
+    }
+
+    /// Record a skip for a specific binding. Used by the prompt's "Not now"
+    /// button, which passes the captured sender so it can't race the alert's
+    /// own dismissal clearing `pendingSenderPrompt`.
+    public func markPromptSkipped(for sender: SenderIdentity) {
         pendingSenderPrompt = nil
         recordContactStatus(.notNow, for: sender)
     }
 
-    /// Shared entry point usable from re-entry surfaces (e.g. history detail).
+    /// Shared entry point usable from the prompt's "Save" button and re-entry
+    /// surfaces (e.g. history detail).
     public func beginSaveContact(for sender: SenderIdentity) async {
+        pendingSenderPrompt = nil
         guard sender.canSaveContact else { return }
         var status = contacts.authorizationStatus()
         if status == .notDetermined {
