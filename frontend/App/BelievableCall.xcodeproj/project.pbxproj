@@ -11,48 +11,81 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		100000000000000000000C5 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		100000000000000000000D4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		100000000000000000000E1 /* BelievableCallApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BelievableCallApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		100000000000000000000D1 /* BelievableCall */ = {isa = PBXFileSystemSynchronizedRootGroup; path = BelievableCall; sourceTree = "<group>"; };
+		100000000000000000000D1 /* BelievableCall */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BelievableCall;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		100000000000000000000C2 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (
+		100000000000000000000C2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 				100000000000000000000F2 /* BelievableCall in Frameworks */,
-			); runOnlyForDeploymentPostprocessing = 0; };
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		100000000000000000000D2 = {isa = PBXGroup; children = (
+		100000000000000000000D2 = {
+			isa = PBXGroup;
+			children = (
 				100000000000000000000D1 /* BelievableCall */,
 				100000000000000000000D4 /* Info.plist */,
+				100000000000000000000C5 /* Signing.xcconfig */,
 				100000000000000000000D3 /* Products */,
-			); sourceTree = "<group>"; };
-		100000000000000000000D3 /* Products */ = {isa = PBXGroup; children = (
+			);
+			sourceTree = "<group>";
+		};
+		100000000000000000000D3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
 				100000000000000000000E1 /* BelievableCallApp.app */,
-			); name = Products; sourceTree = "<group>"; };
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
-/* Begin PBXFileReference section */
-		100000000000000000000D4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-/* End PBXFileReference section */
-
 /* Begin PBXNativeTarget section */
-		100000000000000000000B1 /* BelievableCallApp */ = {isa = PBXNativeTarget; buildConfigurationList = 100000000000000000000B2 /* Build configuration list for PBXNativeTarget "BelievableCallApp" */; buildPhases = (
+		100000000000000000000B1 /* BelievableCallApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 100000000000000000000B2 /* Build configuration list for PBXNativeTarget "BelievableCallApp" */;
+			buildPhases = (
 				100000000000000000000C1 /* Sources */,
 				100000000000000000000C2 /* Frameworks */,
 				100000000000000000000C3 /* Resources */,
-			); buildRules = (); dependencies = (); fileSystemSynchronizedGroups = (
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
 				100000000000000000000D1 /* BelievableCall */,
-			); name = BelievableCallApp; packageProductDependencies = (
+			);
+			name = BelievableCallApp;
+			packageProductDependencies = (
 				100000000000000000000F1 /* BelievableCall */,
-			); productName = BelievableCallApp; productReference = 100000000000000000000E1 /* BelievableCallApp.app */; productType = "com.apple.product-type.application"; };
+			);
+			productName = BelievableCallApp;
+			productReference = 100000000000000000000E1 /* BelievableCallApp.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		100000000000000000000A1 /* Project object */ = {isa = PBXProject; attributes = {
+		100000000000000000000A1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1700;
 				LastUpgradeCheck = 1700;
@@ -61,26 +94,53 @@
 						CreatedOnToolsVersion = 17.0;
 					};
 				};
-			}; buildConfigurationList = 100000000000000000000A2 /* Build configuration list for PBXProject "BelievableCall" */; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (
+			};
+			buildConfigurationList = 100000000000000000000A2 /* Build configuration list for PBXProject "BelievableCall" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
 				en,
 				Base,
-			); mainGroup = 100000000000000000000D2; minimizedProjectReferenceProxies = 1; packageReferences = (
+			);
+			mainGroup = 100000000000000000000D2;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
 				100000000000000000000F3 /* XCLocalSwiftPackageReference ".." */,
-			); preferredProjectObjectVersion = 77; productRefGroup = 100000000000000000000D3 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 100000000000000000000D3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
 				100000000000000000000B1 /* BelievableCallApp */,
-			); };
+			);
+		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		100000000000000000000C3 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		100000000000000000000C3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		100000000000000000000C1 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		100000000000000000000C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		100000000000000000000A3 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {
+		100000000000000000000A3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -100,8 +160,12 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			}; name = Debug; };
-		100000000000000000000A4 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {
+			};
+			name = Debug;
+		};
+		100000000000000000000A4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -114,8 +178,13 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
-			}; name = Release; };
-		100000000000000000000B3 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {
+			};
+			name = Release;
+		};
+		100000000000000000000B3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 100000000000000000000C5 /* Signing.xcconfig */;
+			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -137,8 +206,13 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			}; name = Debug; };
-		100000000000000000000B4 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {
+			};
+			name = Debug;
+		};
+		100000000000000000000B4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 100000000000000000000C5 /* Signing.xcconfig */;
+			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -160,26 +234,44 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			}; name = Release; };
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		100000000000000000000A2 /* Build configuration list for PBXProject "BelievableCall" */ = {isa = XCConfigurationList; buildConfigurations = (
+		100000000000000000000A2 /* Build configuration list for PBXProject "BelievableCall" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
 				100000000000000000000A3 /* Debug */,
 				100000000000000000000A4 /* Release */,
-			); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-		100000000000000000000B2 /* Build configuration list for PBXNativeTarget "BelievableCallApp" */ = {isa = XCConfigurationList; buildConfigurations = (
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		100000000000000000000B2 /* Build configuration list for PBXNativeTarget "BelievableCallApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
 				100000000000000000000B3 /* Debug */,
 				100000000000000000000B4 /* Release */,
-			); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		100000000000000000000F3 /* XCLocalSwiftPackageReference ".." */ = {isa = XCLocalSwiftPackageReference; relativePath = ".."; };
+		100000000000000000000F3 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		100000000000000000000F1 /* BelievableCall */ = {isa = XCSwiftPackageProductDependency; productName = BelievableCall; };
+		100000000000000000000F1 /* BelievableCall */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BelievableCall;
+		};
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 100000000000000000000A1 /* Project object */;

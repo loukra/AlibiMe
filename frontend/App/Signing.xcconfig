@@ -1,0 +1,10 @@
+// Code-signing base config for the app target.
+//
+// The Apple Developer Team ID is intentionally NOT committed (it links the repo
+// to a specific Apple account and breaks other developers' device signing).
+// For device builds, copy Local.xcconfig.example to Local.xcconfig (gitignored)
+// and set your own DEVELOPMENT_TEAM. Simulator builds need no team.
+//
+// The include is optional (`#include?`), so builds without a Local.xcconfig
+// still succeed (e.g. simulator-only, or CI).
+#include? "Local.xcconfig"

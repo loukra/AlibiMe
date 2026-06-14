@@ -1,0 +1,9 @@
+// Copy this file to `Local.xcconfig` (which is gitignored) and set your Apple
+// Developer Team ID to code-sign on a physical device. Find it in
+// Xcode > Settings > Accounts (select your team), or developer.apple.com membership.
+//
+//   cp Local.xcconfig.example Local.xcconfig
+//
+// Simulator builds don't need this.
+DEVELOPMENT_TEAM = YOUR_TEAM_ID
+CODE_SIGN_STYLE = Automatic

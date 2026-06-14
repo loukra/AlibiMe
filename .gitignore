@@ -32,6 +32,9 @@ DerivedData/
 *.xcuserdatad/
 Pods/
 
+# Local Xcode signing override — keeps the Apple Developer Team ID off the repo.
+Local.xcconfig
+
 # macOS
 .DS_Store
 
