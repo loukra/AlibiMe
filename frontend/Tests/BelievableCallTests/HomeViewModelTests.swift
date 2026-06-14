@@ -6,11 +6,15 @@ final class HomeViewModelTests: XCTestCase {
     private func makeVM(templates: [TemplateSummary] = Fixtures.templates,
                         profile: UserProfile = Fixtures.profile(),
                         request: MockRequestService = MockRequestService(),
-                        prefs: PreferencesStoring = InMemoryPreferences()) -> HomeViewModel {
+                        prefs: PreferencesStoring = InMemoryPreferences(),
+                        contacts: ContactsServicing = MockContactsService(),
+                        contactLinks: ContactLinkStoring = InMemoryContactLinkStore()) -> HomeViewModel {
         HomeViewModel(templateService: MockTemplateService(templates: templates),
                       requestService: request,
                       profileService: MockProfileService(profile: profile),
-                      prefs: prefs)
+                      prefs: prefs,
+                      contacts: contacts,
+                      contactLinks: contactLinks)
     }
 
     func testLoadPopulatesAndSelectsFirstTemplate() async {

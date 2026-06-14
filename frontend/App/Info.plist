@@ -8,5 +8,9 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<!-- Requested only in-context, when the user chooses to save a sender as a
+	     contact. The app never asks for Contacts access at launch. -->
+	<key>NSContactsUsageDescription</key>
+	<string>Save a message sender as a contact so future texts from the same sender look familiar. This is optional — texts work whether or not you save a contact.</string>
 </dict>
 </plist>

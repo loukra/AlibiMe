@@ -69,6 +69,9 @@ def list_catalog(db: Session, locale: str) -> list[dict]:
                 "category": tmpl.category,
                 "caller_persona": tmpl.caller_persona,
                 "reason_code": tmpl.reason_code,
+                "sender_persona_key": tmpl.sender_persona_key,
+                "sender_display_name": tmpl.sender_display_name,
+                "supports_contact_save": tmpl.supports_contact_save,
                 "supported_channels": supported_channels(version),
                 "call_max_duration_seconds": version.call_max_duration_seconds
                 if version.supports_call

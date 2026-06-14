@@ -55,6 +55,10 @@ def get_history(
                 final_status=req.status,
                 duration_seconds=duration,
                 delivered_preview=preview,
+                sender_binding_id=str(req.sender_binding_id) if req.sender_binding_id else None,
+                sender_persona_key=req.sender_persona_key,
+                sender_display_name=req.sender_display_name_snapshot,
+                sender_phone_e164=req.sender_phone_e164_snapshot,
             )
         )
 

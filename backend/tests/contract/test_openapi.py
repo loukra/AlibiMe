@@ -34,8 +34,11 @@ def test_create_request_response_shape(client):
     )
     body = resp.json()
     assert set(body.keys()) == {
-        "request_id", "channel", "status", "execute_at", "credits_available", "cancelable"
+        "request_id", "channel", "status", "execute_at", "credits_available",
+        "cancelable", "sender_identity",
     }
+    # A call request resolves no SMS sender binding in this pass.
+    assert body["sender_identity"] is None
 
 
 def test_error_envelope_shape(client):
@@ -53,5 +56,6 @@ def test_templates_catalog_shape(client):
     for key in (
         "id", "code", "display_name", "category", "caller_persona",
         "reason_code", "supported_channels",
+        "sender_persona_key", "sender_display_name", "supports_contact_save",
     ):
         assert key in sample

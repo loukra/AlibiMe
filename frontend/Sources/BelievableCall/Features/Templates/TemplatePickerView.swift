@@ -99,7 +99,9 @@ struct TemplatePickerView_Previews: PreviewProvider {
         TemplatePickerView(vm: HomeViewModel(templateService: MockTemplateService(),
                                              requestService: MockRequestService(),
                                              profileService: MockProfileService(),
-                                             prefs: InMemoryPreferences())) {}
+                                             prefs: InMemoryPreferences(),
+                                             contacts: MockContactsService(),
+                                             contactLinks: InMemoryContactLinkStore())) {}
     }
 }
 #endif

@@ -38,6 +38,19 @@ frontend/
 - **State.** `@Observable` view models, async/await, a small top-level
   `AppModel.Phase` (launching / unauthenticated / authenticated) plus a
   normalized `RequestStatus`, so no screen reinvents backend state.
+- **Stable sender identity + optional Save Contact.** A successful SMS returns a
+  `SenderIdentity` (the backend's sticky sender for that persona). After the send
+  is accepted — never before, never blocking — Home offers a non-blocking *Save
+  this sender as a contact?* prompt. Tapping Save requests Contacts access
+  in-context (never at launch) and presents a prefilled iOS new-contact sheet
+  (name + bound sender number only). Skipping, dismissing, or denying is a valid
+  outcome: sender continuity is backend-bound, so future texts keep the same
+  number regardless. Whether the prompt was shown/created/dismissed/denied is
+  tracked **on-device** in `ContactLinkStoring`, keyed by `sender_binding_id`;
+  iOS contact identifiers never leave the device. `ContactsServicing` owns only
+  authorization (so it compiles on the macOS test host); the UIKit
+  `CNContactViewController` sheet lives in the view layer
+  (`Features/Requests/ContactSaveViews.swift`).
 
 ## Running the tests
 
@@ -112,11 +125,13 @@ App/
 
 ## Test coverage summary
 
-- **Unit (64):** auth VM transitions, phone normalization, template selection,
+- **Unit (77):** auth VM transitions, phone normalization, template selection,
   channel-availability filtering, timing presets, request DTO mapping
   (no-destination invariant), error→copy mapping, session restore/expiry,
   history pagination, settings, date coding, `APIClient` header/decoding/error
-  handling via a stub transport.
+  handling via a stub transport, plus the Save Contact flow (prompt offered only
+  once per binding, accept/skip/deny paths, contact-link state transitions,
+  sender-identity + history-snapshot mapping).
 - **Integration (12):** real backend round-trips for login, wrong-OTP, profile,
   templates, create/get/cancel, SMS, active-request blocking, schedule-window
   rejection, history, unauthorized, entitlements, device registration.

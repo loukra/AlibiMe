@@ -26,6 +26,44 @@ The source of truth for behavior is [`BACKEND_SPEC.md`](./BACKEND_SPEC.md).
 - Credits are checked before dispatch, reserved at dispatch, captured on
   provider acceptance, released on pre-dispatch failure.
 - Templates are versioned and server-controlled; SMS is one-way.
+- **Stable sender identity** (SMS): the backend allocates a sender line once per
+  `(user, sender persona, channel)` and reuses it for every later send from the
+  same persona — independent of whether the user saves a contact (see below).
+
+## Stable sender identity + save contact (SMS)
+
+So a text from a persona such as *Boss* keeps coming from the **same** number
+over time, the backend owns a sticky sender binding. The contact-save UI on iOS
+is a pure convenience layer on top of it — continuity never depends on it.
+
+- **Sender lines** are the `service_identities` pool (a provider-controlled
+  outbound identity we own and can send from). Twilio/Vapi handles live on this
+  row (`external_identity_id`, `twilio_messaging_service_sid`,
+  `vapi_phone_number_id`) at the infrastructure edge; the domain stays
+  provider-agnostic.
+- **Sender bindings** (`user_sender_bindings`) map `(user, sender_persona_key,
+  channel) → sender_line`, unique on that triple. Allocation happens at SMS
+  **create** time so the response can return the sender identity synchronously:
+  reuse an active binding if present, else pick an active SMS-capable line. If
+  the bound line is disabled, the binding is re-pointed to a replacement
+  (marked through `orphaned`) without mutating past history.
+- With a **single** Twilio number, several personas simply bind to the same
+  line — allowed by design (the unique constraint is on the persona, not the
+  line). Multiple coherent saved-contact identities just need more numbers in
+  the pool.
+- Templates carry `sender_persona_key` / `sender_display_name` /
+  `supports_contact_save` (defaulted from `caller_persona` / `display_name` at
+  seed time), so different templates from one persona share a binding.
+- Each SMS request persists an immutable **sender snapshot**
+  (`sender_binding_id`, `sender_persona_key`, `sender_display_name_snapshot`,
+  `sender_phone_e164_snapshot`); the dispatcher sends through the bound line.
+- API: `POST /v1/requests` and `GET /v1/requests/{id}` return a
+  `sender_identity` object (`sender_binding_id`, `sender_persona_key`,
+  `sender_display_name`, `sender_phone_e164`, `contact_prompt_recommended`);
+  `GET /v1/history` exposes the snapshot fields. Calls return `null` (SMS-only
+  in this pass; the model is ready for Vapi voice reuse).
+- The own-number delivery invariant is unchanged: `sender_*` is the *from*
+  side; delivery still only ever goes to the user's verified primary number.
 
 ## Quick start (local, SQLite, all-mock)
 
@@ -45,7 +83,7 @@ make start            # migrate + seed, then uvicorn on :8000 (http://localhost:
 Other useful targets:
 
 ```bash
-make test             # run the full test suite (62 tests)
+make test             # run the full test suite (114 tests)
 make worker           # scheduler + dispatch + reconciliation + cleanup loop
 make api              # serve only (assumes the DB is already set up)
 make setup            # prepare the DB only (migrate + seed), no server

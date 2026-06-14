@@ -20,10 +20,25 @@ extension TemplateSummary {
             category: TemplateCategory(wireValue: dto.category),
             callerPersona: dto.caller_persona,
             reasonCode: dto.reason_code,
+            senderPersonaKey: dto.sender_persona_key,
+            senderDisplayName: dto.sender_display_name,
+            supportsContactSave: dto.supports_contact_save,
             supportedChannels: Set(channels),
             callMaxDurationSeconds: dto.call_max_duration_seconds,
             previewOpeningLine: dto.preview_opening_line,
             previewSMSBody: dto.preview_sms_body
+        )
+    }
+}
+
+extension SenderIdentity {
+    init(dto: SenderIdentityDTO) {
+        self.init(
+            bindingID: dto.sender_binding_id,
+            personaKey: dto.sender_persona_key,
+            displayName: dto.sender_display_name,
+            phoneE164: dto.sender_phone_e164,
+            contactPromptRecommended: dto.contact_prompt_recommended
         )
     }
 }
@@ -70,7 +85,8 @@ extension RequestSummary {
             executeAt: dto.execute_at,
             requestedAt: nil,
             cancelable: dto.cancelable,
-            lastErrorCode: nil
+            lastErrorCode: nil,
+            senderIdentity: dto.sender_identity.map(SenderIdentity.init(dto:))
         )
     }
 
@@ -83,13 +99,25 @@ extension RequestSummary {
             executeAt: dto.execute_at,
             requestedAt: dto.requested_at,
             cancelable: dto.cancelable,
-            lastErrorCode: dto.last_error_code
+            lastErrorCode: dto.last_error_code,
+            senderIdentity: dto.sender_identity.map(SenderIdentity.init(dto:))
         )
     }
 }
 
 extension HistoryEntry {
     init(dto: HistoryItemDTO) {
+        // History keeps an immutable sender snapshot; rebuild a SenderIdentity
+        // for the save-contact re-entry point when a binding was recorded.
+        let sender: SenderIdentity? = dto.sender_binding_id.map { bindingID in
+            SenderIdentity(
+                bindingID: bindingID,
+                personaKey: dto.sender_persona_key,
+                displayName: dto.sender_display_name,
+                phoneE164: dto.sender_phone_e164,
+                contactPromptRecommended: false
+            )
+        }
         self.init(
             id: dto.request_id,
             channel: Channel(wireValue: dto.channel) ?? .call,
@@ -97,7 +125,8 @@ extension HistoryEntry {
             requestedAt: dto.requested_at,
             status: RequestStatus(wireValue: dto.final_status),
             durationSeconds: dto.duration_seconds,
-            preview: dto.delivered_preview
+            preview: dto.delivered_preview,
+            senderIdentity: sender
         )
     }
 }

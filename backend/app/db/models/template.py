@@ -21,6 +21,12 @@ class Template(Base):
     reason_code: Mapped[str] = mapped_column(String(32), nullable=False)
     display_name: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # Sender identity, keyed by persona (not by template id) so different
+    # templates from the same persona reuse one sender binding. Defaults derive
+    # from caller_persona/display_name at seed time.
+    sender_persona_key: Mapped[str] = mapped_column(String(48), nullable=False)
+    sender_display_name: Mapped[str] = mapped_column(String(120), nullable=False)
+    supports_contact_save: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=utcnow, nullable=False)
 

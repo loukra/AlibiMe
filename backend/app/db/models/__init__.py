@@ -14,6 +14,7 @@ from app.db.models.service_identity import ServiceIdentity
 from app.db.models.template import Template, TemplateVersion
 from app.db.models.usage_daily import UsageDaily
 from app.db.models.user import User
+from app.db.models.user_sender_binding import UserSenderBinding
 from app.db.models.user_session import UserSession
 from app.db.models.webhook_event import WebhookEvent
 
@@ -35,6 +36,7 @@ __all__ = [
     "TemplateVersion",
     "UsageDaily",
     "User",
+    "UserSenderBinding",
     "UserSession",
     "WebhookEvent",
 ]

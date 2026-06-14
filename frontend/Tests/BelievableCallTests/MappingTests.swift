@@ -33,7 +33,9 @@ final class MappingTests: XCTestCase {
         let dto = TemplateOutDTO(
             id: "t1", code: "boss_travel_assignment", display_name: "Boss — trip",
             description: "desc", category: "work", caller_persona: "boss",
-            reason_code: "travel_assignment_abroad", supported_channels: ["call", "sms"],
+            reason_code: "travel_assignment_abroad",
+            sender_persona_key: "boss", sender_display_name: "Boss", supports_contact_save: true,
+            supported_channels: ["call", "sms"],
             call_max_duration_seconds: 60, preview_opening_line: "hi", preview_sms_body: "yo"
         )
         let model = TemplateSummary(dto: dto)
@@ -41,6 +43,9 @@ final class MappingTests: XCTestCase {
         XCTAssertEqual(model.supportedChannels, [.call, .text])
         XCTAssertTrue(model.supports(.call))
         XCTAssertEqual(model.preview(for: .text), "yo")
+        XCTAssertEqual(model.senderPersonaKey, "boss")
+        XCTAssertEqual(model.senderDisplayName, "Boss")
+        XCTAssertTrue(model.supportsContactSave)
     }
 
     func testUnknownCategoryFallsBack() {

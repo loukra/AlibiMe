@@ -36,6 +36,14 @@ class Request(Base, TimestampMixin):
     service_identity_id: Mapped[uuid.UUID] = uuid_fk(
         ForeignKey("service_identities.id"), nullable=True
     )
+    # Stable sender binding resolved at create time (SMS), plus an immutable
+    # snapshot so history renders correctly even if inventory changes later.
+    sender_binding_id: Mapped[uuid.UUID | None] = uuid_fk(
+        ForeignKey("user_sender_bindings.id"), nullable=True
+    )
+    sender_persona_key: Mapped[str | None] = mapped_column(String(48), nullable=True)
+    sender_display_name_snapshot: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    sender_phone_e164_snapshot: Mapped[str | None] = mapped_column(String(32), nullable=True)
     client_request_id: Mapped[str] = mapped_column(String(128), nullable=False)
     requested_at: Mapped[datetime] = mapped_column(nullable=False)
     execute_at: Mapped[datetime] = mapped_column(nullable=False, index=True)

@@ -56,6 +56,30 @@ public protocol DeviceServicing: Sendable {
     func register(deviceID: String, pushToken: String?, appVersion: String?, osVersion: String?) async throws
 }
 
+/// Contacts authorization, normalized so view models don't depend on the
+/// Contacts framework directly (and so it compiles on the macOS test host).
+public enum ContactAuthorization: String, Sendable, Equatable {
+    case notDetermined
+    case authorized
+    case limited
+    case denied
+    case restricted
+
+    /// Whether we can present the prefilled new-contact sheet without first
+    /// asking for permission.
+    public var canPresentContactSheet: Bool {
+        self == .authorized || self == .limited
+    }
+}
+
+/// Permission gateway for the optional Save Contact flow. The prefilled
+/// new-contact *sheet* itself is presented by the view layer (UIKit), so this
+/// service only owns authorization — never contact creation without the user.
+public protocol ContactsServicing: Sendable {
+    func authorizationStatus() -> ContactAuthorization
+    func requestAccess() async -> ContactAuthorization
+}
+
 // MARK: - Live implementations
 
 public struct LiveAuthService: AuthServicing {

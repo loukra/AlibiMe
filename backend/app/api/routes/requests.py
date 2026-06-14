@@ -16,6 +16,7 @@ from app.schemas.requests import (
     CreateRequestBody,
     CreateRequestResponse,
     RequestDetail,
+    SenderIdentityOut,
 )
 
 router = APIRouter(prefix="/v1/requests", tags=["requests"])
@@ -45,6 +46,7 @@ def create_request(
         scheduled_at=body.scheduled_at,
         user_locale=ctx.user.locale,
     )
+    sender = requests_service.sender_identity_payload(db, req)
     return CreateRequestResponse(
         request_id=str(req.id),
         channel=req.channel,
@@ -52,6 +54,7 @@ def create_request(
         execute_at=req.execute_at,
         credits_available=credits.current_balance(db, ctx.user.id),
         cancelable=state.is_cancelable(req.status),
+        sender_identity=SenderIdentityOut(**sender) if sender else None,
     )
 
 
@@ -64,6 +67,7 @@ def get_request(
     rid = _parse_uuid(request_id, "request_id")
     req = requests_service.get_request(db, ctx.user.id, rid)
     summary = requests_service.latest_attempt_summary(db, req)
+    sender = requests_service.sender_identity_payload(db, req)
     return RequestDetail(
         request_id=str(req.id),
         channel=req.channel,
@@ -74,6 +78,7 @@ def get_request(
         cancelable=state.is_cancelable(req.status),
         last_error_code=req.last_error_code,
         latest_attempt=AttemptSummary(**summary) if summary else None,
+        sender_identity=SenderIdentityOut(**sender) if sender else None,
     )
 
 

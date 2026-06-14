@@ -21,16 +21,32 @@ public final class HomeViewModel {
     private let requestService: RequestServicing
     private let profileService: ProfileServicing
     private let prefs: PreferencesStoring
+    private let contacts: ContactsServicing
+    private let contactLinks: ContactLinkStoring
     public var onSessionExpired: (() -> Void)?
+
+    // MARK: Save Contact flow (post-SMS-success, fully optional)
+
+    /// The soft "Save this sender as a contact?" prompt. Non-blocking; set after
+    /// a successful SMS send when the binding hasn't been acted on before.
+    public var pendingSenderPrompt: SenderIdentity?
+    /// When set, the view presents the prefilled iOS new-contact sheet.
+    public var contactSheetSender: SenderIdentity?
+    /// When set, the view shows the "Contacts access is optional" notice.
+    public var contactPermissionDeniedSender: SenderIdentity?
 
     public init(templateService: TemplateServicing,
                 requestService: RequestServicing,
                 profileService: ProfileServicing,
-                prefs: PreferencesStoring) {
+                prefs: PreferencesStoring,
+                contacts: ContactsServicing,
+                contactLinks: ContactLinkStoring) {
         self.templateService = templateService
         self.requestService = requestService
         self.profileService = profileService
         self.prefs = prefs
+        self.contacts = contacts
+        self.contactLinks = contactLinks
         if let saved = prefs.lastChannel, let ch = Channel(rawValue: saved) { channel = ch }
         if let delay = prefs.lastTimingDelay {
             timing = TimingOption.presets.first { $0.delaySeconds == delay } ?? .now
@@ -158,6 +174,10 @@ public final class HomeViewModel {
             prefs.lastTimingDelay = timing.delaySeconds
             // Reflect the credit spend immediately if the backend reported it.
             await refreshProfileQuietly()
+            // After the send is accepted, optionally suggest saving the sender as
+            // a contact. This never blocks scheduling and only appears the first
+            // time a binding is seen on this device.
+            maybeOfferContactPrompt(for: request)
         } catch {
             // If a parallel request already exists, surface its state.
             if case let .api(code, _, _, _) = asAPIError(error), code == "active_request_exists" {
@@ -192,6 +212,80 @@ public final class HomeViewModel {
     }
 
     public func clearActiveRequest() { activeRequest = nil }
+
+    // MARK: Save Contact flow
+
+    /// Decide whether to show the post-success contact prompt. Continuity comes
+    /// from the backend binding regardless, so this is purely a convenience.
+    func maybeOfferContactPrompt(for request: RequestSummary) {
+        guard request.channel == .text else { return }
+        guard let sender = request.senderIdentity,
+              sender.contactPromptRecommended,
+              sender.canSaveContact,
+              contactLinks.shouldOfferPrompt(forBinding: sender.bindingID)
+        else { return }
+        pendingSenderPrompt = sender
+    }
+
+    /// User tapped "Save" on the soft prompt: request access in-context if
+    /// needed, then either present the contact sheet or explain the denial.
+    public func acceptContactPrompt() async {
+        guard let sender = pendingSenderPrompt else { return }
+        pendingSenderPrompt = nil
+        await beginSaveContact(for: sender)
+    }
+
+    /// User tapped "Not now" on the soft prompt (or it was auto-dismissed).
+    public func skipContactPrompt() {
+        guard let sender = pendingSenderPrompt else { return }
+        pendingSenderPrompt = nil
+        recordContactStatus(.notNow, for: sender)
+    }
+
+    /// Shared entry point usable from re-entry surfaces (e.g. history detail).
+    public func beginSaveContact(for sender: SenderIdentity) async {
+        guard sender.canSaveContact else { return }
+        var status = contacts.authorizationStatus()
+        if status == .notDetermined {
+            status = await contacts.requestAccess()
+        }
+        if status.canPresentContactSheet {
+            contactSheetSender = sender
+        } else {
+            recordContactStatus(.denied, for: sender)
+            contactPermissionDeniedSender = sender
+        }
+    }
+
+    /// Called when the contact sheet finishes. `identifier` is non-nil only when
+    /// the user actually saved the contact.
+    public func contactSheetFinished(savedIdentifier identifier: String?) {
+        guard let sender = contactSheetSender else { return }
+        contactSheetSender = nil
+        if let identifier {
+            recordContactStatus(.created, for: sender, contactIdentifier: identifier)
+        } else {
+            recordContactStatus(.dismissed, for: sender)
+        }
+    }
+
+    public func dismissPermissionDeniedNotice() {
+        contactPermissionDeniedSender = nil
+    }
+
+    private func recordContactStatus(_ status: ContactLinkStatus,
+                                     for sender: SenderIdentity,
+                                     contactIdentifier: String? = nil) {
+        let previous = contactLinks.state(forBinding: sender.bindingID)
+        let state = ContactLinkState(
+            senderBindingID: sender.bindingID,
+            contactStatus: status,
+            iosContactIdentifier: contactIdentifier ?? previous?.iosContactIdentifier,
+            lastPromptedAt: Date(),
+            createdAt: status == .created ? Date() : previous?.createdAt
+        )
+        contactLinks.save(state)
+    }
 
     // MARK: Helpers
 

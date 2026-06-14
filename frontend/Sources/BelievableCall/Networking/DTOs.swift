@@ -97,6 +97,9 @@ struct TemplateOutDTO: Decodable {
     let category: String
     let caller_persona: String
     let reason_code: String
+    let sender_persona_key: String
+    let sender_display_name: String
+    let supports_contact_save: Bool
     let supported_channels: [String]
     let call_max_duration_seconds: Int?
     let preview_opening_line: String?
@@ -117,6 +120,14 @@ struct CreateRequestBodyDTO: Encodable {
     let scheduled_at: Date?
 }
 
+struct SenderIdentityDTO: Decodable {
+    let sender_binding_id: String
+    let sender_persona_key: String?
+    let sender_display_name: String?
+    let sender_phone_e164: String?
+    let contact_prompt_recommended: Bool
+}
+
 struct CreateRequestResponseDTO: Decodable {
     let request_id: String
     let channel: String
@@ -124,6 +135,7 @@ struct CreateRequestResponseDTO: Decodable {
     let execute_at: Date
     let credits_available: Int
     let cancelable: Bool
+    let sender_identity: SenderIdentityDTO?
 }
 
 struct AttemptSummaryDTO: Decodable {
@@ -143,6 +155,7 @@ struct RequestDetailDTO: Decodable {
     let cancelable: Bool
     let last_error_code: String?
     let latest_attempt: AttemptSummaryDTO?
+    let sender_identity: SenderIdentityDTO?
 }
 
 struct CancelResponseDTO: Decodable {
@@ -160,6 +173,10 @@ struct HistoryItemDTO: Decodable {
     let final_status: String
     let duration_seconds: Int?
     let delivered_preview: String?
+    let sender_binding_id: String?
+    let sender_persona_key: String?
+    let sender_display_name: String?
+    let sender_phone_e164: String?
 }
 
 struct HistoryResponseDTO: Decodable {

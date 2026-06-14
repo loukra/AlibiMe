@@ -46,6 +46,7 @@ public struct HomeView: View {
                     showSchedule = false
                 }
             }
+            .saveContactFlow(vm: vm)
         }
     }
 
@@ -164,7 +165,9 @@ struct HomeView_Previews: PreviewProvider {
         HomeView(vm: HomeViewModel(templateService: MockTemplateService(),
                                    requestService: MockRequestService(),
                                    profileService: MockProfileService(),
-                                   prefs: InMemoryPreferences()))
+                                   prefs: InMemoryPreferences(),
+                                   contacts: MockContactsService(),
+                                   contactLinks: InMemoryContactLinkStore()))
     }
 }
 #endif

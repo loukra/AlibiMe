@@ -71,6 +71,7 @@ def seed_service_identities(db: Session) -> int:
             capability_outbound_voice=True,
             capability_outbound_sms=True,
             status=ServiceIdentityStatus.active.value,
+            display_label="default-sender",
             notes="Default mock sender identity",
         )
     )
@@ -88,6 +89,13 @@ def _upsert_template(db: Session, data: dict) -> Template:
     tmpl.reason_code = data["reason_code"]
     tmpl.display_name = data["display_name"]
     tmpl.description = data.get("description")
+    # Sender persona drives stable sender bindings. Default from caller_persona
+    # (and a humanized label) so existing templates work without YAML edits.
+    tmpl.sender_persona_key = data.get("sender_persona_key", data["caller_persona"])
+    tmpl.sender_display_name = data.get(
+        "sender_display_name", data["caller_persona"].replace("_", " ").title()
+    )
+    tmpl.supports_contact_save = data.get("supports_contact_save", True)
     tmpl.active = True
     db.flush()
     return tmpl

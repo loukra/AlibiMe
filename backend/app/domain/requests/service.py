@@ -37,6 +37,7 @@ from app.db.models.request import Request
 from app.db.models.template import Template
 from app.domain.billing import credits
 from app.domain.requests import state
+from app.domain.sender_identity import service as sender_identity
 from app.domain.templates import service as templates
 from app.domain.users.service import require_primary_phone
 
@@ -133,6 +134,28 @@ def create_request(
 
         raise InsufficientCredits()
 
+    # Resolve (or allocate) a stable sender binding so the same persona keeps the
+    # same sender number across sends, and snapshot it onto the request. SMS-only
+    # in this pass; the binding system is channel-agnostic for later voice reuse.
+    sender_binding_id = None
+    sender_persona_key = None
+    sender_display_name_snapshot = None
+    sender_phone_e164_snapshot = None
+    if channel == Channel.sms.value:
+        resolved = sender_identity.resolve_or_allocate_binding(
+            db,
+            user_id,
+            sender_persona_key=template.sender_persona_key,
+            channel=channel,
+            template_id=template.id,
+        )
+        if resolved is not None:
+            binding, line = resolved
+            sender_binding_id = binding.id
+            sender_persona_key = template.sender_persona_key
+            sender_display_name_snapshot = template.sender_display_name
+            sender_phone_e164_snapshot = line.identity_value
+
     request = Request(
         user_id=user_id,
         template_id=template.id,
@@ -146,6 +169,10 @@ def create_request(
         scheduled_kind=scheduled_kind.value,
         credit_cost_units=cost,
         credits_reserved=False,
+        sender_binding_id=sender_binding_id,
+        sender_persona_key=sender_persona_key,
+        sender_display_name_snapshot=sender_display_name_snapshot,
+        sender_phone_e164_snapshot=sender_phone_e164_snapshot,
     )
     db.add(request)
     try:
@@ -164,6 +191,22 @@ def create_request(
         raise
     db.commit()
     return request
+
+
+def sender_identity_payload(db: Session, request: Request) -> dict | None:
+    """Sender metadata for API responses; ``None`` when no binding was resolved
+    (e.g. call requests, or an empty sender pool)."""
+    if request.sender_binding_id is None:
+        return None
+    template = db.get(Template, request.template_id)
+    supports_contact_save = bool(template.supports_contact_save) if template else False
+    return {
+        "sender_binding_id": str(request.sender_binding_id),
+        "sender_persona_key": request.sender_persona_key,
+        "sender_display_name": request.sender_display_name_snapshot,
+        "sender_phone_e164": request.sender_phone_e164_snapshot,
+        "contact_prompt_recommended": supports_contact_save,
+    }
 
 
 def latest_call_attempt(db: Session, request_id: uuid.UUID):

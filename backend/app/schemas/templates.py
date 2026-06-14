@@ -11,6 +11,9 @@ class TemplateOut(BaseModel):
     category: str
     caller_persona: str
     reason_code: str
+    sender_persona_key: str
+    sender_display_name: str
+    supports_contact_save: bool = True
     supported_channels: list[str]
     call_max_duration_seconds: int | None = None
     preview_opening_line: str | None = None

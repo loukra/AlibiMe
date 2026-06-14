@@ -18,6 +18,14 @@ class CreateRequestBody(BaseModel):
     scheduled_at: datetime | None = None
 
 
+class SenderIdentityOut(BaseModel):
+    sender_binding_id: str
+    sender_persona_key: str | None = None
+    sender_display_name: str | None = None
+    sender_phone_e164: str | None = None
+    contact_prompt_recommended: bool = False
+
+
 class CreateRequestResponse(BaseModel):
     request_id: str
     channel: str
@@ -25,6 +33,7 @@ class CreateRequestResponse(BaseModel):
     execute_at: datetime
     credits_available: int
     cancelable: bool
+    sender_identity: SenderIdentityOut | None = None
 
 
 class AttemptSummary(BaseModel):
@@ -44,6 +53,7 @@ class RequestDetail(BaseModel):
     cancelable: bool
     last_error_code: str | None = None
     latest_attempt: AttemptSummary | None = None
+    sender_identity: SenderIdentityOut | None = None
 
 
 class CancelResponse(BaseModel):

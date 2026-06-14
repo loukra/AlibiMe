@@ -85,6 +85,11 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
     public let category: TemplateCategory
     public let callerPersona: String
     public let reasonCode: String
+    /// Sender identity, keyed by persona so different templates from the same
+    /// persona share a sender. `supportsContactSave` gates the save-contact UI.
+    public let senderPersonaKey: String
+    public let senderDisplayName: String
+    public let supportsContactSave: Bool
     public let supportedChannels: Set<Channel>
     public let callMaxDurationSeconds: Int?
     public let previewOpeningLine: String?
@@ -97,6 +102,9 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
                 category: TemplateCategory,
                 callerPersona: String,
                 reasonCode: String,
+                senderPersonaKey: String = "",
+                senderDisplayName: String = "",
+                supportsContactSave: Bool = true,
                 supportedChannels: Set<Channel>,
                 callMaxDurationSeconds: Int?,
                 previewOpeningLine: String?,
@@ -108,6 +116,9 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
         self.category = category
         self.callerPersona = callerPersona
         self.reasonCode = reasonCode
+        self.senderPersonaKey = senderPersonaKey
+        self.senderDisplayName = senderDisplayName
+        self.supportsContactSave = supportsContactSave
         self.supportedChannels = supportedChannels
         self.callMaxDurationSeconds = callMaxDurationSeconds
         self.previewOpeningLine = previewOpeningLine
@@ -266,6 +277,66 @@ public enum RequestStatus: String, Sendable {
     }
 }
 
+/// Stable sender identity returned with a created/fetched SMS request. Continuity
+/// comes from the backend binding, not from whether the user saves a contact.
+public struct SenderIdentity: Equatable, Identifiable, Sendable {
+    public let bindingID: String
+    public let personaKey: String?
+    public let displayName: String?
+    public let phoneE164: String?
+    public let contactPromptRecommended: Bool
+
+    public var id: String { bindingID }
+
+    public init(bindingID: String,
+                personaKey: String?,
+                displayName: String?,
+                phoneE164: String?,
+                contactPromptRecommended: Bool) {
+        self.bindingID = bindingID
+        self.personaKey = personaKey
+        self.displayName = displayName
+        self.phoneE164 = phoneE164
+        self.contactPromptRecommended = contactPromptRecommended
+    }
+
+    /// We can only offer to save a contact when we actually have a number.
+    public var canSaveContact: Bool { (phoneE164?.isEmpty == false) }
+}
+
+/// Local-device record of whether the user saved the sender as a contact. This
+/// is a convenience layer — never the source of truth for sender assignment.
+public enum ContactLinkStatus: String, Sendable, Codable {
+    case unknown
+    case created
+    case dismissed
+    case denied
+    case notNow = "not_now"
+}
+
+public struct ContactLinkState: Equatable, Sendable, Codable {
+    public let senderBindingID: String
+    public var contactStatus: ContactLinkStatus
+    public var iosContactIdentifier: String?
+    public var lastPromptedAt: Date?
+    public var createdAt: Date?
+
+    public init(senderBindingID: String,
+                contactStatus: ContactLinkStatus = .unknown,
+                iosContactIdentifier: String? = nil,
+                lastPromptedAt: Date? = nil,
+                createdAt: Date? = nil) {
+        self.senderBindingID = senderBindingID
+        self.contactStatus = contactStatus
+        self.iosContactIdentifier = iosContactIdentifier
+        self.lastPromptedAt = lastPromptedAt
+        self.createdAt = createdAt
+    }
+
+    /// Whether the post-success prompt should still be offered automatically.
+    public var shouldOfferPrompt: Bool { contactStatus == .unknown }
+}
+
 public struct RequestSummary: Equatable, Identifiable, Sendable {
     public let id: String
     public let channel: Channel
@@ -275,6 +346,7 @@ public struct RequestSummary: Equatable, Identifiable, Sendable {
     public let requestedAt: Date?
     public let cancelable: Bool
     public let lastErrorCode: String?
+    public let senderIdentity: SenderIdentity?
 
     public init(id: String,
                 channel: Channel,
@@ -283,7 +355,8 @@ public struct RequestSummary: Equatable, Identifiable, Sendable {
                 executeAt: Date,
                 requestedAt: Date?,
                 cancelable: Bool,
-                lastErrorCode: String?) {
+                lastErrorCode: String?,
+                senderIdentity: SenderIdentity? = nil) {
         self.id = id
         self.channel = channel
         self.status = status
@@ -292,6 +365,7 @@ public struct RequestSummary: Equatable, Identifiable, Sendable {
         self.requestedAt = requestedAt
         self.cancelable = cancelable
         self.lastErrorCode = lastErrorCode
+        self.senderIdentity = senderIdentity
     }
 
     /// Seconds remaining until execution, never negative.
@@ -308,6 +382,7 @@ public struct HistoryEntry: Equatable, Identifiable, Sendable {
     public let status: RequestStatus
     public let durationSeconds: Int?
     public let preview: String?
+    public let senderIdentity: SenderIdentity?
 
     public init(id: String,
                 channel: Channel,
@@ -315,7 +390,8 @@ public struct HistoryEntry: Equatable, Identifiable, Sendable {
                 requestedAt: Date,
                 status: RequestStatus,
                 durationSeconds: Int?,
-                preview: String?) {
+                preview: String?,
+                senderIdentity: SenderIdentity? = nil) {
         self.id = id
         self.channel = channel
         self.templateLabel = templateLabel
@@ -323,6 +399,7 @@ public struct HistoryEntry: Equatable, Identifiable, Sendable {
         self.status = status
         self.durationSeconds = durationSeconds
         self.preview = preview
+        self.senderIdentity = senderIdentity
     }
 }
 

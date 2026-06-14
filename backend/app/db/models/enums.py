@@ -110,6 +110,14 @@ class ServiceIdentityStatus(StrEnum):
     disabled = "disabled"
 
 
+class SenderBindingStatus(StrEnum):
+    """Lifecycle of a stable user+persona+channel -> sender line binding."""
+
+    active = "active"
+    orphaned = "orphaned"  # bound line removed/disabled; reallocate on next send
+    released = "released"  # admin cleanup only (MVP: unused at runtime)
+
+
 class PlanKind(StrEnum):
     one_time = "one_time"
     subscription = "subscription"

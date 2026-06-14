@@ -16,10 +16,22 @@ public enum Fixtures {
             id: id, code: code, displayName: name,
             description: "Your boss calls about an urgent work issue.",
             category: category, callerPersona: "boss", reasonCode: "urgent_work_issue",
+            senderPersonaKey: "boss", senderDisplayName: "Boss", supportsContactSave: true,
             supportedChannels: channels, callMaxDurationSeconds: 60,
             previewOpeningLine: "Hi, sorry to call — there's an urgent issue I need you on.",
             previewSMSBody: "Need you on an urgent work issue — can you call back?"
         )
+    }
+
+    public static func senderIdentity(
+        bindingID: String = "binding-1",
+        persona: String = "boss",
+        displayName: String = "Boss",
+        phone: String = "+15551234567",
+        promptRecommended: Bool = true
+    ) -> SenderIdentity {
+        SenderIdentity(bindingID: bindingID, personaKey: persona, displayName: displayName,
+                       phoneE164: phone, contactPromptRecommended: promptRecommended)
     }
 
     public static let templates: [TemplateSummary] = [
@@ -159,5 +171,26 @@ public final class MockDeviceService: DeviceServicing, @unchecked Sendable {
     public init() {}
     public func register(deviceID: String, pushToken: String?, appVersion: String?, osVersion: String?) async throws {
         registered = true
+    }
+}
+
+public final class MockContactsService: ContactsServicing, @unchecked Sendable {
+    public var status: ContactAuthorization
+    /// What `requestAccess()` resolves to when starting from `.notDetermined`.
+    public var grantResult: ContactAuthorization
+    public private(set) var requestAccessCalled = false
+
+    public init(status: ContactAuthorization = .notDetermined,
+                grantResult: ContactAuthorization = .authorized) {
+        self.status = status
+        self.grantResult = grantResult
+    }
+
+    public func authorizationStatus() -> ContactAuthorization { status }
+
+    public func requestAccess() async -> ContactAuthorization {
+        requestAccessCalled = true
+        if status == .notDetermined { status = grantResult }
+        return status
     }
 }

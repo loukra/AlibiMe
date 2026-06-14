@@ -93,6 +93,21 @@ def _select_service_identity(db: Session, channel: str) -> ServiceIdentity | Non
     return db.execute(stmt.order_by(ServiceIdentity.created_at)).scalars().first()
 
 
+def _resolve_dispatch_identity(db: Session, request: Request) -> ServiceIdentity | None:
+    """Prefer the line the request was bound to at create time so the sender
+    number stays consistent with what the user was shown; fall back to a pool
+    pick if the binding's line is gone or no binding exists (e.g. calls)."""
+    from app.db.models.user_sender_binding import UserSenderBinding
+
+    if request.sender_binding_id is not None:
+        binding = db.get(UserSenderBinding, request.sender_binding_id)
+        if binding is not None:
+            line = db.get(ServiceIdentity, binding.sender_line_id)
+            if line is not None and line.status == ServiceIdentityStatus.active.value:
+                return line
+    return _select_service_identity(db, request.channel)
+
+
 def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None) -> RequestPlan:
     template = db.get(Template, request.template_id)
     version = db.get(TemplateVersion, request.template_version_id)
@@ -165,7 +180,7 @@ def dispatch_one(
             db.commit()
             return "failed"
 
-    identity = _select_service_identity(db, request.channel)
+    identity = _resolve_dispatch_identity(db, request)
     if identity is None:
         _fail_request(db, request, "provider_unavailable", "No active service identity.")
         db.commit()

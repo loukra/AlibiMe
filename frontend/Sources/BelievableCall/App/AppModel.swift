@@ -82,7 +82,9 @@ public final class AppModel {
         let vm = HomeViewModel(templateService: env.templates,
                                requestService: env.requests,
                                profileService: env.profile,
-                               prefs: env.prefs)
+                               prefs: env.prefs,
+                               contacts: env.contacts,
+                               contactLinks: env.contactLinks)
         vm.onSessionExpired = { [weak self] in self?.handleSessionExpired() }
         return vm
     }
