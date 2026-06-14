@@ -37,12 +37,12 @@ public struct LiveContactsService: ContactsServicing {
         case .restricted: return .restricted
         case .denied: return .denied
         case .authorized: return .authorized
+        #if os(iOS)
+        // `.limited` is iOS 18+ (and absent from the macOS SDK this file also
+        // compiles against). Limited access still lets us add a new contact.
+        case .limited: return .limited
+        #endif
         @unknown default:
-            // `CNAuthorizationStatus.limited` is iOS 18+ and not present in the
-            // macOS SDK this file also compiles against, so match it by rawValue
-            // (4) rather than by symbol. Limited access still lets us add a new
-            // contact, so it's usable.
-            if status.rawValue == 4 { return .limited }
             return .denied
         }
     }
