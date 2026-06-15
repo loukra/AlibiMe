@@ -1,36 +1,58 @@
 # AlibiMe
 
-**Get a believable call or text on your own phone — your graceful way out of any situation.**
+**Your personal alibi — a believable call or text, on your terms.**
 
-AlibiMe lets you summon a realistic phone call or SMS to *your own verified
-number*, on demand or on a timer, so you can step away from an awkward date, a
-dragging meeting, or an unsafe situation without making a scene. You pick a
-believable scenario, choose call or text, set the timing — and your phone rings
-or buzzes right on cue.
+AlibiMe is an alibi tool for everyone. It sends a realistic phone call or SMS to
+*your own verified number*, on demand or on a timer, so you always have a
+credible reason, a story to back up, or a way out — whatever your situation. You
+pick a scenario, choose call or text, set the timing, and your phone rings or
+buzzes right on cue, sounding and reading like the real thing.
 
 > The internal Swift module and original codename is **BelievableCall**; the
 > shipping product is **AlibiMe**.
 
 ---
 
-## The idea
+## What people use it for
+
+Everyone has a moment where a perfectly-timed call or text would make life
+easier. A few:
+
+- **Slip out of a bad date** — your "roommate has a problem at home" and you
+  genuinely have to go.
+- **Escape a dragging meeting or hangout** — "urgent work issue," handled.
+- **Protect your private life** — carve out time for yourself for a day or two
+  weeks without owing anyone an explanation.
+- **Back up a story with family** — make a new relationship or partner feel real
+  to the people around you.
+- **Make a new chapter feel established** — a fresh job or move looks settled
+  when the right people are checking in on you.
+- **Get out of an unsafe or uncomfortable situation** — a believable reason to
+  leave, immediately.
+
+One template, your scenario, your timing. It's a tool for everyone.
+
+---
+
+## How it works
 
 The core experience is one tap away:
 
 1. **Pick a template** — a believable situation like *Boss — urgent travel
    assignment*, *Best friend — needs you outside*, or *Roommate — issue at
    home*. Each template is one concept that can run as a **call**, a **text**,
-   or **both**.
+   or **both** — or build your own.
 2. **Choose a channel** — call or text, whichever fits the moment.
 3. **Choose timing** — now, in 30 seconds, in 5 minutes, or scheduled.
-4. **Receive it** — the call/text arrives on your phone, sounding and reading
-   like the real thing.
+4. **Receive it** — the call/text arrives on your phone, and you take it from
+   there.
 
 ### The one rule that matters
 
-AlibiMe **only ever contacts your own verified phone number.** There is no
-third-party destination, ever — you can't use it to call or text someone else.
-It's a personal exit tool, not a way to reach other people.
+AlibiMe **only ever delivers to your own verified phone number.** It can't be
+pointed at anyone else's phone — the call or text always comes to *you*, as a
+prop you present in the moment. That keeps it a personal tool, not a way to
+harass, spam, or impersonate someone to a third party's device.
 
 ### What makes it believable
 
@@ -112,7 +134,8 @@ scheme environment variable. See [`frontend/README.md`](frontend/README.md).
 
 ## Responsible use
 
-AlibiMe is designed for one purpose: giving **you** a graceful, believable way
-out of a situation, delivered only to **your own** verified number. It is not a
-tool for deceiving or contacting other people, and the architecture enforces
-that — the destination is always the authenticated user's own phone.
+AlibiMe delivers only to **your own** verified number — the architecture
+enforces it, so the app can never be pointed at someone else's phone to harass,
+spam, or impersonate. What you do with your own alibi is up to you; please keep
+it legal and don't use it where a real call matters (emergencies, official or
+legal obligations).
