@@ -21,6 +21,11 @@ class Template(Base):
     reason_code: Mapped[str] = mapped_column(String(32), nullable=False)
     display_name: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # Ownership: NULL = built-in/system template; set = a user's custom template.
+    # Custom templates reuse the same shared core + per-channel version model.
+    owner_user_id: Mapped[uuid.UUID | None] = uuid_fk(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True
+    )
     # Sender identity, keyed by persona (not by template id) so different
     # templates from the same persona reuse one sender binding. Defaults derive
     # from caller_persona/display_name at seed time.

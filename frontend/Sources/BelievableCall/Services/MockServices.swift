@@ -48,6 +48,24 @@ public enum Fixtures {
                  name: "Safety check-in", category: .safety, channels: [.call, .text]),
     ]
 
+    public static let templateOptions = TemplateOptions(
+        personas: [
+            TemplateOption(code: "boss", label: "your manager"),
+            TemplateOption(code: "best_friend", label: "your best friend"),
+            TemplateOption(code: "partner", label: "your partner"),
+        ],
+        reasons: [
+            TemplateOption(code: "urgent_work_issue", label: "an urgent work issue"),
+            TemplateOption(code: "need_you_outside", label: "needing you outside"),
+            TemplateOption(code: "safety_checkin", label: "a safety check-in"),
+        ],
+        categories: ["work", "family", "social", "logistics", "safety"],
+        urgencies: ["low", "normal", "high"],
+        voiceStyles: ["neutral", "warm"],
+        channels: [.call, .text],
+        callSecondsMin: 30, callSecondsMax: 120, callSecondsDefault: 60
+    )
+
     public static func profile(credits: Int = 3, activeRequest: RequestSummary? = nil) -> UserProfile {
         UserProfile(
             id: "user-1", locale: "en", timezone: "UTC", displayName: "Alex",
@@ -123,10 +141,38 @@ public final class MockAuthService: AuthServicing, @unchecked Sendable {
 public final class MockTemplateService: TemplateServicing, @unchecked Sendable {
     public var templates: [TemplateSummary]
     public var error: Error?
+    public var createError: Error?
+    public private(set) var deletedIDs: [String] = []
     public init(templates: [TemplateSummary] = Fixtures.templates) { self.templates = templates }
     public func list() async throws -> [TemplateSummary] {
         if let error { throw error }
         return templates
+    }
+
+    public func options() async throws -> TemplateOptions {
+        if let error { throw error }
+        return Fixtures.templateOptions
+    }
+
+    public func createCustom(_ draft: CustomTemplateDraft) async throws -> TemplateSummary {
+        if let createError { throw createError }
+        let created = TemplateSummary(
+            id: "custom-\(templates.count + 1)", code: "custom_\(draft.persona)",
+            displayName: draft.displayName, description: draft.description.isEmpty ? nil : draft.description,
+            category: TemplateCategory(wireValue: draft.category), callerPersona: draft.persona,
+            reasonCode: draft.reason, senderPersonaKey: draft.persona, senderDisplayName: draft.persona,
+            supportsContactSave: true, isCustom: true, supportedChannels: draft.channels,
+            callMaxDurationSeconds: draft.channels.contains(.call) ? draft.callMaxSeconds : nil,
+            previewOpeningLine: draft.channels.contains(.call) ? "Hi, it's your \(draft.persona)…" : nil,
+            previewSMSBody: draft.channels.contains(.text) ? "Your \(draft.persona) here…" : nil
+        )
+        templates.append(created)
+        return created
+    }
+
+    public func delete(id: String) async throws {
+        deletedIDs.append(id)
+        templates.removeAll { $0.id == id }
     }
 }
 

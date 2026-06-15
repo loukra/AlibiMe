@@ -100,6 +100,7 @@ struct TemplateOutDTO: Decodable {
     let sender_persona_key: String
     let sender_display_name: String
     let supports_contact_save: Bool
+    let is_custom: Bool?
     let supported_channels: [String]
     let call_max_duration_seconds: Int?
     let preview_opening_line: String?
@@ -108,6 +109,35 @@ struct TemplateOutDTO: Decodable {
 
 struct TemplateListResponseDTO: Decodable {
     let templates: [TemplateOutDTO]
+}
+
+struct TemplateOptionItemDTO: Decodable {
+    let code: String
+    let label: String
+}
+
+struct TemplateOptionsResponseDTO: Decodable {
+    let personas: [TemplateOptionItemDTO]
+    let reasons: [TemplateOptionItemDTO]
+    let categories: [String]
+    let urgencies: [String]
+    let voice_styles: [String]
+    let channels: [String]
+    let call_seconds_min: Int
+    let call_seconds_max: Int
+    let call_seconds_default: Int
+}
+
+struct CreateCustomTemplateBodyDTO: Encodable {
+    let display_name: String
+    let description: String?
+    let category: String
+    let persona: String
+    let reason: String
+    let urgency: String
+    let channels: [String]
+    let voice_style: String
+    let call_max_seconds: Int?
 }
 
 // MARK: Requests

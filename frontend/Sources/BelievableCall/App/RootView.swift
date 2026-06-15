@@ -71,16 +71,18 @@ struct AuthContainer: View {
 }
 
 struct MainTabView: View {
-    enum Tab: Hashable { case home, history, settings }
+    enum Tab: Hashable { case history, templates, home, calm, settings }
 
     @State private var home: HomeViewModel
     @State private var history: HistoryViewModel
+    @State private var templates: TemplatesViewModel
     @State private var settings: SettingsViewModel
     @State private var selection: Tab = .home
 
     init(app: AppModel) {
         _home = State(initialValue: app.makeHomeViewModel())
         _history = State(initialValue: app.makeHistoryViewModel())
+        _templates = State(initialValue: app.makeTemplatesViewModel())
         _settings = State(initialValue: app.makeSettingsViewModel())
     }
 
@@ -92,19 +94,20 @@ struct MainTabView: View {
         }
         .tint(Theme.accent)
         // The screens stay resident, so onAppear only fires once. Refresh the
-        // relevant view model each time its tab becomes visible so balances and
-        // history reflect actions taken on another tab (e.g. buying credits).
+        // relevant view model each time its tab becomes visible so balances,
+        // history, and templates reflect actions taken on another tab.
         .onChange(of: selection) { _, newValue in
             switch newValue {
             case .home: Task { await home.refresh() }
             case .history: Task { await history.load() }
-            case .settings: break
+            case .templates: Task { await templates.load() }
+            case .calm, .settings: break
             }
         }
     }
 
-    // All three screens stay resident so per-tab state and scroll position
-    // survive switching; only the selected one is visible and interactive.
+    // All screens stay resident so per-tab state and scroll position survive
+    // switching; only the selected one is visible and interactive.
     private var screens: some View {
         ZStack {
             HomeView(vm: home, onOpenVerifiedNumber: { selection = .settings })
@@ -113,6 +116,12 @@ struct MainTabView: View {
             HistoryView(vm: history)
                 .opacity(selection == .history ? 1 : 0)
                 .allowsHitTesting(selection == .history)
+            NavigationStack { TemplatesView(vm: templates) }
+                .opacity(selection == .templates ? 1 : 0)
+                .allowsHitTesting(selection == .templates)
+            CalmWavesView()
+                .opacity(selection == .calm ? 1 : 0)
+                .allowsHitTesting(selection == .calm)
             SettingsView(vm: settings)
                 .opacity(selection == .settings ? 1 : 0)
                 .allowsHitTesting(selection == .settings)
@@ -125,8 +134,8 @@ struct MainTabView: View {
 }
 
 /// A detached, glassy tab bar that floats above the screen backdrop. Chrome only
-/// — it drives the same three destinations. Home is a raised circular button
-/// in the middle (showing the app logo); History and Settings flank it.
+/// — Home is a raised circular button in the middle (showing the app logo),
+/// symmetrically flanked by two destinations on each side.
 struct FloatingTabBar: View {
     @Binding var selection: MainTabView.Tab
 
@@ -139,14 +148,16 @@ struct FloatingTabBar: View {
 
     var body: some View {
         ZStack {
-            // The pill bar with the two side destinations and a gap for the
-            // raised Home button.
+            // Two destinations on each side, with a centered gap for the raised
+            // Home button (keeps the bar symmetric).
             HStack(spacing: 0) {
                 sideItem(.history, icon: "clock.fill", label: "History")
+                sideItem(.templates, icon: "square.stack.3d.up.fill", label: "Templates")
                 Spacer(minLength: centerDiameter)
+                sideItem(.calm, icon: "water.waves", label: "Calm")
                 sideItem(.settings, icon: "gearshape.fill", label: "Settings")
             }
-            .padding(.horizontal, Spacing.l)
+            .padding(.horizontal, Spacing.m)
             .padding(.vertical, Spacing.s)
             .bcGlassCapsule()
             .shadow(color: Theme.cardShadow, radius: 18, x: 0, y: 10)
@@ -154,7 +165,7 @@ struct FloatingTabBar: View {
             homeButton
                 .offset(y: -centerLift)
         }
-        .padding(.horizontal, Spacing.xl)
+        .padding(.horizontal, Spacing.l)
         .padding(.top, centerLift)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selection)
     }

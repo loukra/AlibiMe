@@ -68,11 +68,15 @@ struct TemplateCard: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-                    if let preview = template.previewOpeningLine ?? template.previewSMSBody {
-                        Text("“\(preview)”")
-                            .font(.footnote.italic())
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
+                    // One template, both channel previews — so a dual-channel
+                    // template reveals how each channel behaves.
+                    VStack(alignment: .leading, spacing: Spacing.xs) {
+                        if template.supports(.call), let line = template.previewOpeningLine {
+                            channelPreview(.call, text: line)
+                        }
+                        if template.supports(.text), let body = template.previewSMSBody {
+                            channelPreview(.text, text: body)
+                        }
                     }
                     HStack(spacing: Spacing.xs) {
                         ForEach(Array(template.supportedChannels).sorted { $0.rawValue < $1.rawValue }) { channel in
@@ -91,6 +95,24 @@ struct TemplateCard: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    /// A labelled, per-channel preview line (e.g. CALL “…”, TEXT “…”).
+    @ViewBuilder
+    private func channelPreview(_ channel: Channel, text: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: Spacing.s) {
+            Label(channel.title, systemImage: channel.systemImage)
+                .labelStyle(.iconOnly)
+                .font(.caption)
+                .foregroundStyle(Theme.accent)
+                .frame(width: 18)
+            Text("“\(text)”")
+                .font(.footnote.italic())
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(channel.title) preview: \(text)")
     }
 }
 

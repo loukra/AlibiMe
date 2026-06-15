@@ -35,6 +35,12 @@ public protocol AuthServicing: Sendable {
 
 public protocol TemplateServicing: Sendable {
     func list() async throws -> [TemplateSummary]
+    /// Allowed structured choices for building a custom template.
+    func options() async throws -> TemplateOptions
+    /// Create a user-owned custom template from structured choices.
+    func createCustom(_ draft: CustomTemplateDraft) async throws -> TemplateSummary
+    /// Delete one of the user's own custom templates.
+    func delete(id: String) async throws
 }
 
 public protocol RequestServicing: Sendable {
@@ -131,6 +137,37 @@ public struct LiveTemplateService: TemplateServicing {
     public func list() async throws -> [TemplateSummary] {
         let dto = try await client.send(Endpoint(.GET, "v1/templates"), as: TemplateListResponseDTO.self)
         return dto.templates.map(TemplateSummary.init(dto:))
+    }
+
+    public func options() async throws -> TemplateOptions {
+        let dto = try await client.send(
+            Endpoint(.GET, "v1/templates/options"), as: TemplateOptionsResponseDTO.self
+        )
+        return TemplateOptions(dto: dto)
+    }
+
+    public func createCustom(_ draft: CustomTemplateDraft) async throws -> TemplateSummary {
+        let body = try BCCoding.encoder.encode(
+            CreateCustomTemplateBodyDTO(
+                display_name: draft.displayName,
+                description: draft.description.isEmpty ? nil : draft.description,
+                category: draft.category,
+                persona: draft.persona,
+                reason: draft.reason,
+                urgency: draft.urgency,
+                channels: draft.channels.map(\.wireValue),
+                voice_style: draft.voiceStyle,
+                call_max_seconds: draft.callMaxSeconds
+            )
+        )
+        let dto = try await client.send(
+            Endpoint(.POST, "v1/templates", body: body), as: TemplateOutDTO.self
+        )
+        return TemplateSummary(dto: dto)
+    }
+
+    public func delete(id: String) async throws {
+        try await client.sendExpectingNoContent(Endpoint(.DELETE, "v1/templates/\(id)"))
     }
 }
 

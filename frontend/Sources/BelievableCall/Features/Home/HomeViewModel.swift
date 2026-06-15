@@ -105,12 +105,24 @@ public final class HomeViewModel {
         }
     }
 
-    /// On foreground/resume, refresh just the active request if one exists.
+    /// On foreground/resume (and each time the Home tab becomes visible), refresh
+    /// the active request, profile, and the template catalog — so templates
+    /// created on the Templates tab appear here too. The current selection is
+    /// preserved if it still exists.
     public func refresh() async {
         await refreshActiveRequest()
         if let updated = try? await profileService.me() {
             profile = updated
             if !hasActiveRequest { activeRequest = updated.activeRequest }
+        }
+        if let latest = try? await templateService.list() {
+            templates = latest
+            if let current = selectedTemplate, latest.contains(where: { $0.id == current.id }) {
+                selectedTemplate = latest.first { $0.id == current.id }
+            } else {
+                restoreSelection()
+            }
+            reconcileChannel()
         }
     }
 

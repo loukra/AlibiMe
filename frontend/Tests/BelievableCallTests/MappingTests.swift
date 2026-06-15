@@ -35,6 +35,7 @@ final class MappingTests: XCTestCase {
             description: "desc", category: "work", caller_persona: "boss",
             reason_code: "travel_assignment_abroad",
             sender_persona_key: "boss", sender_display_name: "Boss", supports_contact_save: true,
+            is_custom: false,
             supported_channels: ["call", "sms"],
             call_max_duration_seconds: 60, preview_opening_line: "hi", preview_sms_body: "yo"
         )
@@ -46,6 +47,7 @@ final class MappingTests: XCTestCase {
         XCTAssertEqual(model.senderPersonaKey, "boss")
         XCTAssertEqual(model.senderDisplayName, "Boss")
         XCTAssertTrue(model.supportsContactSave)
+        XCTAssertFalse(model.isCustom)
     }
 
     func testUnknownCategoryFallsBack() {

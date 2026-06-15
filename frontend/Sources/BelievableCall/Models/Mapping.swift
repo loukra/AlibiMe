@@ -23,10 +23,27 @@ extension TemplateSummary {
             senderPersonaKey: dto.sender_persona_key,
             senderDisplayName: dto.sender_display_name,
             supportsContactSave: dto.supports_contact_save,
+            isCustom: dto.is_custom ?? false,
             supportedChannels: Set(channels),
             callMaxDurationSeconds: dto.call_max_duration_seconds,
             previewOpeningLine: dto.preview_opening_line,
             previewSMSBody: dto.preview_sms_body
+        )
+    }
+}
+
+extension TemplateOptions {
+    init(dto: TemplateOptionsResponseDTO) {
+        self.init(
+            personas: dto.personas.map { TemplateOption(code: $0.code, label: $0.label) },
+            reasons: dto.reasons.map { TemplateOption(code: $0.code, label: $0.label) },
+            categories: dto.categories,
+            urgencies: dto.urgencies,
+            voiceStyles: dto.voice_styles,
+            channels: dto.channels.compactMap { Channel(wireValue: $0) },
+            callSecondsMin: dto.call_seconds_min,
+            callSecondsMax: dto.call_seconds_max,
+            callSecondsDefault: dto.call_seconds_default
         )
     }
 }

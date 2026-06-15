@@ -1,11 +1,20 @@
 from __future__ import annotations
 
+import uuid
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentContext, get_current_context, get_db
-from app.domain.templates.service import list_catalog
-from app.schemas.templates import TemplateListResponse, TemplateOut
+from app.core.errors import ValidationFailed
+from app.domain.templates import compose
+from app.domain.templates import service as templates_service
+from app.schemas.templates import (
+    CreateCustomTemplateBody,
+    TemplateListResponse,
+    TemplateOptionsResponse,
+    TemplateOut,
+)
 
 router = APIRouter(prefix="/v1/templates", tags=["templates"])
 
@@ -15,5 +24,48 @@ def get_templates(
     ctx: CurrentContext = Depends(get_current_context),
     db: Session = Depends(get_db),
 ) -> TemplateListResponse:
-    catalog = list_catalog(db, ctx.user.locale)
+    catalog = templates_service.list_catalog(db, ctx.user.locale, ctx.user.id)
     return TemplateListResponse(templates=[TemplateOut(**t) for t in catalog])
+
+
+@router.get("/options", response_model=TemplateOptionsResponse)
+def get_template_options(
+    ctx: CurrentContext = Depends(get_current_context),
+) -> TemplateOptionsResponse:
+    return TemplateOptionsResponse(**compose.options(ctx.user.locale))
+
+
+@router.post("", response_model=TemplateOut, status_code=201)
+def create_custom_template(
+    body: CreateCustomTemplateBody,
+    ctx: CurrentContext = Depends(get_current_context),
+    db: Session = Depends(get_db),
+) -> TemplateOut:
+    item = templates_service.create_custom_template(
+        db,
+        ctx.user.id,
+        display_name=body.display_name,
+        description=body.description,
+        category=body.category,
+        persona=body.persona,
+        reason=body.reason,
+        urgency=body.urgency,
+        channels=body.channels,
+        voice_style=body.voice_style,
+        call_max_seconds=body.call_max_seconds,
+        locale=ctx.user.locale,
+    )
+    return TemplateOut(**item)
+
+
+@router.delete("/{template_id}", status_code=204)
+def delete_custom_template(
+    template_id: str,
+    ctx: CurrentContext = Depends(get_current_context),
+    db: Session = Depends(get_db),
+) -> None:
+    try:
+        tid = uuid.UUID(template_id)
+    except (ValueError, TypeError):
+        raise ValidationFailed("Invalid template id.")
+    templates_service.delete_custom_template(db, ctx.user.id, tid)

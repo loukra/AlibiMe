@@ -90,6 +90,8 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
     public let senderPersonaKey: String
     public let senderDisplayName: String
     public let supportsContactSave: Bool
+    /// True for a user's own custom template; false for built-in/system ones.
+    public let isCustom: Bool
     public let supportedChannels: Set<Channel>
     public let callMaxDurationSeconds: Int?
     public let previewOpeningLine: String?
@@ -105,6 +107,7 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
                 senderPersonaKey: String = "",
                 senderDisplayName: String = "",
                 supportsContactSave: Bool = true,
+                isCustom: Bool = false,
                 supportedChannels: Set<Channel>,
                 callMaxDurationSeconds: Int?,
                 previewOpeningLine: String?,
@@ -119,6 +122,7 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
         self.senderPersonaKey = senderPersonaKey
         self.senderDisplayName = senderDisplayName
         self.supportsContactSave = supportsContactSave
+        self.isCustom = isCustom
         self.supportedChannels = supportedChannels
         self.callMaxDurationSeconds = callMaxDurationSeconds
         self.previewOpeningLine = previewOpeningLine
@@ -136,6 +140,59 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
         case .text: return previewSMSBody
         }
     }
+}
+
+/// A labelled option (persona/reason) for the custom-template editor dropdowns.
+public struct TemplateOption: Identifiable, Equatable, Sendable {
+    public var id: String { code }
+    public let code: String
+    public let label: String
+    public init(code: String, label: String) {
+        self.code = code
+        self.label = label
+    }
+}
+
+/// Backend-provided catalog of safe choices for building a custom template.
+public struct TemplateOptions: Equatable, Sendable {
+    public let personas: [TemplateOption]
+    public let reasons: [TemplateOption]
+    public let categories: [String]
+    public let urgencies: [String]
+    public let voiceStyles: [String]
+    public let channels: [Channel]
+    public let callSecondsMin: Int
+    public let callSecondsMax: Int
+    public let callSecondsDefault: Int
+
+    public init(personas: [TemplateOption], reasons: [TemplateOption], categories: [String],
+                urgencies: [String], voiceStyles: [String], channels: [Channel],
+                callSecondsMin: Int, callSecondsMax: Int, callSecondsDefault: Int) {
+        self.personas = personas
+        self.reasons = reasons
+        self.categories = categories
+        self.urgencies = urgencies
+        self.voiceStyles = voiceStyles
+        self.channels = channels
+        self.callSecondsMin = callSecondsMin
+        self.callSecondsMax = callSecondsMax
+        self.callSecondsDefault = callSecondsDefault
+    }
+}
+
+/// The structured selections a user makes to create a custom template. There is
+/// no free-form prompt/SMS text — only safe, backend-validated choices.
+public struct CustomTemplateDraft: Equatable, Sendable {
+    public var displayName: String = ""
+    public var description: String = ""
+    public var category: String = "social"
+    public var persona: String = ""
+    public var reason: String = ""
+    public var urgency: String = "normal"
+    public var channels: Set<Channel> = [.call, .text]
+    public var voiceStyle: String = "neutral"
+    public var callMaxSeconds: Int = 60
+    public init() {}
 }
 
 /// User-facing channel. The wire value (`call`/`sms`) lives only in the mapping.
