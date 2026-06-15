@@ -26,29 +26,27 @@ class TemplateListResponse(BaseModel):
 
 
 class CreateCustomTemplateBody(BaseModel):
+    """Structured custom-template inputs. All coded fields; the backend rejects
+    anything outside the approved catalogs. No free-form provider content."""
+
     display_name: str = Field(min_length=1, max_length=120)
     description: str | None = Field(default=None, max_length=255)
     category: str
     persona: str
     reason: str
-    urgency: str = "normal"
     channels: list[str] = Field(min_length=1)
+    # Richer shared-core meaning (sensible defaults so a minimal payload works).
+    urgency: str = "medium"
+    outcome: str = "step_out_briefly"
+    setting: str = "casual_hangout"
+    tone: str = "casual"
+    detail_profile: str = "minimal"
+    discretion_level: str = "normal"
+    formality: str = "neutral"
+    expected_response: str = "no_reply_needed"
+    followup_behavior: str = "one_touch_only"
+    continuity_scope: str = "one_off"
+    context_modules: list[str] = Field(default_factory=list)
+    # Existing channel knobs.
     voice_style: str = "neutral"
     call_max_seconds: int | None = None
-
-
-class TemplateOptionItem(BaseModel):
-    code: str
-    label: str
-
-
-class TemplateOptionsResponse(BaseModel):
-    personas: list[TemplateOptionItem]
-    reasons: list[TemplateOptionItem]
-    categories: list[str]
-    urgencies: list[str]
-    voice_styles: list[str]
-    channels: list[str]
-    call_seconds_min: int
-    call_seconds_max: int
-    call_seconds_default: int

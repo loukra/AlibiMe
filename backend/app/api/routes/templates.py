@@ -12,7 +12,6 @@ from app.domain.templates import service as templates_service
 from app.schemas.templates import (
     CreateCustomTemplateBody,
     TemplateListResponse,
-    TemplateOptionsResponse,
     TemplateOut,
 )
 
@@ -28,11 +27,13 @@ def get_templates(
     return TemplateListResponse(templates=[TemplateOut(**t) for t in catalog])
 
 
-@router.get("/options", response_model=TemplateOptionsResponse)
+@router.get("/options")
 def get_template_options(
     ctx: CurrentContext = Depends(get_current_context),
-) -> TemplateOptionsResponse:
-    return TemplateOptionsResponse(**compose.options(ctx.user.locale))
+) -> dict:
+    # The full coded catalog (scenario dimensions + user-context profile options)
+    # the editor and Profile tab build from. Returned as-is.
+    return compose.options(ctx.user.locale)
 
 
 @router.post("", response_model=TemplateOut, status_code=201)
@@ -49,8 +50,18 @@ def create_custom_template(
         category=body.category,
         persona=body.persona,
         reason=body.reason,
-        urgency=body.urgency,
         channels=body.channels,
+        urgency=body.urgency,
+        outcome=body.outcome,
+        setting=body.setting,
+        tone=body.tone,
+        detail_profile=body.detail_profile,
+        discretion_level=body.discretion_level,
+        formality=body.formality,
+        expected_response=body.expected_response,
+        followup_behavior=body.followup_behavior,
+        continuity_scope=body.continuity_scope,
+        context_modules=body.context_modules,
         voice_style=body.voice_style,
         call_max_seconds=body.call_max_seconds,
         locale=ctx.user.locale,

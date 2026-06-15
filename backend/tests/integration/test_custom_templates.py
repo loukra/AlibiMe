@@ -6,8 +6,8 @@ def _create(client, headers, **overrides):
     body = {
         "display_name": "My boss call",
         "category": "work",
-        "persona": "boss",
-        "reason": "urgent_work_issue",
+        "persona": "manager",
+        "reason": "work_urgent_task",
         "urgency": "high",
         "channels": ["call", "sms"],
         "voice_style": "neutral",
@@ -23,7 +23,7 @@ def test_options_lists_allowed_choices(client):
     assert resp.status_code == 200, resp.text
     opts = resp.json()
     persona_codes = {p["code"] for p in opts["personas"]}
-    assert {"boss", "best_friend"} <= persona_codes
+    assert {"manager", "best_friend"} <= persona_codes
     assert opts["personas"][0]["label"]  # localized label present
     assert "call" in opts["channels"] and "sms" in opts["channels"]
     assert opts["call_seconds_min"] <= opts["call_seconds_default"] <= opts["call_seconds_max"]

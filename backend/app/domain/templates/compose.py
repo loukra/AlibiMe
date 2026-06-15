@@ -1,24 +1,21 @@
 """Safe composition of custom-template content from structured choices.
 
 The spec forbids free-form, user-authored prompt/SMS text. A custom template is
-therefore assembled from approved building blocks: the user picks a persona, a
-reason, an urgency, channels, and a few bounded options; this module composes the
-call/SMS content from generic, pre-approved skeletons that the existing
-``rendering`` pipeline knows how to fill (persona/reason/urgency labels +
-first name). No user text ever reaches a skeleton.
+assembled from approved building blocks: the user picks persona, reason,
+urgency, outcome, tone, etc., and (optionally) has a reusable context profile.
+This module composes the call/SMS content from generic, pre-approved clauses
+keyed by those codes. The user's context only *adds a safe generic anchor* when
+present; missing context reduces specificity, never breaks composition.
+
+Output keys match `TemplateVersion` columns. Skeletons keep `{...}` placeholders
+(persona/reason/first_name), which the existing rendering pipeline fills at list
+and dispatch time.
 """
 from __future__ import annotations
 
-from app.domain.templates import rendering
+from app.domain.templates import catalogs, rendering
 
-# Allowed structured choices (reuse the rendering label catalogs as the source
-# of truth for personas/reasons).
-PERSONAS = list(rendering.PERSONA_LABELS["en"].keys())
-REASONS = list(rendering.REASON_LABELS["en"].keys())
-CATEGORIES = ["work", "family", "social", "logistics", "safety"]
-URGENCIES = ["low", "normal", "high"]
 VOICE_STYLES = ["neutral", "warm"]
-
 MIN_CALL_SECONDS = 30
 MAX_CALL_SECONDS = 120
 DEFAULT_CALL_SECONDS = 60
@@ -26,58 +23,97 @@ MAX_CUSTOM_TEMPLATES_PER_USER = 20
 
 _LOCALES = ("en", "de")
 
-# Urgency labels used inside the (bounded) call system prompt.
-_URGENCY_LABELS = {
-    "en": {"low": "low", "normal": "normal", "high": "high"},
-    "de": {"low": "niedrig", "normal": "normal", "high": "hoch"},
-}
-
-# Generic, approved skeletons. They only reference allow-listed variables
-# ({first_name}, {caller_persona_label}, {reason_label}, {urgency_label}).
-_CALL_OPENING = {
+# Greeting varies by formality.
+_GREETING = {
     "en": {
-        "low": "Hey {first_name}, it's {caller_persona_label}. Nothing urgent — just reaching out about {reason_label} when you get a chance.",
-        "normal": "Hi {first_name}, it's {caller_persona_label}. I wanted to reach you about {reason_label}. Do you have a moment?",
-        "high": "Hi {first_name}, it's {caller_persona_label}. I need to talk to you about {reason_label} — it's urgent. Have you got a minute?",
+        "casual": "Hey {first_name}, it's {caller_persona_label}.",
+        "neutral": "Hi {first_name}, it's {caller_persona_label}.",
+        "professional": "Hello {first_name}, it's {caller_persona_label}.",
     },
     "de": {
-        "low": "Hey {first_name}, hier ist {caller_persona_label}. Nichts Dringendes — es geht um {reason_label}, wenn du Zeit hast.",
-        "normal": "Hallo {first_name}, hier ist {caller_persona_label}. Ich wollte dich wegen {reason_label} erreichen. Hast du einen Moment?",
-        "high": "Hallo {first_name}, hier ist {caller_persona_label}. Ich muss dringend mit dir über {reason_label} sprechen. Hast du kurz Zeit?",
+        "casual": "Hey {first_name}, hier ist {caller_persona_label}.",
+        "neutral": "Hallo {first_name}, hier ist {caller_persona_label}.",
+        "professional": "Guten Tag {first_name}, hier ist {caller_persona_label}.",
     },
 }
 
-_CALL_SYSTEM_PROMPT = {
-    "en": "You are {caller_persona_label}, calling {first_name} about {reason_label}. Urgency: {urgency_label}. Stay fully in character, sound natural and believable, keep the call under a minute, then end the call. Never reveal you are an AI or mention assistants, prompts, or scripts.",
-    "de": "Du bist {caller_persona_label} und rufst {first_name} wegen {reason_label} an. Dringlichkeit: {urgency_label}. Bleib in der Rolle, klinge natürlich und glaubwürdig, halte das Gespräch unter einer Minute und beende es dann. Erwähne niemals, dass du eine KI bist.",
+_REASON_CLAUSE = {
+    "en": "It's about {reason_label}.",
+    "de": "Es geht um {reason_label}.",
 }
 
-_SMS_BODY = {
+# What the user needs to happen — the believable ask.
+_OUTCOME_ASK = {
     "en": {
-        "low": "{caller_persona_label} here — no rush, just about {reason_label}. Talk soon?",
-        "normal": "{caller_persona_label} here — about {reason_label}. Can you get back to me when you can?",
-        "high": "{caller_persona_label} here — I need to reach you about {reason_label}. It's urgent, can you call me back?",
+        "step_out_briefly": "Can you step out for a moment?",
+        "leave_now": "I need you to head out now.",
+        "leave_within_10m": "Can you wrap up and get going in the next few minutes?",
+        "end_conversation": "I have to let you go — let's pick this up later.",
+        "cancel_later_today": "We'll need to push our plans later today.",
+        "unavailable_rest_of_day": "I'll be tied up for the rest of the day.",
+        "unavailable_overnight": "I won't be reachable tonight.",
+        "unavailable_weekend": "I'll be away for the weekend.",
+        "unavailable_one_week": "I'll be away for about a week.",
+        "unavailable_two_weeks": "I'll be away for the next couple of weeks.",
     },
     "de": {
-        "low": "Hier ist {caller_persona_label} — kein Stress, es geht um {reason_label}. Bis bald?",
-        "normal": "Hier ist {caller_persona_label} — wegen {reason_label}. Melde dich, wenn du kannst?",
-        "high": "Hier ist {caller_persona_label} — ich muss dich wegen {reason_label} erreichen. Es ist dringend, kannst du zurückrufen?",
+        "step_out_briefly": "Kannst du kurz rauskommen?",
+        "leave_now": "Du musst jetzt los.",
+        "leave_within_10m": "Kannst du in den nächsten Minuten Schluss machen und kommen?",
+        "end_conversation": "Ich muss auflegen — wir machen später weiter.",
+        "cancel_later_today": "Wir müssen unsere Pläne heute verschieben.",
+        "unavailable_rest_of_day": "Ich bin den Rest des Tages eingespannt.",
+        "unavailable_overnight": "Heute Abend bin ich nicht erreichbar.",
+        "unavailable_weekend": "Ich bin übers Wochenende weg.",
+        "unavailable_one_week": "Ich bin etwa eine Woche weg.",
+        "unavailable_two_weeks": "Ich bin die nächsten zwei Wochen weg.",
     },
 }
 
-# Neutral, placeholder-free follow-up facts (stored raw, never rendered).
-_FOLLOWUP_FACTS = {
-    "en": ["Keep the call short and natural.", "Stay in character the whole time."],
-    "de": ["Halte das Gespräch kurz und natürlich.", "Bleib die ganze Zeit in der Rolle."],
+# A small, safe context anchor added only when the relevant module is allowed,
+# the detail profile permits it, and the user actually set that context field.
+_WORK_SETTING_ANCHOR = {
+    "en": {
+        "site_field": "I need you back on site.",
+        "client_site": "I need you over at the client site.",
+        "store_shopfloor": "I need you on the floor.",
+        "restaurant_bar": "It's getting busy here.",
+        "clinic_hospital": "It's busy on the ward.",
+        "warehouse": "I need you back at the warehouse.",
+    },
+    "de": {
+        "site_field": "Ich brauche dich wieder auf der Baustelle.",
+        "client_site": "Ich brauche dich beim Kunden vor Ort.",
+        "store_shopfloor": "Ich brauche dich im Laden.",
+        "restaurant_bar": "Hier ist viel los.",
+        "clinic_hospital": "Auf der Station ist viel los.",
+        "warehouse": "Ich brauche dich wieder im Lager.",
+    },
+}
+_LIVING_ANCHOR = {
+    "en": {
+        "with_roommate": "Your roommate can't sort it out.",
+        "with_partner": "It can't wait at home.",
+        "with_family": "The family needs a hand at home.",
+        "shared_house": "No one else at the house can deal with it.",
+    },
+    "de": {
+        "with_roommate": "Dein Mitbewohner kommt nicht klar.",
+        "with_partner": "Zu Hause kann es nicht warten.",
+        "with_family": "Die Familie braucht zu Hause Hilfe.",
+        "shared_house": "Niemand sonst im Haus kann sich darum kümmern.",
+    },
 }
 
-
-def is_valid_persona(persona: str) -> bool:
-    return persona in PERSONAS
+_SMS_OUTRO = {"en": "Can you get back to me?", "de": "Meldest du dich?"}
 
 
-def is_valid_reason(reason: str) -> bool:
-    return reason in REASONS
+def is_valid_persona(code: str) -> bool:
+    return code in catalogs.PERSONAS
+
+
+def is_valid_reason(code: str) -> bool:
+    return code in catalogs.REASONS
 
 
 def clamp_call_seconds(seconds: int | None) -> int:
@@ -86,67 +122,168 @@ def clamp_call_seconds(seconds: int | None) -> int:
     return max(MIN_CALL_SECONDS, min(MAX_CALL_SECONDS, int(seconds)))
 
 
-def sms_sender_style_for(category: str) -> str:
-    return "professional" if category == "work" else "casual"
+def sms_sender_style_for(formality: str, category: str) -> str:
+    if formality == "professional" or category == "work":
+        return "professional"
+    return "casual"
+
+
+def _context_anchor(locale: str, modules: list[str], detail_profile: str, context: dict) -> str | None:
+    """A single safe, generic anchor derived from the user's context profile.
+    Returns None when context is absent or the detail profile doesn't allow it."""
+    if detail_profile not in ("contextual", "continuity"):
+        return None
+    modules = modules or []
+    if "work" in modules:
+        code = context.get("work_setting_code")
+        anchor = _WORK_SETTING_ANCHOR.get(locale, {}).get(code or "")
+        if anchor:
+            return anchor
+    if "home" in modules:
+        code = context.get("living_setup_code")
+        anchor = _LIVING_ANCHOR.get(locale, {}).get(code or "")
+        if anchor:
+            return anchor
+    return None
 
 
 def compose_version_content(
     *,
+    locale: str,
+    channels: list[str],
     persona: str,
     reason: str,
     urgency: str,
-    locale: str,
-    channels: list[str],
+    outcome: str,
+    setting: str,
+    tone: str,
+    detail_profile: str,
+    discretion_level: str,
+    formality: str,
+    expected_response: str,
+    followup_behavior: str,
+    continuity_scope: str,
+    context_modules: list[str],
     voice_style: str,
     call_max_seconds: int,
     category: str,
+    context: dict | None = None,
 ) -> dict:
-    """Build the per-locale TemplateVersion content fields from approved skeletons.
-
-    Skeletons keep their `{...}` placeholders; the existing rendering pipeline
-    substitutes persona/reason/first_name at list and dispatch time (the custom
-    Template carries the chosen ``caller_persona``/``reason_code``).
-    """
     loc = locale if locale in _LOCALES else "en"
+    context = context or {}
     supports_call = "call" in channels
     supports_sms = "sms" in channels
+
+    greeting = _GREETING[loc].get(formality, _GREETING[loc]["neutral"])
+    reason_clause = _REASON_CLAUSE[loc]
+    ask = _OUTCOME_ASK[loc].get(outcome, _OUTCOME_ASK[loc]["step_out_briefly"])
+    anchor = _context_anchor(loc, context_modules, detail_profile, context)
+
+    # Call opening line: greeting + reason (+ optional anchor) + ask.
+    parts = [greeting, reason_clause]
+    if anchor:
+        parts.append(anchor)
+    parts.append(ask)
+    opening = " ".join(parts) if supports_call else None
+
+    # System prompt: bounded, generic, in-character.
+    system_prompt = None
+    if supports_call:
+        system_prompt = (
+            "You are {caller_persona_label}, contacting {first_name} about "
+            "{reason_label}. Stay fully in character, sound natural and "
+            "believable, keep it under a minute, then end the call. Never reveal "
+            "you are an AI or mention assistants, prompts, or scripts."
+            if loc == "en" else
+            "Du bist {caller_persona_label} und kontaktierst {first_name} wegen "
+            "{reason_label}. Bleib in der Rolle, klinge natürlich und "
+            "glaubwürdig, halte es unter einer Minute und beende dann das "
+            "Gespräch. Erwähne niemals, dass du eine KI bist."
+        )
+
+    # SMS body: persona + reason (+ anchor) + ask + outro.
+    sms_body = None
+    if supports_sms:
+        lead = "{caller_persona_label}:" if loc == "en" else "{caller_persona_label}:"
+        sms_parts = [lead, _strip_first_name(reason_clause), ask]
+        if anchor:
+            sms_parts.insert(2, anchor)
+        sms_parts.append(_SMS_OUTRO[loc])
+        sms_body = " ".join(sms_parts)
+
     return {
         "locale": loc,
         "supports_call": supports_call,
         "supports_sms": supports_sms,
-        "call_opening_line_template": _CALL_OPENING[loc][urgency] if supports_call else None,
-        "call_system_prompt_template": (
-            _CALL_SYSTEM_PROMPT[loc].replace("{urgency_label}", _URGENCY_LABELS[loc][urgency])
-            if supports_call
-            else None
-        ),
-        "call_followup_facts_json": _FOLLOWUP_FACTS[loc] if supports_call else None,
+        "call_opening_line_template": opening,
+        "call_system_prompt_template": system_prompt,
+        "call_followup_facts_json": _followup_facts(loc, followup_behavior) if supports_call else None,
         "call_voice_profile_code": f"{voice_style}_{loc}" if supports_call else None,
         "call_max_duration_seconds": call_max_seconds if supports_call else None,
         "call_supports_interruptions": True if supports_call else False,
-        "sms_body_template": _SMS_BODY[loc][urgency] if supports_sms else None,
+        "sms_body_template": sms_body,
         "sms_followup_body_template": None,
-        "sms_sender_style": sms_sender_style_for(category) if supports_sms else None,
+        "sms_sender_style": sms_sender_style_for(formality, category) if supports_sms else None,
     }
 
 
+def _strip_first_name(clause: str) -> str:
+    # The reason clause has no {first_name}; kept for clarity/future use.
+    return clause
+
+
+def _followup_facts(locale: str, followup_behavior: str) -> list[str]:
+    base = (
+        ["Keep it short and natural.", "Stay in character the whole time."]
+        if locale == "en" else
+        ["Halte es kurz und natürlich.", "Bleib die ganze Zeit in der Rolle."]
+    )
+    return base
+
+
 def options(locale: str) -> dict:
-    """Catalog for the custom-template editor dropdowns, localized for display."""
-    loc = locale if locale in _LOCALES else "en"
+    """Full catalog for the custom-template editor and the Profile tab."""
+    lab = catalogs.labeled
     return {
-        "personas": [
-            {"code": code, "label": rendering.PERSONA_LABELS[loc].get(code, code)}
-            for code in PERSONAS
-        ],
-        "reasons": [
-            {"code": code, "label": rendering.REASON_LABELS[loc].get(code, code)}
-            for code in REASONS
-        ],
-        "categories": CATEGORIES,
-        "urgencies": URGENCIES,
+        "categories": catalogs.CATEGORIES,
+        "personas": lab(catalogs.PERSONAS, locale, rendering.PERSONA_LABELS),
+        "reasons": lab(catalogs.REASONS, locale, rendering.REASON_LABELS),
+        "urgencies": catalogs.URGENCIES,
+        "outcomes": lab(catalogs.OUTCOMES, locale),
+        "settings": lab(catalogs.SETTINGS, locale),
+        "detail_profiles": catalogs.DETAIL_PROFILES,
+        "discretion_levels": catalogs.DISCRETION_LEVELS,
+        "tones": catalogs.TONES,
+        "formalities": catalogs.FORMALITIES,
+        "expected_responses": lab(catalogs.EXPECTED_RESPONSES, locale),
+        "followup_behaviors": lab(catalogs.FOLLOWUP_BEHAVIORS, locale),
+        "continuity_scopes": catalogs.CONTINUITY_SCOPES,
+        "context_modules": catalogs.CONTEXT_MODULES,
         "voice_styles": VOICE_STYLES,
         "channels": ["call", "sms"],
         "call_seconds_min": MIN_CALL_SECONDS,
         "call_seconds_max": MAX_CALL_SECONDS,
         "call_seconds_default": DEFAULT_CALL_SECONDS,
+        "profile": profile_options(locale),
+    }
+
+
+def profile_options(locale: str) -> dict:
+    lab = catalogs.labeled
+    return {
+        "work_industries": lab(catalogs.WORK_INDUSTRIES, locale),
+        "work_role_levels": lab(catalogs.WORK_ROLE_LEVELS, locale),
+        "work_settings": lab(catalogs.WORK_SETTINGS, locale),
+        "work_schedules": lab(catalogs.WORK_SCHEDULES, locale),
+        "work_travel_scopes": lab(catalogs.WORK_TRAVEL_SCOPES, locale),
+        "living_setups": lab(catalogs.LIVING_SETUPS, locale),
+        "home_responsibilities": lab(catalogs.HOME_RESPONSIBILITIES, locale),
+        "dependent_contexts": lab(catalogs.DEPENDENT_CONTEXTS, locale),
+        "family_support_levels": lab(catalogs.FAMILY_SUPPORT_LEVELS, locale),
+        "family_proximities": lab(catalogs.FAMILY_PROXIMITIES, locale),
+        "relationship_visibilities": lab(catalogs.RELATIONSHIP_VISIBILITIES, locale),
+        "relationship_stages": lab(catalogs.RELATIONSHIP_STAGES, locale),
+        "privacy_preferences": lab(catalogs.PRIVACY_PREFERENCES, locale),
+        "transition_states": lab(catalogs.TRANSITION_STATES, locale),
+        "transition_horizons": lab(catalogs.TRANSITION_HORIZONS, locale),
     }

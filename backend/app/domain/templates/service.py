@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 from app.core.errors import NotFound, TemplateChannelNotSupported, ValidationFailed
 from app.db.models.enums import Channel
 from app.db.models.template import Template, TemplateVersion
-from app.domain.templates import compose, rendering
+from app.domain.profile import context as profile_context
+from app.domain.templates import catalogs, compose, rendering
 
 _DEFAULT_LOCALE = "en"
 
@@ -101,6 +102,11 @@ def list_catalog(db: Session, locale: str, user_id: uuid.UUID) -> list[dict]:
     return catalog
 
 
+def _require(code: str, allowed: list[str], field: str) -> None:
+    if code not in allowed:
+        raise ValidationFailed(f"Unknown {field}.")
+
+
 def create_custom_template(
     db: Session,
     user_id: uuid.UUID,
@@ -110,29 +116,46 @@ def create_custom_template(
     category: str,
     persona: str,
     reason: str,
-    urgency: str,
     channels: list[str],
-    voice_style: str,
-    call_max_seconds: int | None,
+    urgency: str = "medium",
+    outcome: str = "step_out_briefly",
+    setting: str = "casual_hangout",
+    tone: str = "casual",
+    detail_profile: str = "minimal",
+    discretion_level: str = "normal",
+    formality: str = "neutral",
+    expected_response: str = "no_reply_needed",
+    followup_behavior: str = "one_touch_only",
+    continuity_scope: str = "one_off",
+    context_modules: list[str] | None = None,
+    voice_style: str = "neutral",
+    call_max_seconds: int | None = None,
     locale: str = _DEFAULT_LOCALE,
 ) -> dict:
     """Validate structured choices and compose a user-owned template (+ versions)
-    from approved skeletons. No free-form user text reaches the content."""
+    from approved building blocks. No free-form user text reaches the content;
+    the user's optional context profile only adds safe, generic anchors."""
     name = (display_name or "").strip()
     if not (1 <= len(name) <= 120):
         raise ValidationFailed("Template name must be 1–120 characters.")
     if description and len(description) > 255:
         raise ValidationFailed("Description is too long.")
-    if category not in compose.CATEGORIES:
-        raise ValidationFailed("Unknown category.")
-    if not compose.is_valid_persona(persona):
-        raise ValidationFailed("Unknown persona.")
-    if not compose.is_valid_reason(reason):
-        raise ValidationFailed("Unknown reason.")
-    if urgency not in compose.URGENCIES:
-        raise ValidationFailed("Unknown urgency.")
+    _require(category, catalogs.CATEGORIES, "category")
+    _require(persona, catalogs.PERSONAS, "persona")
+    _require(reason, catalogs.REASONS, "reason")
+    _require(urgency, catalogs.URGENCIES, "urgency")
+    _require(outcome, catalogs.OUTCOMES, "outcome")
+    _require(setting, catalogs.SETTINGS, "setting")
+    _require(tone, catalogs.TONES, "tone")
+    _require(detail_profile, catalogs.DETAIL_PROFILES, "detail profile")
+    _require(discretion_level, catalogs.DISCRETION_LEVELS, "discretion level")
+    _require(formality, catalogs.FORMALITIES, "formality")
+    _require(expected_response, catalogs.EXPECTED_RESPONSES, "expected response")
+    _require(followup_behavior, catalogs.FOLLOWUP_BEHAVIORS, "follow-up behavior")
+    _require(continuity_scope, catalogs.CONTINUITY_SCOPES, "continuity scope")
     if voice_style not in compose.VOICE_STYLES:
         raise ValidationFailed("Unknown voice style.")
+    modules = [m for m in (context_modules or []) if m in catalogs.CONTEXT_MODULES]
     selected = [c for c in channels if c in (Channel.call.value, Channel.sms.value)]
     if not selected:
         raise ValidationFailed("Select at least one channel.")
@@ -144,6 +167,10 @@ def create_custom_template(
     if existing >= compose.MAX_CUSTOM_TEMPLATES_PER_USER:
         raise ValidationFailed("You've reached the maximum number of custom templates.")
 
+    # Optional context profile → a plain dict of present fields (composer
+    # tolerates emptiness and falls back to generic wording).
+    context = profile_context.context_dict(db, user_id) if modules else {}
+
     tmpl = Template(
         code=f"custom_{uuid.uuid4().hex[:12]}",
         category=category,
@@ -153,23 +180,45 @@ def create_custom_template(
         description=(description.strip() if description else None),
         owner_user_id=user_id,
         sender_persona_key=persona,
-        sender_display_name=rendering.PERSONA_LABELS["en"].get(persona, persona),
+        sender_display_name=rendering._label(rendering.PERSONA_LABELS, "en", persona),
         supports_contact_save=True,
         active=True,
+        urgency_code=urgency,
+        outcome_code=outcome,
+        setting_code=setting,
+        tone_code=tone,
+        detail_profile_code=detail_profile,
+        discretion_level_code=discretion_level,
+        formality_code=formality,
+        expected_response_code=expected_response,
+        followup_behavior_code=followup_behavior,
+        continuity_scope_code=continuity_scope,
+        context_modules_json=modules or None,
     )
     db.add(tmpl)
     db.flush()
 
     for loc in ("en", "de"):
         content = compose.compose_version_content(
+            locale=loc,
+            channels=selected,
             persona=persona,
             reason=reason,
             urgency=urgency,
-            locale=loc,
-            channels=selected,
+            outcome=outcome,
+            setting=setting,
+            tone=tone,
+            detail_profile=detail_profile,
+            discretion_level=discretion_level,
+            formality=formality,
+            expected_response=expected_response,
+            followup_behavior=followup_behavior,
+            continuity_scope=continuity_scope,
+            context_modules=modules,
             voice_style=voice_style,
             call_max_seconds=seconds,
             category=category,
+            context=context,
         )
         db.add(TemplateVersion(template_id=tmpl.id, version=1, active=True, **content))
 

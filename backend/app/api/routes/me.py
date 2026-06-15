@@ -5,8 +5,10 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentContext, get_current_context, get_db
 from app.domain.billing.entitlements import entitlement_summary
+from app.domain.profile import context as profile_context
 from app.domain.requests.service import get_active_request
 from app.domain.users.service import masked_primary_number
+from app.schemas.context_profile import ContextProfileBody, ContextProfileOut
 from app.schemas.me import (
     ActiveRequestSummary,
     EntitlementSummaryItem,
@@ -63,3 +65,25 @@ def patch_me(
         user.display_name = body.display_name
     db.commit()
     return _build_me(db, user)
+
+
+@router.get("/context-profile", response_model=ContextProfileOut)
+def get_context_profile(
+    ctx: CurrentContext = Depends(get_current_context),
+    db: Session = Depends(get_db),
+) -> ContextProfileOut:
+    profile = profile_context.get_profile(db, ctx.user.id)
+    return ContextProfileOut(**profile_context.profile_to_dict(profile))
+
+
+@router.put("/context-profile", response_model=ContextProfileOut)
+def put_context_profile(
+    body: ContextProfileBody,
+    ctx: CurrentContext = Depends(get_current_context),
+    db: Session = Depends(get_db),
+) -> ContextProfileOut:
+    # Only fields explicitly sent are written (so a partial save doesn't clear
+    # the rest); send an explicit null to clear a field.
+    values = body.model_dump(exclude_unset=True)
+    profile = profile_context.upsert_profile(db, ctx.user.id, values)
+    return ContextProfileOut(**profile_context.profile_to_dict(profile))

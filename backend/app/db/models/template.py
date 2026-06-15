@@ -35,6 +35,23 @@ class Template(Base):
     active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=utcnow, nullable=False)
 
+    # Richer structured scenario meaning (shared core, applies across channels).
+    # All are safe coded values (validated against catalogs), never free text.
+    # Nullable so existing/system templates need no values; custom templates set
+    # them and the composer uses them to shape approved wording.
+    urgency_code: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    outcome_code: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    setting_code: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    tone_code: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    detail_profile_code: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    discretion_level_code: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    formality_code: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    expected_response_code: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    followup_behavior_code: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    continuity_scope_code: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    # Which user-context modules this template may draw on (e.g. ["work","home"]).
+    context_modules_json: Mapped[list | None] = mapped_column(JSON, default=None, nullable=True)
+
     versions: Mapped[list["TemplateVersion"]] = relationship(
         back_populates="template", cascade="all, delete-orphan"
     )
