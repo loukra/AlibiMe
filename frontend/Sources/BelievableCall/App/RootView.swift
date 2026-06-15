@@ -71,11 +71,12 @@ struct AuthContainer: View {
 }
 
 struct MainTabView: View {
-    enum Tab: Hashable { case history, templates, home, calm, settings }
+    enum Tab: Hashable { case history, templates, home, profile, settings }
 
     @State private var home: HomeViewModel
     @State private var history: HistoryViewModel
     @State private var templates: TemplatesViewModel
+    @State private var profile: ProfileViewModel
     @State private var settings: SettingsViewModel
     @State private var selection: Tab = .home
 
@@ -83,6 +84,7 @@ struct MainTabView: View {
         _home = State(initialValue: app.makeHomeViewModel())
         _history = State(initialValue: app.makeHistoryViewModel())
         _templates = State(initialValue: app.makeTemplatesViewModel())
+        _profile = State(initialValue: app.makeProfileViewModel())
         _settings = State(initialValue: app.makeSettingsViewModel())
     }
 
@@ -101,7 +103,7 @@ struct MainTabView: View {
             case .home: Task { await home.refresh() }
             case .history: Task { await history.load() }
             case .templates: Task { await templates.load() }
-            case .calm, .settings: break
+            case .profile, .settings: break
             }
         }
     }
@@ -119,9 +121,9 @@ struct MainTabView: View {
             NavigationStack { TemplatesView(vm: templates) }
                 .opacity(selection == .templates ? 1 : 0)
                 .allowsHitTesting(selection == .templates)
-            CalmWavesView()
-                .opacity(selection == .calm ? 1 : 0)
-                .allowsHitTesting(selection == .calm)
+            ProfileView(vm: profile)
+                .opacity(selection == .profile ? 1 : 0)
+                .allowsHitTesting(selection == .profile)
             SettingsView(vm: settings)
                 .opacity(selection == .settings ? 1 : 0)
                 .allowsHitTesting(selection == .settings)
@@ -154,7 +156,7 @@ struct FloatingTabBar: View {
                 sideItem(.history, icon: "clock.fill", label: "History")
                 sideItem(.templates, icon: "square.stack.3d.up.fill", label: "Templates")
                 Spacer(minLength: centerDiameter)
-                sideItem(.calm, icon: "water.waves", label: "Calm")
+                sideItem(.profile, icon: "person.crop.circle.fill", label: "Profile")
                 sideItem(.settings, icon: "gearshape.fill", label: "Settings")
             }
             .padding(.horizontal, Spacing.m)

@@ -69,6 +69,11 @@ public protocol CreditPackagesServicing: Sendable {
     func acquire(code: String, clientRequestID: String) async throws -> CreditAcquisition
 }
 
+public protocol ContextProfileServicing: Sendable {
+    func get() async throws -> ContextProfile
+    func update(_ profile: ContextProfile) async throws -> ContextProfile
+}
+
 /// Contacts authorization, normalized so view models don't depend on the
 /// Contacts framework directly (and so it compiles on the macOS test host).
 public enum ContactAuthorization: String, Sendable, Equatable {
@@ -154,8 +159,18 @@ public struct LiveTemplateService: TemplateServicing {
                 category: draft.category,
                 persona: draft.persona,
                 reason: draft.reason,
-                urgency: draft.urgency,
                 channels: draft.channels.map(\.wireValue),
+                urgency: draft.urgency,
+                outcome: draft.outcome,
+                setting: draft.setting,
+                tone: draft.tone,
+                detail_profile: draft.detailProfile,
+                discretion_level: draft.discretionLevel,
+                formality: draft.formality,
+                expected_response: draft.expectedResponse,
+                followup_behavior: draft.followupBehavior,
+                continuity_scope: draft.continuityScope,
+                context_modules: Array(draft.contextModules),
                 voice_style: draft.voiceStyle,
                 call_max_seconds: draft.callMaxSeconds
             )
@@ -257,6 +272,26 @@ public struct LiveDeviceService: DeviceServicing {
                             push_token: pushToken, app_version: appVersion, os_version: osVersion)
         )
         _ = try await client.send(Endpoint(.PUT, "v1/devices/current", body: body), as: DeviceResponseDTO.self)
+    }
+}
+
+public struct LiveContextProfileService: ContextProfileServicing {
+    let client: APIClient
+    public init(client: APIClient) { self.client = client }
+
+    public func get() async throws -> ContextProfile {
+        let dto = try await client.send(
+            Endpoint(.GET, "v1/me/context-profile"), as: ContextProfileDTO.self
+        )
+        return ContextProfile(dto: dto)
+    }
+
+    public func update(_ profile: ContextProfile) async throws -> ContextProfile {
+        let body = try BCCoding.encoder.encode(profile.toDTO())
+        let dto = try await client.send(
+            Endpoint(.PUT, "v1/me/context-profile", body: body), as: ContextProfileDTO.self
+        )
+        return ContextProfile(dto: dto)
     }
 }
 

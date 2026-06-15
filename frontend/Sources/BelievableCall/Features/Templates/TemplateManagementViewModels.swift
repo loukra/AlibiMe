@@ -9,16 +9,23 @@ public final class TemplatesViewModel {
     public private(set) var templates: [TemplateSummary] = []
     public private(set) var isLoading = false
     public var errorMessage: String?
+    /// Whether the user has any context profile set (drives the optional note).
+    public private(set) var hasProfileContext = false
 
     private let service: TemplateServicing
+    private let contextProfile: ContextProfileServicing?
     public var onSessionExpired: (() -> Void)?
 
-    public init(service: TemplateServicing) {
+    public init(service: TemplateServicing, contextProfile: ContextProfileServicing? = nil) {
         self.service = service
+        self.contextProfile = contextProfile
     }
 
     public var systemTemplates: [TemplateSummary] { templates.filter { !$0.isCustom } }
     public var customTemplates: [TemplateSummary] { templates.filter { $0.isCustom } }
+
+    /// Show the "configure your profile" note only when we know there's no context.
+    public var showProfileNote: Bool { contextProfile != nil && !hasProfileContext }
 
     public func load() async {
         isLoading = true
@@ -26,6 +33,9 @@ public final class TemplatesViewModel {
         defer { isLoading = false }
         do {
             templates = try await service.list()
+            if let contextProfile {
+                hasProfileContext = (try? await contextProfile.get())?.hasAnyContext ?? false
+            }
         } catch {
             handle(error)
         }

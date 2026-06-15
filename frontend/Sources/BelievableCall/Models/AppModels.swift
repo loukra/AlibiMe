@@ -153,31 +153,49 @@ public struct TemplateOption: Identifiable, Equatable, Sendable {
     }
 }
 
+/// Catalog of safe profile-context choices (for the Profile tab dropdowns).
+public struct ProfileOptions: Equatable, Sendable {
+    public var workIndustries: [TemplateOption] = []
+    public var workRoleLevels: [TemplateOption] = []
+    public var workSettings: [TemplateOption] = []
+    public var workSchedules: [TemplateOption] = []
+    public var workTravelScopes: [TemplateOption] = []
+    public var livingSetups: [TemplateOption] = []
+    public var homeResponsibilities: [TemplateOption] = []
+    public var dependentContexts: [TemplateOption] = []
+    public var familySupportLevels: [TemplateOption] = []
+    public var familyProximities: [TemplateOption] = []
+    public var relationshipVisibilities: [TemplateOption] = []
+    public var relationshipStages: [TemplateOption] = []
+    public var privacyPreferences: [TemplateOption] = []
+    public var transitionStates: [TemplateOption] = []
+    public var transitionHorizons: [TemplateOption] = []
+    public init() {}
+}
+
 /// Backend-provided catalog of safe choices for building a custom template.
 public struct TemplateOptions: Equatable, Sendable {
-    public let personas: [TemplateOption]
-    public let reasons: [TemplateOption]
-    public let categories: [String]
-    public let urgencies: [String]
-    public let voiceStyles: [String]
-    public let channels: [Channel]
-    public let callSecondsMin: Int
-    public let callSecondsMax: Int
-    public let callSecondsDefault: Int
-
-    public init(personas: [TemplateOption], reasons: [TemplateOption], categories: [String],
-                urgencies: [String], voiceStyles: [String], channels: [Channel],
-                callSecondsMin: Int, callSecondsMax: Int, callSecondsDefault: Int) {
-        self.personas = personas
-        self.reasons = reasons
-        self.categories = categories
-        self.urgencies = urgencies
-        self.voiceStyles = voiceStyles
-        self.channels = channels
-        self.callSecondsMin = callSecondsMin
-        self.callSecondsMax = callSecondsMax
-        self.callSecondsDefault = callSecondsDefault
-    }
+    public var categories: [String] = []
+    public var personas: [TemplateOption] = []
+    public var reasons: [TemplateOption] = []
+    public var urgencies: [String] = []
+    public var outcomes: [TemplateOption] = []
+    public var settings: [TemplateOption] = []
+    public var detailProfiles: [String] = []
+    public var discretionLevels: [String] = []
+    public var tones: [String] = []
+    public var formalities: [String] = []
+    public var expectedResponses: [TemplateOption] = []
+    public var followupBehaviors: [TemplateOption] = []
+    public var continuityScopes: [String] = []
+    public var contextModules: [String] = []
+    public var voiceStyles: [String] = []
+    public var channels: [Channel] = []
+    public var callSecondsMin: Int = 30
+    public var callSecondsMax: Int = 120
+    public var callSecondsDefault: Int = 60
+    public var profile = ProfileOptions()
+    public init() {}
 }
 
 /// The structured selections a user makes to create a custom template. There is
@@ -185,14 +203,76 @@ public struct TemplateOptions: Equatable, Sendable {
 public struct CustomTemplateDraft: Equatable, Sendable {
     public var displayName: String = ""
     public var description: String = ""
-    public var category: String = "social"
+    public var category: String = "social_exit"
     public var persona: String = ""
     public var reason: String = ""
-    public var urgency: String = "normal"
     public var channels: Set<Channel> = [.call, .text]
+    public var urgency: String = "medium"
+    public var outcome: String = "step_out_briefly"
+    public var setting: String = "casual_hangout"
+    public var tone: String = "casual"
+    public var detailProfile: String = "minimal"
+    public var discretionLevel: String = "normal"
+    public var formality: String = "neutral"
+    public var expectedResponse: String = "no_reply_needed"
+    public var followupBehavior: String = "one_touch_only"
+    public var continuityScope: String = "one_off"
+    public var contextModules: Set<String> = []
     public var voiceStyle: String = "neutral"
     public var callMaxSeconds: Int = 60
     public init() {}
+}
+
+/// The user's reusable, optional context profile (all fields optional).
+public struct ContextProfile: Equatable, Sendable {
+    public var workIndustry: String?
+    public var workRoleLevel: String?
+    public var workSetting: String?
+    public var workSchedule: String?
+    public var workTravelScope: String?
+    public var livingSetup: String?
+    public var homeResponsibilities: [String]
+    public var dependentContexts: [String]
+    public var familySupportLevel: String?
+    public var familyProximity: String?
+    public var relationshipVisibility: String?
+    public var relationshipStage: String?
+    public var privacyPreference: String?
+    public var transitionState: String?
+    public var transitionHorizon: String?
+
+    public init(workIndustry: String? = nil, workRoleLevel: String? = nil, workSetting: String? = nil,
+                workSchedule: String? = nil, workTravelScope: String? = nil, livingSetup: String? = nil,
+                homeResponsibilities: [String] = [], dependentContexts: [String] = [],
+                familySupportLevel: String? = nil, familyProximity: String? = nil,
+                relationshipVisibility: String? = nil, relationshipStage: String? = nil,
+                privacyPreference: String? = nil, transitionState: String? = nil,
+                transitionHorizon: String? = nil) {
+        self.workIndustry = workIndustry
+        self.workRoleLevel = workRoleLevel
+        self.workSetting = workSetting
+        self.workSchedule = workSchedule
+        self.workTravelScope = workTravelScope
+        self.livingSetup = livingSetup
+        self.homeResponsibilities = homeResponsibilities
+        self.dependentContexts = dependentContexts
+        self.familySupportLevel = familySupportLevel
+        self.familyProximity = familyProximity
+        self.relationshipVisibility = relationshipVisibility
+        self.relationshipStage = relationshipStage
+        self.privacyPreference = privacyPreference
+        self.transitionState = transitionState
+        self.transitionHorizon = transitionHorizon
+    }
+
+    /// True when the user has set anything at all (drives the Templates-page note).
+    public var hasAnyContext: Bool {
+        workIndustry != nil || workRoleLevel != nil || workSetting != nil || workSchedule != nil
+            || workTravelScope != nil || livingSetup != nil || !homeResponsibilities.isEmpty
+            || !dependentContexts.isEmpty || familySupportLevel != nil || familyProximity != nil
+            || relationshipVisibility != nil || relationshipStage != nil || privacyPreference != nil
+            || transitionState != nil || transitionHorizon != nil
+    }
 }
 
 /// User-facing channel. The wire value (`call`/`sms`) lives only in the mapping.

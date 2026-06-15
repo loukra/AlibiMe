@@ -96,7 +96,13 @@ public final class AppModel {
     }
 
     public func makeTemplatesViewModel() -> TemplatesViewModel {
-        let vm = TemplatesViewModel(service: env.templates)
+        let vm = TemplatesViewModel(service: env.templates, contextProfile: env.contextProfile)
+        vm.onSessionExpired = { [weak self] in self?.handleSessionExpired() }
+        return vm
+    }
+
+    public func makeProfileViewModel() -> ProfileViewModel {
+        let vm = ProfileViewModel(service: env.contextProfile, templates: env.templates)
         vm.onSessionExpired = { [weak self] in self?.handleSessionExpired() }
         return vm
     }

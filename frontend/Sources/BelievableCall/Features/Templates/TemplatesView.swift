@@ -15,6 +15,14 @@ public struct TemplatesView: View {
             if let error = vm.errorMessage {
                 Section { ErrorBanner(error) }
             }
+            if vm.showProfileNote {
+                Section {
+                    Label("You can configure your Profile for more tailored custom templates.",
+                          systemImage: "person.crop.circle")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
             if !vm.customTemplates.isEmpty {
                 Section("Your templates") {
                     ForEach(vm.customTemplates) { TemplateRow(template: $0) }

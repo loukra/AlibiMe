@@ -48,23 +48,46 @@ public enum Fixtures {
                  name: "Safety check-in", category: .safety, channels: [.call, .text]),
     ]
 
-    public static let templateOptions = TemplateOptions(
-        personas: [
-            TemplateOption(code: "boss", label: "your manager"),
+    public static var templateOptions: TemplateOptions = {
+        var o = TemplateOptions()
+        o.categories = ["work", "home_logistics", "family_care", "social_exit",
+                        "relationship_privacy", "travel_transition", "personal_boundaries",
+                        "safety_discomfort"]
+        o.personas = [
+            TemplateOption(code: "manager", label: "your manager"),
+            TemplateOption(code: "roommate", label: "your roommate"),
             TemplateOption(code: "best_friend", label: "your best friend"),
             TemplateOption(code: "partner", label: "your partner"),
-        ],
-        reasons: [
-            TemplateOption(code: "urgent_work_issue", label: "an urgent work issue"),
-            TemplateOption(code: "need_you_outside", label: "needing you outside"),
-            TemplateOption(code: "safety_checkin", label: "a safety check-in"),
-        ],
-        categories: ["work", "family", "social", "logistics", "safety"],
-        urgencies: ["low", "normal", "high"],
-        voiceStyles: ["neutral", "warm"],
-        channels: [.call, .text],
-        callSecondsMin: 30, callSecondsMax: 120, callSecondsDefault: 60
-    )
+        ]
+        o.reasons = [
+            TemplateOption(code: "work_urgent_task", label: "an urgent task"),
+            TemplateOption(code: "home_problem", label: "a problem at home"),
+            TemplateOption(code: "social_friend_outside", label: "waiting outside"),
+        ]
+        o.urgencies = ["low", "medium", "high", "immediate"]
+        o.outcomes = [TemplateOption(code: "step_out_briefly", label: "Step out briefly"),
+                      TemplateOption(code: "leave_now", label: "Leave now")]
+        o.settings = [TemplateOption(code: "date", label: "Date"),
+                      TemplateOption(code: "work_meeting", label: "Work meeting")]
+        o.detailProfiles = ["minimal", "grounded", "contextual", "continuity"]
+        o.discretionLevels = ["public_safe", "normal", "direct"]
+        o.tones = ["warm", "casual", "professional", "firm"]
+        o.formalities = ["casual", "neutral", "professional"]
+        o.expectedResponses = [TemplateOption(code: "no_reply_needed", label: "No reply needed"),
+                               TemplateOption(code: "say_on_my_way", label: "Say on my way")]
+        o.followupBehaviors = [TemplateOption(code: "one_touch_only", label: "One touch only")]
+        o.continuityScopes = ["one_off", "same_day", "weekend", "two_weeks"]
+        o.contextModules = ["work", "home", "family", "relationship", "transition"]
+        o.voiceStyles = ["neutral", "warm"]
+        o.channels = [.call, .text]
+        var p = ProfileOptions()
+        p.workSettings = [TemplateOption(code: "site_field", label: "Site/field"),
+                          TemplateOption(code: "office", label: "Office")]
+        p.livingSetups = [TemplateOption(code: "with_roommate", label: "With roommate"),
+                          TemplateOption(code: "alone", label: "Alone")]
+        o.profile = p
+        return o
+    }()
 
     public static func profile(credits: Int = 3, activeRequest: RequestSummary? = nil) -> UserProfile {
         UserProfile(
@@ -232,6 +255,21 @@ public final class MockDeviceService: DeviceServicing, @unchecked Sendable {
     public init() {}
     public func register(deviceID: String, pushToken: String?, appVersion: String?, osVersion: String?) async throws {
         registered = true
+    }
+}
+
+public final class MockContextProfileService: ContextProfileServicing, @unchecked Sendable {
+    public var profile: ContextProfile
+    public var error: Error?
+    public init(profile: ContextProfile = ContextProfile()) { self.profile = profile }
+    public func get() async throws -> ContextProfile {
+        if let error { throw error }
+        return profile
+    }
+    public func update(_ profile: ContextProfile) async throws -> ContextProfile {
+        if let error { throw error }
+        self.profile = profile
+        return profile
     }
 }
 
