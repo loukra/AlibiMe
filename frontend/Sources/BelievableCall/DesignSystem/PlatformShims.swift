@@ -65,6 +65,37 @@ extension View {
         }
     }
 
+    /// Liquid Glass capsule (iOS 26+); falls back to a translucent material
+    /// capsule with a bright edge on earlier systems.
+    @ViewBuilder func bcGlassCapsule(interactive: Bool = false) -> some View {
+        if #available(iOS 26, macOS 26, *) {
+            self.glassEffect(interactive ? .regular.interactive() : .regular, in: Capsule())
+        } else {
+            self.background(.ultraThinMaterial, in: Capsule())
+                .overlay(Capsule().strokeBorder(Theme.glassBorder, lineWidth: 1))
+        }
+    }
+
+    /// Liquid Glass circle (iOS 26+), used for the raised center tab button.
+    @ViewBuilder func bcGlassCircle(interactive: Bool = false) -> some View {
+        if #available(iOS 26, macOS 26, *) {
+            self.glassEffect(interactive ? .regular.interactive() : .regular, in: Circle())
+        } else {
+            self.background(.regularMaterial, in: Circle())
+                .overlay(Circle().strokeBorder(Theme.glassBorder, lineWidth: 1))
+        }
+    }
+
+    /// A tinted Liquid Glass capsule (iOS 26+) for selection highlights; falls
+    /// back to a solid tint fill.
+    @ViewBuilder func bcGlassTintCapsule(_ tint: Color) -> some View {
+        if #available(iOS 26, macOS 26, *) {
+            self.glassEffect(.regular.tint(tint), in: Capsule())
+        } else {
+            self.background(tint, in: Capsule())
+        }
+    }
+
     /// Native bottom-sheet presentation: medium/large detents plus a drag handle.
     @ViewBuilder func bcSheetDetents() -> some View {
         if #available(iOS 16, macOS 13, *) {

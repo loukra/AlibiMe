@@ -148,8 +148,7 @@ struct FloatingTabBar: View {
             }
             .padding(.horizontal, Spacing.l)
             .padding(.vertical, Spacing.s)
-            .background(.ultraThinMaterial, in: Capsule())
-            .overlay(Capsule().strokeBorder(Theme.glassBorder, lineWidth: 1))
+            .bcGlassCapsule()
             .shadow(color: Theme.cardShadow, radius: 18, x: 0, y: 10)
 
             homeButton
@@ -171,11 +170,11 @@ struct FloatingTabBar: View {
                 .scaledToFit()
                 .padding(centerDiameter * 0.22)
                 .frame(width: centerDiameter, height: centerDiameter)
-                .background(.regularMaterial, in: Circle())
+                .bcGlassCircle(interactive: true)
                 .overlay(
                     Circle().strokeBorder(
-                        isSelected ? Theme.accent : Theme.glassBorder,
-                        lineWidth: isSelected ? 2.5 : 1
+                        isSelected ? Theme.accent : Color.clear,
+                        lineWidth: isSelected ? 2.5 : 0
                     )
                 )
                 .shadow(color: Theme.cardShadow, radius: 12, x: 0, y: 6)

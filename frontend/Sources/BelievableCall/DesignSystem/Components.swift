@@ -153,8 +153,8 @@ public struct SegmentedSelector: View {
                         .padding(.vertical, Spacing.s)
                         .background {
                             if isSelected {
-                                Capsule()
-                                    .fill(Theme.accent)
+                                Color.clear
+                                    .bcGlassTintCapsule(Theme.accent)
                                     .matchedGeometryEffect(id: "segmentedSelection", in: ns)
                             }
                         }
@@ -166,8 +166,7 @@ public struct SegmentedSelector: View {
             }
         }
         .padding(4)
-        .background(.ultraThinMaterial, in: Capsule())
-        .overlay(Capsule().strokeBorder(Theme.glassBorder, lineWidth: 1))
+        .bcGlassCapsule()
         .animation(.spring(response: 0.32, dampingFraction: 0.82), value: selectedID)
     }
 }
