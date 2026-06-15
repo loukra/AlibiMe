@@ -32,7 +32,7 @@ public struct TemplatePickerView: View {
                 }
                 .padding(Spacing.m)
             }
-            .background(Theme.background.ignoresSafeArea())
+            .bcScreenBackground()
             .navigationTitle("Choose a template")
             .bcInlineNavTitle()
             .toolbar {

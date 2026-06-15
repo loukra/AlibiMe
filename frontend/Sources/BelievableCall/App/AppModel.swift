@@ -96,7 +96,9 @@ public final class AppModel {
     }
 
     public func makeSettingsViewModel() -> SettingsViewModel {
-        let vm = SettingsViewModel(profileService: env.profile, auth: env.auth)
+        let vm = SettingsViewModel(profileService: env.profile,
+                                   auth: env.auth,
+                                   creditPackages: env.creditPackages)
         vm.onSignOut = { [weak self] in self?.signOut() }
         vm.onSessionExpired = { [weak self] in self?.handleSessionExpired() }
         return vm

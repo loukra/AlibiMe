@@ -14,7 +14,7 @@ public struct AuthFlowView: View {
 
     public var body: some View {
         ZStack {
-            Theme.background.ignoresSafeArea()
+            Theme.backgroundGradient.ignoresSafeArea()
             switch vm.step {
             case .welcome:
                 WelcomeView(sessionExpiredNotice: sessionExpiredNotice) { vm.begin() }

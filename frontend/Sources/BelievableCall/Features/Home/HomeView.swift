@@ -7,8 +7,14 @@ public struct HomeView: View {
     @Bindable var vm: HomeViewModel
     @State private var showTemplatePicker = false
     @State private var showSchedule = false
+    /// Invoked when the user taps the verified-number card; the tab container
+    /// routes this to the Settings tab (where the number lives).
+    var onOpenVerifiedNumber: (() -> Void)?
 
-    public init(vm: HomeViewModel) { self.vm = vm }
+    public init(vm: HomeViewModel, onOpenVerifiedNumber: (() -> Void)? = nil) {
+        self.vm = vm
+        self.onOpenVerifiedNumber = onOpenVerifiedNumber
+    }
 
     public var body: some View {
         NavigationStack {
@@ -28,8 +34,10 @@ public struct HomeView: View {
                     creditsSummary
                 }
                 .padding(Spacing.m)
+                .bcPinScrollWidth()
             }
-            .background(Theme.background.ignoresSafeArea())
+            .bcVerticalScrollOnly()
+            .bcScreenBackground()
             .navigationTitle(greeting)
             .refreshable { await vm.refresh() }
             .task { if vm.templates.isEmpty { await vm.load() } }
@@ -52,26 +60,36 @@ public struct HomeView: View {
 
     private var greeting: String {
         if let name = vm.profile?.displayName, !name.isEmpty { return "Hi, \(name)" }
-        return "Home"
+        return "Alibi"
     }
 
     private var verifiedNumberCard: some View {
-        Card {
-            HStack(spacing: Spacing.m) {
-                Image(systemName: "checkmark.shield.fill")
-                    .font(.title2)
-                    .foregroundStyle(Theme.success)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Your verified number")
-                        .font(.subheadline.weight(.medium))
-                    Text(vm.maskedNumber ?? "Not verified")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
+        Button {
+            onOpenVerifiedNumber?()
+        } label: {
+            Card {
+                HStack(spacing: Spacing.m) {
+                    Image(systemName: "checkmark.shield.fill")
+                        .font(.title2)
+                        .foregroundStyle(Theme.success)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Your verified number")
+                            .font(.subheadline.weight(.medium))
+                        Text(vm.maskedNumber ?? "Not verified")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    if onOpenVerifiedNumber != nil {
+                        Image(systemName: "chevron.right").foregroundStyle(.secondary)
+                    }
                 }
-                Spacer()
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Opens your number in Settings")
             }
-            .accessibilityElement(children: .combine)
         }
+        .buttonStyle(.plain)
+        .disabled(onOpenVerifiedNumber == nil)
     }
 
     @ViewBuilder private var requestComposer: some View {

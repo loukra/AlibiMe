@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.routes import (
     auth,
+    credit_packages,
     devices,
     entitlements,
     health,
@@ -83,6 +84,7 @@ for module in (
     requests,
     history,
     entitlements,
+    credit_packages,
     webhooks_voice,
     webhooks_sms,
     webhooks_revenuecat,

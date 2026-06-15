@@ -74,6 +74,21 @@ public enum Fixtures {
                      requestedAt: Date().addingTimeInterval(-90000), status: .canceled,
                      durationSeconds: nil, preview: nil),
     ]
+
+    public static let creditPackages: [CreditPackage] = [
+        CreditPackage(code: "credits_5", displayName: "5 Credits", credits: 5,
+                      fulfillmentMode: "free_dev", priceLabel: "Free for now",
+                      badgeText: "Free", sortOrder: 10),
+        CreditPackage(code: "credits_15", displayName: "15 Credits", credits: 15,
+                      fulfillmentMode: "free_dev", priceLabel: "Free for now",
+                      badgeText: "Free", sortOrder: 20),
+        CreditPackage(code: "credits_30", displayName: "30 Credits", credits: 30,
+                      fulfillmentMode: "free_dev", priceLabel: "Free for now",
+                      badgeText: "Free", sortOrder: 30),
+        CreditPackage(code: "credits_60", displayName: "60 Credits", credits: 60,
+                      fulfillmentMode: "free_dev", priceLabel: "Free for now",
+                      badgeText: "Free", sortOrder: 40),
+    ]
 }
 
 public final class MockAuthService: AuthServicing, @unchecked Sendable {
@@ -192,5 +207,35 @@ public final class MockContactsService: ContactsServicing, @unchecked Sendable {
         requestAccessCalled = true
         if status == .notDetermined { status = grantResult }
         return status
+    }
+}
+
+public final class MockCreditPackagesService: CreditPackagesServicing, @unchecked Sendable {
+    public var packages: [CreditPackage]
+    public var listError: Error?
+    public var acquireError: Error?
+    /// Running balance the mock reports after each grant, so view models can
+    /// assert the post-grant value.
+    public var balance: Int
+    public private(set) var acquiredCodes: [String] = []
+
+    public init(packages: [CreditPackage] = Fixtures.creditPackages, balance: Int = 3) {
+        self.packages = packages
+        self.balance = balance
+    }
+
+    public func list() async throws -> [CreditPackage] {
+        if let listError { throw listError }
+        return packages
+    }
+
+    public func acquire(code: String, clientRequestID: String) async throws -> CreditAcquisition {
+        if let acquireError { throw acquireError }
+        acquiredCodes.append(code)
+        let credits = packages.first { $0.code == code }?.credits ?? 0
+        balance += credits
+        return CreditAcquisition(claimID: "claim-\(clientRequestID)", status: "granted",
+                                 grantedCredits: credits, creditsAvailable: balance,
+                                 planCode: code)
     }
 }

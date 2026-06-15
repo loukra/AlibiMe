@@ -16,7 +16,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.logging import configure_logging, get_logger
-from app.db.models.enums import IdentityType, PlanKind, ServiceIdentityStatus
+from app.db.models.enums import (
+    FulfillmentMode,
+    IdentityType,
+    PlanKind,
+    ServiceIdentityStatus,
+)
 from app.db.models.plan import Plan
 from app.db.models.service_identity import ServiceIdentity
 from app.db.models.template import Template, TemplateVersion
@@ -26,10 +31,32 @@ logger = get_logger("seeds")
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
 
+# Credit-package metadata (display_name/badge/sort/fulfillment) is set for the
+# one-time packs so they appear in the Add Credits sheet. `free` and the
+# subscription stub carry no package metadata and are excluded from the catalog.
+_FREE_DEV = FulfillmentMode.free_dev
 PLANS = [
     {"code": "free", "kind": PlanKind.one_time, "included_credit_units": 0},
-    {"code": "credits_5", "kind": PlanKind.one_time, "included_credit_units": 5},
-    {"code": "credits_15", "kind": PlanKind.one_time, "included_credit_units": 15},
+    {
+        "code": "credits_5", "kind": PlanKind.one_time, "included_credit_units": 5,
+        "display_name": "5 Credits", "badge_text": "Free", "fulfillment_mode": _FREE_DEV,
+        "sort_order": 10,
+    },
+    {
+        "code": "credits_15", "kind": PlanKind.one_time, "included_credit_units": 15,
+        "display_name": "15 Credits", "badge_text": "Free", "fulfillment_mode": _FREE_DEV,
+        "sort_order": 20,
+    },
+    {
+        "code": "credits_30", "kind": PlanKind.one_time, "included_credit_units": 30,
+        "display_name": "30 Credits", "badge_text": "Free", "fulfillment_mode": _FREE_DEV,
+        "sort_order": 30,
+    },
+    {
+        "code": "credits_60", "kind": PlanKind.one_time, "included_credit_units": 60,
+        "display_name": "60 Credits", "badge_text": "Free", "fulfillment_mode": _FREE_DEV,
+        "sort_order": 40,
+    },
     {"code": "starter_monthly", "kind": PlanKind.subscription, "included_credit_units": 30},
 ]
 
@@ -51,6 +78,10 @@ def seed_plans(db: Session) -> int:
         plan.kind = spec["kind"].value
         plan.included_credit_units = spec["included_credit_units"]
         plan.active = True
+        plan.display_name = spec.get("display_name")
+        plan.badge_text = spec.get("badge_text")
+        plan.fulfillment_mode = spec.get("fulfillment_mode", FulfillmentMode.free_dev).value
+        plan.sort_order = spec.get("sort_order", 0)
     db.flush()
     return count
 

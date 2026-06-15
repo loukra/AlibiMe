@@ -1,7 +1,7 @@
 #if canImport(SwiftUI)
 import SwiftUI
 
-/// A slightly elevated, rounded card surface.
+/// A translucent, softly elevated "glass" card surface.
 public struct Card<Content: View>: View {
     private let content: Content
     public init(@ViewBuilder content: () -> Content) { self.content = content() }
@@ -9,12 +9,15 @@ public struct Card<Content: View>: View {
         content
             .padding(Spacing.m)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Theme.card)
-            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+            .background(
+                .ultraThinMaterial,
+                in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+            )
             .overlay(
                 RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
-                    .strokeBorder(Theme.subtleBorder, lineWidth: 1)
+                    .strokeBorder(Theme.glassBorder, lineWidth: 1)
             )
+            .shadow(color: Theme.cardShadow, radius: 16, x: 0, y: 8)
     }
 }
 
@@ -54,8 +57,14 @@ public struct PrimaryButton: View {
             .frame(minHeight: 30)
             .padding(.vertical, Spacing.m)
             .foregroundStyle(.white)
-            .background(role == .destructive ? Theme.destructive : Theme.accent)
-            .clipShape(RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+            .background(
+                role == .destructive ? Theme.destructive : Theme.accent,
+                in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
+            )
+            .shadow(
+                color: (role == .destructive ? Theme.destructive : Theme.accent).opacity(0.30),
+                radius: 14, x: 0, y: 8
+            )
         }
         .buttonStyle(.plain)
         .disabled(isLoading)
@@ -87,12 +96,15 @@ public struct SelectablePill: View {
             .padding(.vertical, Spacing.s)
             .frame(maxWidth: .infinity)
             .foregroundStyle(isSelected ? Color.white : Color.primary)
-            .background(isSelected ? Theme.accent : Theme.card)
-            .clipShape(RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+            .background(
+                isSelected ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Material.ultraThin),
+                in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
+            )
             .overlay(
                 RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
-                    .strokeBorder(isSelected ? Color.clear : Theme.subtleBorder, lineWidth: 1)
+                    .strokeBorder(isSelected ? Color.clear : Theme.glassBorder, lineWidth: 1)
             )
+            .shadow(color: isSelected ? Theme.accent.opacity(0.25) : .clear, radius: 8, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }

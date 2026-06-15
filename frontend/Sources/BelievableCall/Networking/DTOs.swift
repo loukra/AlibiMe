@@ -198,6 +198,35 @@ struct EntitlementsResponseDTO: Decodable {
     let active_entitlements: [EntitlementItemDTO]
 }
 
+// MARK: Credit packages
+
+struct CreditPackageDTO: Decodable {
+    let code: String
+    let display_name: String
+    let credits: Int
+    let fulfillment_mode: String
+    let price_label: String
+    let badge_text: String?
+    let active: Bool
+    let sort_order: Int
+}
+
+struct CreditPackagesResponseDTO: Decodable {
+    let packages: [CreditPackageDTO]
+}
+
+struct AcquirePackageRequestDTO: Encodable {
+    let client_request_id: String
+}
+
+struct AcquirePackageResponseDTO: Decodable {
+    let claim_id: String
+    let status: String
+    let granted_credits: Int
+    let credits_available: Int
+    let plan_code: String
+}
+
 // MARK: Error envelope
 
 struct ErrorBodyDTO: Decodable {

@@ -14,6 +14,7 @@ def test_openapi_schema_generates(client):
         "/v1/templates",
         "/v1/history",
         "/v1/entitlements",
+        "/v1/credit-packages",
         "/v1/webhooks/voice",
     ):
         assert path in paths

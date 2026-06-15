@@ -16,7 +16,7 @@ public struct HistoryView: View {
                     list
                 }
             }
-            .background(Theme.background.ignoresSafeArea())
+            .bcScreenBackground()
             .navigationTitle("History")
             // Refresh whenever the tab becomes visible (e.g. after scheduling a
             // request on Home), in addition to pull-to-refresh. Existing rows
@@ -40,7 +40,9 @@ public struct HistoryView: View {
                 if vm.isLoadingMore { ProgressView().padding() }
             }
             .padding(Spacing.m)
+            .bcPinScrollWidth()
         }
+        .bcVerticalScrollOnly()
         .refreshable { await vm.refresh() }
     }
 

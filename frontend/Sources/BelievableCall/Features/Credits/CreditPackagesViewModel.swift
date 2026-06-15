@@ -1,0 +1,106 @@
+import Foundation
+import Observation
+
+/// Drives the Add Credits bottom sheet: loads the backend package catalog,
+/// tracks the selection, and submits an (idempotent) acquisition. The backend
+/// remains the source of truth for the resulting balance.
+@MainActor
+@Observable
+public final class CreditPackagesViewModel {
+    /// Explicit sheet state machine (mirrors the feature spec).
+    public enum Phase: Equatable {
+        case idle
+        case loadingPackages
+        case ready
+        case submitting
+        case success
+        case failure
+    }
+
+    public private(set) var phase: Phase = .idle
+    public private(set) var packages: [CreditPackage] = []
+    public var selectedCode: String?
+    public private(set) var errorMessage: String?
+    public private(set) var lastGranted: CreditAcquisition?
+
+    private let service: CreditPackagesServicing
+    public var onSessionExpired: (() -> Void)?
+
+    public init(service: CreditPackagesServicing) {
+        self.service = service
+    }
+
+    public var selectedPackage: CreditPackage? {
+        guard let selectedCode else { return nil }
+        return packages.first { $0.code == selectedCode }
+    }
+
+    public var canSubmit: Bool {
+        selectedPackage != nil && phase != .submitting
+    }
+
+    public var isSubmitting: Bool { phase == .submitting }
+
+    /// Distinguishes a catalog-load failure (offer retry) from an acquisition
+    /// failure (packages still shown, selection preserved).
+    public var didFailToLoad: Bool { phase == .failure && packages.isEmpty }
+    public var isEmptyCatalog: Bool { phase == .ready && packages.isEmpty }
+
+    public var primaryButtonTitle: String {
+        if let pkg = selectedPackage { return "Add \(pkg.credits) Credits" }
+        return "Add Credits"
+    }
+
+    public func load() async {
+        phase = .loadingPackages
+        errorMessage = nil
+        do {
+            let list = try await service.list()
+            packages = list
+            // Preserve a still-valid selection, else default to the first pack.
+            if selectedCode == nil || !list.contains(where: { $0.code == selectedCode }) {
+                selectedCode = list.first?.code
+            }
+            phase = .ready
+        } catch {
+            handle(error)
+        }
+    }
+
+    public func select(_ code: String) {
+        guard phase != .submitting else { return }
+        selectedCode = code
+        // Clear a stale acquisition error once the user changes intent.
+        if phase == .failure { errorMessage = nil; phase = .ready }
+    }
+
+    /// Acquires the selected package. Returns `true` on success so the caller can
+    /// dismiss the sheet and refresh the outer screen. Double-submits are guarded
+    /// by `phase == .submitting` and backend idempotency.
+    @discardableResult
+    public func acquire() async -> Bool {
+        guard let pkg = selectedPackage, phase != .submitting else { return false }
+        phase = .submitting
+        errorMessage = nil
+        do {
+            let result = try await service.acquire(code: pkg.code, clientRequestID: UUID().uuidString)
+            lastGranted = result
+            phase = .success
+            return true
+        } catch {
+            handle(error)
+            return false
+        }
+    }
+
+    private func handle(_ error: Error) {
+        let apiError = asAPIError(error)
+        if apiError.requiresReauth {
+            onSessionExpired?()
+            phase = .failure
+            return
+        }
+        errorMessage = ErrorCopy.userMessage(for: apiError)
+        phase = .failure
+    }
+}

@@ -20,7 +20,8 @@ let package = Package(
     targets: [
         .target(
             name: "BelievableCall",
-            path: "Sources/BelievableCall"
+            path: "Sources/BelievableCall",
+            resources: [.process("Resources")]
         ),
         // Pure unit tests: view-model transitions, mapping, filtering, timing,
         // error copy, session restore. No network required.

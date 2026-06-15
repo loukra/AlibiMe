@@ -4,6 +4,8 @@ import SwiftUI
 /// Settings: verified-number snapshot, profile, credits, help/legal, sign out.
 public struct SettingsView: View {
     @Bindable var vm: SettingsViewModel
+    @State private var showAddCredits = false
+    @State private var creditPackagesVM: CreditPackagesViewModel?
     private let locales = ["en", "de"]
 
     public init(vm: SettingsViewModel) { self.vm = vm }
@@ -33,8 +35,25 @@ public struct SettingsView: View {
                     }
                 }
                 Section("Plan") {
-                    LabeledContent("Credits", value: "\(vm.creditsAvailable)")
-                    LabeledContent("Plan", value: vm.planLabel)
+                    LabeledContent("Plan tier", value: vm.planLabel)
+                }
+                Section {
+                    Button {
+                        creditPackagesVM = vm.makeCreditPackagesViewModel()
+                        showAddCredits = true
+                    } label: {
+                        Label("Add Credits", systemImage: "plus.circle.fill")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(Theme.accent)
+                    }
+                    if let success = vm.creditSuccessMessage {
+                        Label(success, systemImage: "checkmark.circle.fill")
+                            .font(.subheadline)
+                            .foregroundStyle(Theme.success)
+                    }
+                    LabeledContent("Credits available", value: "\(vm.creditsAvailable)")
+                } footer: {
+                    Text("Credits are used each time you request a call or text.")
                 }
                 if let error = vm.errorMessage {
                     Section { ErrorBanner(error) }
@@ -52,15 +71,32 @@ public struct SettingsView: View {
                     }
                 }
             }
+            .bcClearScrollBackground()
+            .bcScreenBackground()
             .navigationTitle("Settings")
             .task { await vm.load() }
+            .sheet(isPresented: $showAddCredits) {
+                if let packagesVM = creditPackagesVM {
+                    AddCreditsSheet(
+                        vm: packagesVM,
+                        onClose: { showAddCredits = false },
+                        onAcquired: { result in
+                            showAddCredits = false
+                            Task { await vm.didAcquireCredits(result) }
+                        }
+                    )
+                    .bcSheetDetents()
+                }
+            }
         }
     }
 }
 
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsView(vm: SettingsViewModel(profileService: MockProfileService(), auth: MockAuthService()))
+        SettingsView(vm: SettingsViewModel(profileService: MockProfileService(),
+                                           auth: MockAuthService(),
+                                           creditPackages: MockCreditPackagesService()))
     }
 }
 #endif

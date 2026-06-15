@@ -3,6 +3,7 @@ from app.db.base import Base
 from app.db.models.artifact import RequestArtifact
 from app.db.models.attempts import CallAttempt, MessageAttempt
 from app.db.models.credit_ledger import CreditLedger
+from app.db.models.credit_package_claim import CreditPackageClaim
 from app.db.models.device import Device
 from app.db.models.entitlement import Entitlement
 from app.db.models.otp_verification import OtpVerification
@@ -24,6 +25,7 @@ __all__ = [
     "CallAttempt",
     "MessageAttempt",
     "CreditLedger",
+    "CreditPackageClaim",
     "Device",
     "Entitlement",
     "OtpVerification",

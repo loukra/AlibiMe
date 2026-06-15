@@ -403,6 +403,53 @@ public struct HistoryEntry: Equatable, Identifiable, Sendable {
     }
 }
 
+/// A purchasable (currently free) credit package, as presented in the Add
+/// Credits sheet. The backend is the source of truth; the app never invents
+/// amounts or pricing.
+public struct CreditPackage: Identifiable, Equatable, Sendable {
+    public var id: String { code }
+    public let code: String
+    public let displayName: String
+    public let credits: Int
+    public let fulfillmentMode: String
+    public let priceLabel: String
+    public let badgeText: String?
+    public let sortOrder: Int
+
+    public init(code: String,
+                displayName: String,
+                credits: Int,
+                fulfillmentMode: String,
+                priceLabel: String,
+                badgeText: String?,
+                sortOrder: Int) {
+        self.code = code
+        self.displayName = displayName
+        self.credits = credits
+        self.fulfillmentMode = fulfillmentMode
+        self.priceLabel = priceLabel
+        self.badgeText = badgeText
+        self.sortOrder = sortOrder
+    }
+}
+
+/// Result of acquiring a credit package — the authoritative post-grant balance.
+public struct CreditAcquisition: Equatable, Sendable {
+    public let claimID: String
+    public let status: String
+    public let grantedCredits: Int
+    public let creditsAvailable: Int
+    public let planCode: String
+
+    public init(claimID: String, status: String, grantedCredits: Int, creditsAvailable: Int, planCode: String) {
+        self.claimID = claimID
+        self.status = status
+        self.grantedCredits = grantedCredits
+        self.creditsAvailable = creditsAvailable
+        self.planCode = planCode
+    }
+}
+
 /// Authenticated session as the app holds it locally.
 public struct Session: Equatable, Sendable {
     public let token: String

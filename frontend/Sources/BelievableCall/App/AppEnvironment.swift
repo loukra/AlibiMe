@@ -18,6 +18,7 @@ public final class AppEnvironment: @unchecked Sendable {
     public let profile: ProfileServicing
     public let devices: DeviceServicing
     public let contacts: ContactsServicing
+    public let creditPackages: CreditPackagesServicing
 
     public init(baseURL: URL,
                 transport: HTTPTransport = URLSession.shared,
@@ -40,6 +41,7 @@ public final class AppEnvironment: @unchecked Sendable {
         self.profile = LiveProfileService(client: client)
         self.devices = LiveDeviceService(client: client)
         self.contacts = contacts ?? Self.defaultContactsService()
+        self.creditPackages = LiveCreditPackagesService(client: client)
     }
 
     private static func defaultContactLinkStore() -> ContactLinkStoring {

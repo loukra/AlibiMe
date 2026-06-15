@@ -56,6 +56,13 @@ public protocol DeviceServicing: Sendable {
     func register(deviceID: String, pushToken: String?, appVersion: String?, osVersion: String?) async throws
 }
 
+public protocol CreditPackagesServicing: Sendable {
+    func list() async throws -> [CreditPackage]
+    /// Acquire a package. `clientRequestID` makes the grant idempotent on the
+    /// backend so repeated taps never double-grant.
+    func acquire(code: String, clientRequestID: String) async throws -> CreditAcquisition
+}
+
 /// Contacts authorization, normalized so view models don't depend on the
 /// Contacts framework directly (and so it compiles on the macOS test host).
 public enum ContactAuthorization: String, Sendable, Equatable {
@@ -213,5 +220,29 @@ public struct LiveDeviceService: DeviceServicing {
                             push_token: pushToken, app_version: appVersion, os_version: osVersion)
         )
         _ = try await client.send(Endpoint(.PUT, "v1/devices/current", body: body), as: DeviceResponseDTO.self)
+    }
+}
+
+public struct LiveCreditPackagesService: CreditPackagesServicing {
+    let client: APIClient
+    public init(client: APIClient) { self.client = client }
+
+    public func list() async throws -> [CreditPackage] {
+        let dto = try await client.send(
+            Endpoint(.GET, "v1/credit-packages"),
+            as: CreditPackagesResponseDTO.self
+        )
+        return dto.packages.map(CreditPackage.init(dto:))
+    }
+
+    public func acquire(code: String, clientRequestID: String) async throws -> CreditAcquisition {
+        let body = try BCCoding.encoder.encode(
+            AcquirePackageRequestDTO(client_request_id: clientRequestID)
+        )
+        let dto = try await client.send(
+            Endpoint(.POST, "v1/credit-packages/\(code)/acquire", body: body),
+            as: AcquirePackageResponseDTO.self
+        )
+        return CreditAcquisition(dto: dto)
     }
 }

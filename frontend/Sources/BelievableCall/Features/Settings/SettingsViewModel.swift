@@ -13,15 +13,36 @@ public final class SettingsViewModel {
     public private(set) var isSaving = false
     public var errorMessage: String?
     public private(set) var didSave = false
+    /// Lightweight success note shown in the credits section after a top-up.
+    public private(set) var creditSuccessMessage: String?
 
     private let profileService: ProfileServicing
     private let auth: AuthServicing
+    private let creditPackages: CreditPackagesServicing
     public var onSignOut: (() -> Void)?
     public var onSessionExpired: (() -> Void)?
 
-    public init(profileService: ProfileServicing, auth: AuthServicing) {
+    public init(profileService: ProfileServicing,
+                auth: AuthServicing,
+                creditPackages: CreditPackagesServicing) {
         self.profileService = profileService
         self.auth = auth
+        self.creditPackages = creditPackages
+    }
+
+    /// A fresh view model for the Add Credits bottom sheet, wired to the same
+    /// session-expiry handling as the rest of Settings.
+    public func makeCreditPackagesViewModel() -> CreditPackagesViewModel {
+        let vm = CreditPackagesViewModel(service: creditPackages)
+        vm.onSessionExpired = { [weak self] in self?.onSessionExpired?() }
+        return vm
+    }
+
+    /// Called after the sheet grants credits: refresh the authoritative balance
+    /// from the backend and surface a brief success note.
+    public func didAcquireCredits(_ result: CreditAcquisition) async {
+        creditSuccessMessage = "\(result.grantedCredits) credits added"
+        await load()
     }
 
     public var maskedNumber: String? { profile?.phone.maskedNumber }

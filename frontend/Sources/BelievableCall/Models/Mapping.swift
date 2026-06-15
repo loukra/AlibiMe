@@ -148,6 +148,32 @@ extension UserProfile {
     }
 }
 
+extension CreditPackage {
+    init(dto: CreditPackageDTO) {
+        self.init(
+            code: dto.code,
+            displayName: dto.display_name,
+            credits: dto.credits,
+            fulfillmentMode: dto.fulfillment_mode,
+            priceLabel: dto.price_label,
+            badgeText: dto.badge_text,
+            sortOrder: dto.sort_order
+        )
+    }
+}
+
+extension CreditAcquisition {
+    init(dto: AcquirePackageResponseDTO) {
+        self.init(
+            claimID: dto.claim_id,
+            status: dto.status,
+            grantedCredits: dto.granted_credits,
+            creditsAvailable: dto.credits_available,
+            planCode: dto.plan_code
+        )
+    }
+}
+
 // MARK: Outgoing request mapping
 
 /// Bundles the user's home-screen selection into the backend request body,

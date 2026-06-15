@@ -123,6 +123,22 @@ class PlanKind(StrEnum):
     subscription = "subscription"
 
 
+class FulfillmentMode(StrEnum):
+    """How a credit package is paid for. ``free_dev`` grants immediately and must
+    be disabled before a public paid release; ``app_store_iap`` requires a
+    validated store transaction (added in a later pass)."""
+
+    free_dev = "free_dev"
+    app_store_iap = "app_store_iap"
+
+
+class CreditPackageClaimStatus(StrEnum):
+    pending = "pending"
+    granted = "granted"
+    failed = "failed"
+    canceled = "canceled"
+
+
 class EntitlementSource(StrEnum):
     app_store = "app_store"
     play_store = "play_store"

@@ -50,7 +50,7 @@ final class HistoryViewModelTests: XCTestCase {
 @MainActor
 final class SettingsViewModelTests: XCTestCase {
     func testLoadPopulatesFields() async {
-        let vm = SettingsViewModel(profileService: MockProfileService(), auth: MockAuthService())
+        let vm = SettingsViewModel(profileService: MockProfileService(), auth: MockAuthService(), creditPackages: MockCreditPackagesService())
         await vm.load()
         XCTAssertEqual(vm.displayName, "Alex")
         XCTAssertEqual(vm.maskedNumber, "+14******123")
@@ -60,7 +60,7 @@ final class SettingsViewModelTests: XCTestCase {
 
     func testSaveUpdatesProfileAndFlagsSuccess() async {
         let profileService = MockProfileService()
-        let vm = SettingsViewModel(profileService: profileService, auth: MockAuthService())
+        let vm = SettingsViewModel(profileService: profileService, auth: MockAuthService(), creditPackages: MockCreditPackagesService())
         await vm.load()
         vm.displayName = "Jordan"
         await vm.save()
@@ -69,7 +69,7 @@ final class SettingsViewModelTests: XCTestCase {
     }
 
     func testSignOutInvokesCallback() async {
-        let vm = SettingsViewModel(profileService: MockProfileService(), auth: MockAuthService())
+        let vm = SettingsViewModel(profileService: MockProfileService(), auth: MockAuthService(), creditPackages: MockCreditPackagesService())
         var signedOut = false
         vm.onSignOut = { signedOut = true }
         await vm.signOut()
@@ -78,11 +78,36 @@ final class SettingsViewModelTests: XCTestCase {
 
     func testSaveErrorMapsToCopy() async {
         let profileService = MockProfileService()
-        let vm = SettingsViewModel(profileService: profileService, auth: MockAuthService())
+        let vm = SettingsViewModel(profileService: profileService, auth: MockAuthService(), creditPackages: MockCreditPackagesService())
         await vm.load()
         profileService.error = APIError.api(code: "rate_limited", message: "x", retryable: true, requestID: nil)
         await vm.save()
         XCTAssertFalse(vm.didSave)
         XCTAssertNotNil(vm.errorMessage)
+    }
+
+    func testDidAcquireCreditsSetsSuccessMessageAndRefreshes() async {
+        let vm = SettingsViewModel(profileService: MockProfileService(),
+                                   auth: MockAuthService(),
+                                   creditPackages: MockCreditPackagesService())
+        await vm.load()
+        await vm.didAcquireCredits(
+            CreditAcquisition(claimID: "c1", status: "granted", grantedCredits: 15,
+                              creditsAvailable: 18, planCode: "credits_15")
+        )
+        XCTAssertEqual(vm.creditSuccessMessage, "15 credits added")
+        // Balance reflects the backend (mock profile) after the refresh.
+        XCTAssertEqual(vm.creditsAvailable, 3)
+    }
+
+    func testMakeCreditPackagesViewModelForwardsSessionExpiry() async {
+        let vm = SettingsViewModel(profileService: MockProfileService(),
+                                   auth: MockAuthService(),
+                                   creditPackages: MockCreditPackagesService())
+        var expired = false
+        vm.onSessionExpired = { expired = true }
+        let packagesVM = vm.makeCreditPackagesViewModel()
+        packagesVM.onSessionExpired?()
+        XCTAssertTrue(expired)
     }
 }
