@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AlibiMe — Your personal alibi</title>
+  <meta name="description" content="AlibiMe sends a believable call or text to your own phone, on your terms. Coming soon to the App Store." />
+
+  <!-- Open Graph / social preview -->
+  <meta property="og:title" content="AlibiMe — Your personal alibi" />
+  <meta property="og:description" content="A believable call or text to your own phone, on your terms. Coming soon to the App Store." />
+  <meta property="og:image" content="icon.png" />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" type="image/png" href="icon.png" />
+
+  <style>
+    :root {
+      --ink: #121B28;
+      --accent: #6366F1;
+      --lavender: #ADAAFC;
+      --bg-top: #F4F5F7;
+      --bg-bottom: #C9CBFB;
+      --card-border: rgba(255, 255, 255, 0.6);
+      --shadow: rgba(18, 27, 40, 0.14);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.55;
+    }
+
+    /* Soft decorative blobs */
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.5;
+      z-index: -1;
+    }
+    body::before { width: 380px; height: 380px; background: var(--lavender); top: -120px; right: -100px; }
+    body::after  { width: 420px; height: 420px; background: var(--accent); bottom: -160px; left: -140px; opacity: 0.25; }
+
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+    /* Glass card */
+    .glass {
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      box-shadow: 0 12px 40px var(--shadow);
+    }
+
+    /* Hero */
+    header { text-align: center; padding: 88px 0 56px; }
+
+    .icon {
+      width: 132px; height: 132px;
+      border-radius: 30px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 14px 36px var(--shadow);
+      object-fit: contain;
+      margin-bottom: 28px;
+    }
+
+    h1 { font-size: clamp(2.6rem, 7vw, 4rem); font-weight: 800; letter-spacing: -0.02em; }
+
+    .tagline {
+      font-size: clamp(1.1rem, 3.2vw, 1.4rem);
+      color: #3a4253;
+      max-width: 30ch;
+      margin: 16px auto 0;
+      font-weight: 500;
+    }
+
+    /* App Store coming-soon badge */
+    .badge {
+      display: inline-flex; align-items: center; gap: 12px;
+      margin-top: 36px;
+      padding: 14px 22px;
+      border-radius: 16px;
+      background: var(--ink);
+      color: #fff;
+      text-decoration: none;
+      box-shadow: 0 10px 28px rgba(18, 27, 40, 0.3);
+    }
+    .badge svg { width: 26px; height: 26px; fill: #fff; }
+    .badge .small { font-size: 0.72rem; opacity: 0.8; display: block; line-height: 1.1; }
+    .badge .big { font-size: 1.15rem; font-weight: 700; line-height: 1.1; }
+
+    /* Sections */
+    section { padding: 36px 0; }
+    h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700; margin-bottom: 24px; text-align: center; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+
+    .card { padding: 24px; }
+    .card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .card p { color: #4a5263; font-size: 0.98rem; }
+
+    /* Steps */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; }
+    .step { padding: 22px; text-align: center; }
+    .step .num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--accent); color: #fff; font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .step p { color: #4a5263; font-size: 0.95rem; }
+
+    footer { text-align: center; padding: 48px 0 64px; color: #5a6273; font-size: 0.9rem; }
+    footer .note { max-width: 52ch; margin: 0 auto 14px; }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <img class="icon" src="icon.png" alt="AlibiMe app icon" />
+      <h1>AlibiMe</h1>
+      <p class="tagline">Your personal alibi — a believable call or text, on your terms.</p>
+
+      <a class="badge" href="#" aria-label="Coming soon to the App Store">
+        <svg viewBox="0 0 384 512" role="img" aria-hidden="true">
+          <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+        </svg>
+        <span>
+          <span class="small">Coming soon to the</span>
+          <span class="big">App Store</span>
+        </span>
+      </a>
+    </header>
+
+    <section>
+      <h2>What people use it for</h2>
+      <div class="grid">
+        <div class="glass card">
+          <h3>Slip out of a bad date</h3>
+          <p>Your roommate has an "issue at home" — and you genuinely have to go.</p>
+        </div>
+        <div class="glass card">
+          <h3>Escape a dragging meeting</h3>
+          <p>An "urgent work issue" calls at exactly the right minute.</p>
+        </div>
+        <div class="glass card">
+          <h3>Protect your private life</h3>
+          <p>Carve out time for yourself — a day or two weeks — no explanations owed.</p>
+        </div>
+        <div class="glass card">
+          <h3>Back up a story</h3>
+          <p>Make a new relationship or chapter feel real to the people around you.</p>
+        </div>
+        <div class="glass card">
+          <h3>Make it feel established</h3>
+          <p>A fresh job or move looks settled when the right people check in on you.</p>
+        </div>
+        <div class="glass card">
+          <h3>A safe way out</h3>
+          <p>A believable reason to leave an uncomfortable situation, immediately.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="glass step"><div class="num">1</div><p>Pick a believable scenario — or build your own.</p></div>
+        <div class="glass step"><div class="num">2</div><p>Choose a call or a text.</p></div>
+        <div class="glass step"><div class="num">3</div><p>Set the timing — now, in a few minutes, or scheduled.</p></div>
+        <div class="glass step"><div class="num">4</div><p>Your phone rings or buzzes right on cue.</p></div>
+      </div>
+    </section>
+
+    <footer>
+      <p class="note">
+        AlibiMe only ever delivers to <strong>your own</strong> verified number —
+        it's a personal prop you present, never a way to contact someone else's phone.
+      </p>
+      <p>© <span id="year"></span> AlibiMe · Coming soon</p>
+    </footer>
+
+  </div>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>
