@@ -89,10 +89,20 @@ extension View {
     /// A tinted Liquid Glass capsule (iOS 26+) for selection highlights; falls
     /// back to a solid tint fill.
     @ViewBuilder func bcGlassTintCapsule(_ tint: Color) -> some View {
+        bcGlassTint(tint, in: Capsule())
+    }
+
+    /// A tinted Liquid Glass fill in an arbitrary shape (iOS 26+); falls back to
+    /// a solid tint fill. Used for buttons and selection highlights so they read
+    /// as translucent tinted glass rather than flat color.
+    @ViewBuilder func bcGlassTint<S: Shape>(_ tint: Color, in shape: S, interactive: Bool = false) -> some View {
         if #available(iOS 26, macOS 26, *) {
-            self.glassEffect(.regular.tint(tint), in: Capsule())
+            self.glassEffect(
+                interactive ? .regular.tint(tint).interactive() : .regular.tint(tint),
+                in: shape
+            )
         } else {
-            self.background(tint, in: Capsule())
+            self.background(tint, in: shape)
         }
     }
 

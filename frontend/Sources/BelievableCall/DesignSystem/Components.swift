@@ -57,13 +57,14 @@ public struct PrimaryButton: View {
             .frame(minHeight: 30)
             .padding(.vertical, Spacing.m)
             .foregroundStyle(.white)
-            .background(
+            .bcGlassTint(
                 role == .destructive ? Theme.destructive : Theme.accent,
-                in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
+                in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous),
+                interactive: true
             )
             .shadow(
-                color: (role == .destructive ? Theme.destructive : Theme.accent).opacity(0.30),
-                radius: 14, x: 0, y: 8
+                color: (role == .destructive ? Theme.destructive : Theme.accent).opacity(0.22),
+                radius: 12, x: 0, y: 6
             )
         }
         .buttonStyle(.plain)
