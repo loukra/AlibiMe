@@ -110,6 +110,68 @@ public struct SelectablePill: View {
     }
 }
 
+/// One choice in a `SegmentedSelector`.
+public struct SegmentItem: Identifiable, Equatable, Sendable {
+    public let id: String
+    public let title: String
+    public init(id: String, title: String) {
+        self.id = id
+        self.title = title
+    }
+}
+
+/// A sliding segmented control — the selected segment is a brand-accent capsule
+/// that glides between options (à la the iOS camera mode switch). Selection is
+/// reported via `onSelect`, so callers can drive a value *or* an action (e.g.
+/// "Schedule" opening a sheet).
+public struct SegmentedSelector: View {
+    let items: [SegmentItem]
+    let selectedID: String
+    let onSelect: (String) -> Void
+    @Namespace private var ns
+
+    public init(items: [SegmentItem], selectedID: String, onSelect: @escaping (String) -> Void) {
+        self.items = items
+        self.selectedID = selectedID
+        self.onSelect = onSelect
+    }
+
+    public var body: some View {
+        HStack(spacing: 0) {
+            ForEach(items) { item in
+                let isSelected = item.id == selectedID
+                Button {
+                    Haptics.play(.impact)
+                    onSelect(item.id)
+                } label: {
+                    Text(item.title)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .foregroundStyle(isSelected ? Color.white : Color.secondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, Spacing.s)
+                        .background {
+                            if isSelected {
+                                Capsule()
+                                    .fill(Theme.accent)
+                                    .matchedGeometryEffect(id: "segmentedSelection", in: ns)
+                            }
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(item.title)
+                .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+            }
+        }
+        .padding(4)
+        .background(.ultraThinMaterial, in: Capsule())
+        .overlay(Capsule().strokeBorder(Theme.glassBorder, lineWidth: 1))
+        .animation(.spring(response: 0.32, dampingFraction: 0.82), value: selectedID)
+    }
+}
+
 /// Section header in the calm, serious tone.
 public struct SectionHeader: View {
     let title: String

@@ -101,25 +101,22 @@ public struct HomeView: View {
         if vm.availableChannels.count > 1 {
             VStack(alignment: .leading, spacing: Spacing.s) {
                 SectionHeader("Channel")
-                HStack(spacing: Spacing.s) {
-                    ForEach(vm.availableChannels) { channel in
-                        SelectablePill(channel.title, systemImage: channel.systemImage,
-                                       isSelected: vm.channel == channel) {
-                            vm.selectChannel(channel)
-                        }
-                    }
+                SegmentedSelector(
+                    items: vm.availableChannels.map { SegmentItem(id: $0.id, title: $0.title) },
+                    selectedID: vm.channel.id
+                ) { id in
+                    if let channel = Channel(rawValue: id) { vm.selectChannel(channel) }
                 }
             }
         }
         VStack(alignment: .leading, spacing: Spacing.s) {
             SectionHeader("When")
-            HStack(spacing: Spacing.s) {
-                ForEach(TimingOption.presets) { option in
-                    SelectablePill(option.shortTitle, isSelected: vm.timing == option) {
-                        vm.selectTiming(option)
-                    }
+            SegmentedSelector(items: timingSegments, selectedID: selectedTimingID) { id in
+                if id == scheduleSegmentID {
+                    showSchedule = true
+                } else if let option = TimingOption.presets.first(where: { $0.id == id }) {
+                    vm.selectTiming(option)
                 }
-                SelectablePill("Schedule", isSelected: isScheduling) { showSchedule = true }
             }
         }
         PrimaryButton(vm.primaryCTATitle, systemImage: vm.channel.systemImage, isLoading: vm.isSubmitting) {
@@ -138,6 +135,18 @@ public struct HomeView: View {
     private var isScheduling: Bool {
         if case .schedule = vm.timing { return true }
         return false
+    }
+
+    private let scheduleSegmentID = "schedule"
+
+    /// The "When" options as segments: the presets plus a Schedule entry.
+    private var timingSegments: [SegmentItem] {
+        TimingOption.presets.map { SegmentItem(id: $0.id, title: $0.shortTitle) }
+            + [SegmentItem(id: scheduleSegmentID, title: "Schedule")]
+    }
+
+    private var selectedTimingID: String {
+        isScheduling ? scheduleSegmentID : vm.timing.id
     }
 
     @ViewBuilder private var selectedTemplateCard: some View {
