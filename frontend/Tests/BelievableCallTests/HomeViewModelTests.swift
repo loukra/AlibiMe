@@ -5,13 +5,14 @@ import XCTest
 final class HomeViewModelTests: XCTestCase {
     private func makeVM(templates: [TemplateSummary] = Fixtures.templates,
                         profile: UserProfile = Fixtures.profile(),
+                        profileService: MockProfileService? = nil,
                         request: MockRequestService = MockRequestService(),
                         prefs: PreferencesStoring = InMemoryPreferences(),
                         contacts: ContactsServicing = MockContactsService(),
                         contactLinks: ContactLinkStoring = InMemoryContactLinkStore()) -> HomeViewModel {
         HomeViewModel(templateService: MockTemplateService(templates: templates),
                       requestService: request,
-                      profileService: MockProfileService(profile: profile),
+                      profileService: profileService ?? MockProfileService(profile: profile),
                       prefs: prefs,
                       contacts: contacts,
                       contactLinks: contactLinks)
@@ -95,9 +96,12 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertEqual(vm.primaryCTATitle, "Schedule text")
     }
 
-    func testSendBuildsDraftAndSetsActiveRequest() async {
-        let request = MockRequestService(created: Fixtures.scheduledRequest(channel: .call, seconds: 30))
-        let vm = makeVM(request: request)
+    func testSendBuildsDraftAndSyncsNextJobFromBackend() async {
+        let created = Fixtures.scheduledRequest(channel: .call, seconds: 30)
+        let request = MockRequestService(created: created)
+        // After sending, the chip reflects the backend's soonest live job (here,
+        // the profile reports one), not the just-created object.
+        let vm = makeVM(profile: Fixtures.profile(activeRequest: created), request: request)
         await vm.load()
         vm.selectChannel(.call)
         vm.selectTiming(.in30Seconds)
@@ -145,24 +149,29 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertNil(vm.errorMessage) // routed, not shown inline
     }
 
-    func testCancelActiveClearsRequest() async {
+    func testCancelActiveShowsNextOrClears() async {
         let active = Fixtures.scheduledRequest()
-        let vm = makeVM(profile: Fixtures.profile(activeRequest: active))
+        let svc = MockProfileService(profile: Fixtures.profile(activeRequest: active))
+        let vm = makeVM(profileService: svc)
         await vm.load()
+        XCTAssertNotNil(vm.activeRequest)
+        // Cancelling the last pending job: the backend then reports none, so the
+        // chip clears (had another been pending, it would surface instead).
+        svc.profile = Fixtures.profile()
         await vm.cancelActive()
         XCTAssertNil(vm.activeRequest)
     }
 
-    func testRefreshActiveRequestClearsWhenTerminal() async {
+    func testRefreshActiveRequestDerivesFromBackend() async {
         let active = Fixtures.scheduledRequest()
-        let request = MockRequestService(created: active)
-        request.created = RequestSummary(id: active.id, channel: .call, status: .completed,
-                                         scheduledKind: nil, executeAt: active.executeAt,
-                                         requestedAt: nil, cancelable: false, lastErrorCode: nil)
-        let vm = makeVM(profile: Fixtures.profile(activeRequest: active), request: request)
+        let svc = MockProfileService(profile: Fixtures.profile(activeRequest: active))
+        let vm = makeVM(profileService: svc)
         await vm.load()
+        XCTAssertNotNil(vm.activeRequest)
+        // Job fired/finished -> backend no longer reports a live one.
+        svc.profile = Fixtures.profile()
         await vm.refreshActiveRequest()
-        XCTAssertNil(vm.activeRequest) // terminal -> cleared
+        XCTAssertNil(vm.activeRequest)
     }
 
     func testTemplatesGroupedByCategoryInOrder() async {

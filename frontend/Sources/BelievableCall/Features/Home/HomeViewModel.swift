@@ -118,10 +118,10 @@ public final class HomeViewModel {
     /// created on the Templates tab appear here too. The current selection is
     /// preserved if it still exists.
     public func refresh() async {
-        await refreshActiveRequest()
         if let updated = try? await profileService.me() {
             profile = updated
-            if !hasActiveRequest { activeRequest = updated.activeRequest }
+            // The chip always reflects the backend's soonest live job.
+            activeRequest = updated.activeRequest
         }
         if let latest = try? await templateService.list() {
             templates = latest
@@ -188,13 +188,14 @@ public final class HomeViewModel {
         let draft = RequestDraft(templateID: template.id, channel: channel, timing: timing)
         do {
             let request = try await requestService.create(draft)
-            activeRequest = request
             lastCreatedChannel = request.channel
             createdJobCount += 1
             prefs.lastChannel = channel.rawValue
             prefs.lastTimingDelay = timing.delaySeconds
-            // Reflect the credit spend immediately if the backend reported it.
+            // Reflect the credit spend and re-derive the "next job" (soonest of
+            // possibly several pending) from the backend — not the one just added.
             await refreshProfileQuietly()
+            activeRequest = profile?.activeRequest
             // After the send is accepted, optionally suggest saving the sender as
             // a contact. This never blocks scheduling and only appears the first
             // time a binding is seen on this device.
@@ -209,15 +210,11 @@ public final class HomeViewModel {
         }
     }
 
+    /// Re-derive the "next job" chip from the backend's soonest live request
+    /// (handles a job firing/finishing and surfaces the next pending one).
     public func refreshActiveRequest() async {
-        guard let id = activeRequest?.id else { return }
-        do {
-            let updated = try await requestService.get(id: id)
-            activeRequest = updated
-            if updated.status.isTerminal { activeRequest = nil }
-        } catch {
-            handle(error)
-        }
+        await refreshProfileQuietly()
+        activeRequest = profile?.activeRequest
     }
 
     public func cancelActive() async {
@@ -225,8 +222,10 @@ public final class HomeViewModel {
         errorMessage = nil
         do {
             _ = try await requestService.cancel(id: id)
-            activeRequest = nil
+            // Re-derive the chip from the backend: the next-soonest pending job,
+            // or nil if that was the last one.
             await refreshProfileQuietly()
+            activeRequest = profile?.activeRequest
         } catch {
             handle(error)
         }

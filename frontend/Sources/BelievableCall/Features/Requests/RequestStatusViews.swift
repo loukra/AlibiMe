@@ -68,33 +68,74 @@ public struct ActiveRequestCard: View {
     }
 }
 
-/// Compact "next job" chip shown on Home above the composer. Shows a live
-/// countdown to the soonest upcoming job with a cancel button; tapping the chip
-/// body (not the ✕) opens History to see all pending jobs.
+/// Always-present "next job" control on Home. Shows a live countdown to the
+/// soonest upcoming job (with a cancel button), or a calm idle state when there
+/// is none. Tapping the body opens History. Its height is identical in both
+/// states so the Home layout never shifts.
 public struct NextJobChip: View {
-    let request: RequestSummary
+    let request: RequestSummary?
     let onCancel: () -> Void
     let onOpen: () -> Void
     @State private var now = Date()
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    public init(request: RequestSummary, onCancel: @escaping () -> Void, onOpen: @escaping () -> Void) {
+    public init(request: RequestSummary?, onCancel: @escaping () -> Void, onOpen: @escaping () -> Void) {
         self.request = request
         self.onCancel = onCancel
         self.onOpen = onOpen
     }
 
     public var body: some View {
+        // The glass capsule (frame/background) is stable so nothing shifts; the
+        // inner row is keyed by job id and push-transitions ("woosh") whenever
+        // the displayed job changes — idle→job, job→next, job→idle. Same-job
+        // ticks keep the same id, so they morph in place (no woosh).
+        ZStack {
+            row
+                .id(request?.id ?? "idle")
+                // Idle ⇄ job is a gentle fade; job ⇄ job (switch/delete-to-next)
+                // is a clearly visible horizontal slide.
+                .transition(rowTransition)
+        }
+        .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
+        .padding(Spacing.m)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
+                .strokeBorder(Theme.glassBorder, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+        .animation(.spring(response: 0.38, dampingFraction: 0.74), value: request?.id)
+        .onReceive(timer) { now = $0 }
+        .accessibilityHint(request == nil ? "Opens History" : "Opens History to see all pending jobs")
+    }
+
+    /// Gentle fade when the idle state is involved; a visible slide for a
+    /// job→job swap so switching/deleting clearly reads as a different timer.
+    private var rowTransition: AnyTransition {
+        request == nil
+            ? .opacity
+            : .asymmetric(
+                insertion: .move(edge: .trailing).combined(with: .opacity),
+                removal: .move(edge: .leading).combined(with: .opacity)
+            )
+    }
+
+    private var row: some View {
         HStack(spacing: Spacing.m) {
             Button(action: onOpen) {
                 HStack(spacing: Spacing.s) {
-                    Image(systemName: request.channel.systemImage)
-                        .foregroundStyle(Theme.accent)
+                    Image(systemName: leadingIcon)
+                        .foregroundStyle(request == nil ? Color.secondary : Theme.accent)
+                        .frame(width: 22)
                     VStack(alignment: .leading, spacing: 0) {
-                        Text("Next \(request.channel == .call ? "call" : "text")")
+                        Text(captionText)
                             .font(.caption).foregroundStyle(.secondary)
-                        Text(countdown)
+                        Text(mainText)
                             .font(.headline.monospacedDigit())
+                            .foregroundStyle(request == nil ? Color.secondary : Color.primary)
+                            // Same-job countdown ticks morph rather than woosh.
+                            .contentTransition(.numericText())
                     }
                     Spacer(minLength: 0)
                     Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
@@ -103,7 +144,7 @@ public struct NextJobChip: View {
             }
             .buttonStyle(.plain)
 
-            if request.cancelable {
+            if request?.cancelable == true {
                 Button(action: onCancel) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
@@ -113,17 +154,18 @@ public struct NextJobChip: View {
                 .accessibilityLabel("Cancel next job")
             }
         }
-        .padding(Spacing.m)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
-                .strokeBorder(Theme.glassBorder, lineWidth: 1)
-        )
-        .onReceive(timer) { now = $0 }
-        .accessibilityHint("Opens History to see all pending jobs")
     }
 
-    private var countdown: String {
+    private var leadingIcon: String {
+        guard let request else { return "moon.stars" }
+        return request.channel.systemImage
+    }
+    private var captionText: String {
+        guard let request else { return "Upcoming" }
+        return "Next \(request.channel == .call ? "call" : "text")"
+    }
+    private var mainText: String {
+        guard let request else { return "Nothing scheduled" }
         let remaining = request.secondsRemaining(now: now)
         return String(format: "%02d:%02d", remaining / 60, remaining % 60)
     }
