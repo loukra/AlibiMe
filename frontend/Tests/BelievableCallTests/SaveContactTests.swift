@@ -204,7 +204,8 @@ final class SaveContactTests: XCTestCase {
     func testHistoryMapsSenderSnapshotForReentry() {
         let dto = HistoryItemDTO(
             request_id: "r1", channel: "sms", template_label: "Boss — trip",
-            requested_at: Date(), final_status: "completed", duration_seconds: nil,
+            requested_at: Date(), execute_at: Date(), final_status: "completed",
+            cancelable: false, duration_seconds: nil,
             delivered_preview: "hi", sender_binding_id: "b3", sender_persona_key: "boss",
             sender_display_name: "Boss", sender_phone_e164: "+15553334444"
         )

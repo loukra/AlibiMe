@@ -21,14 +21,17 @@ _ALLOWED: dict[str, set[str]] = {
     RequestStatus.provider_accepted.value: {
         RequestStatus.active.value,
         RequestStatus.completed.value,
+        RequestStatus.no_answer.value,
         RequestStatus.failed.value,
     },
     RequestStatus.active.value: {
         RequestStatus.completed.value,
+        RequestStatus.no_answer.value,
         RequestStatus.failed.value,
     },
     # terminal states
     RequestStatus.completed.value: set(),
+    RequestStatus.no_answer.value: set(),
     RequestStatus.failed.value: set(),
     RequestStatus.canceled.value: set(),
     RequestStatus.expired.value: set(),

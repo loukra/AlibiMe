@@ -10,6 +10,7 @@ from app.db.models.enums import Channel
 from app.db.models.request import Request
 from app.db.models.template import Template
 from app.domain.requests import service as requests_service
+from app.domain.requests import state
 from app.schemas.history import HistoryItem, HistoryResponse
 
 router = APIRouter(prefix="/v1/history", tags=["history"])
@@ -52,7 +53,9 @@ def get_history(
                 channel=req.channel,
                 template_label=template_label,
                 requested_at=req.requested_at,
+                execute_at=req.execute_at,
                 final_status=req.status,
+                cancelable=state.is_cancelable(req.status),
                 duration_seconds=duration,
                 delivered_preview=preview,
                 sender_binding_id=str(req.sender_binding_id) if req.sender_binding_id else None,

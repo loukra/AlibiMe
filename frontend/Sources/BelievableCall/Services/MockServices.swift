@@ -105,6 +105,10 @@ public enum Fixtures {
     }
 
     public static let history: [HistoryEntry] = [
+        HistoryEntry(id: "p1", channel: .call, templateLabel: "Boss — urgent work issue",
+                     requestedAt: Date(), executeAt: Date().addingTimeInterval(180),
+                     status: .scheduled, cancelable: true,
+                     durationSeconds: nil, preview: nil),
         HistoryEntry(id: "h1", channel: .call, templateLabel: "Boss — urgent work issue",
                      requestedAt: Date().addingTimeInterval(-3600), status: .completed,
                      durationSeconds: 42, preview: "Brief call about a work issue."),
@@ -203,7 +207,9 @@ public final class MockRequestService: RequestServicing, @unchecked Sendable {
     public var created: RequestSummary
     public var createError: Error?
     public var cancelStatus: RequestStatus = .canceled
+    public var cancelError: Error?
     public private(set) var lastDraft: RequestDraft?
+    public private(set) var canceledIDs: [String] = []
 
     public init(created: RequestSummary = Fixtures.scheduledRequest()) { self.created = created }
 
@@ -216,8 +222,10 @@ public final class MockRequestService: RequestServicing, @unchecked Sendable {
     public func get(id: String) async throws -> RequestSummary { created }
 
     public func cancel(id: String) async throws -> RequestSummary {
-        RequestSummary(id: id, channel: created.channel, status: cancelStatus, scheduledKind: nil,
-                       executeAt: created.executeAt, requestedAt: nil, cancelable: false, lastErrorCode: nil)
+        if let cancelError { throw cancelError }
+        canceledIDs.append(id)
+        return RequestSummary(id: id, channel: created.channel, status: cancelStatus, scheduledKind: nil,
+                              executeAt: created.executeAt, requestedAt: nil, cancelable: false, lastErrorCode: nil)
     }
 }
 

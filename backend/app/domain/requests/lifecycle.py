@@ -29,6 +29,18 @@ _CALL_TO_REQUEST = {
     CallAttemptStatus.canceled.value: RequestStatus.canceled.value,
 }
 
+# Provider ended-reasons that mean the call was delivered but never answered
+# (it rang out / DND / declined / went to voicemail) rather than a real
+# conversation. These resolve the request to `no_answer`, not `completed`.
+_NOT_ANSWERED_REASONS = {
+    "customer-did-not-answer",
+    "customer-busy",
+    "no-answer",
+    "voicemail",
+    "assistant-did-not-receive-customer-audio",
+    "twilio-failed-to-connect-call",
+}
+
 _MESSAGE_TO_REQUEST = {
     MessageAttemptStatus.queued.value: RequestStatus.provider_accepted.value,
     MessageAttemptStatus.sent.value: RequestStatus.provider_accepted.value,
@@ -71,6 +83,13 @@ def apply_call_event(db: Session, attempt: CallAttempt, mapped_status: str | Non
     attempt.updated_at = now
 
     target = _CALL_TO_REQUEST.get(mapped_status)
+    # A call that ended without being answered (DND / declined / voicemail /
+    # rang out) resolves to `no_answer`, not a successful `completed`.
+    if (
+        mapped_status == CallAttemptStatus.ended.value
+        and (fields.get("ended_reason") or "") in _NOT_ANSWERED_REASONS
+    ):
+        target = RequestStatus.no_answer.value
     if target:
         _advance_request(db, request, target)
         if target == RequestStatus.completed.value:

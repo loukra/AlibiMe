@@ -13,16 +13,40 @@ public final class HistoryViewModel {
     public var errorMessage: String?
 
     private let service: HistoryServicing
+    private let requests: RequestServicing?
     private let pageSize: Int
     private var offset = 0
     public var onSessionExpired: (() -> Void)?
 
-    public init(service: HistoryServicing, pageSize: Int = 20) {
+    public init(service: HistoryServicing, requests: RequestServicing? = nil, pageSize: Int = 20) {
         self.service = service
+        self.requests = requests
         self.pageSize = pageSize
     }
 
     public var isEmpty: Bool { items.isEmpty && !isLoading }
+
+    /// Pending (cancelable, not-yet-executed) jobs, soonest first.
+    public var pendingItems: [HistoryEntry] {
+        items.filter { $0.isPending }.sorted { $0.executeAt < $1.executeAt }
+    }
+
+    /// Everything that already ran (or was canceled), newest first.
+    public var pastItems: [HistoryEntry] {
+        items.filter { !$0.isPending }
+    }
+
+    /// Cancel a pending job, then drop it from the list (or reload on error).
+    public func cancel(_ entry: HistoryEntry) async {
+        guard let requests, entry.cancelable else { return }
+        do {
+            _ = try await requests.cancel(id: entry.id)
+            items.removeAll { $0.id == entry.id }
+        } catch {
+            handle(error)
+            await load()
+        }
+    }
 
     public func load() async {
         guard !isLoading else { return }  // avoid overlapping reloads (e.g. onAppear + pull)

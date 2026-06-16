@@ -67,4 +67,65 @@ public struct ActiveRequestCard: View {
         }
     }
 }
+
+/// Compact "next job" chip shown on Home above the composer. Shows a live
+/// countdown to the soonest upcoming job with a cancel button; tapping the chip
+/// body (not the ✕) opens History to see all pending jobs.
+public struct NextJobChip: View {
+    let request: RequestSummary
+    let onCancel: () -> Void
+    let onOpen: () -> Void
+    @State private var now = Date()
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    public init(request: RequestSummary, onCancel: @escaping () -> Void, onOpen: @escaping () -> Void) {
+        self.request = request
+        self.onCancel = onCancel
+        self.onOpen = onOpen
+    }
+
+    public var body: some View {
+        HStack(spacing: Spacing.m) {
+            Button(action: onOpen) {
+                HStack(spacing: Spacing.s) {
+                    Image(systemName: request.channel.systemImage)
+                        .foregroundStyle(Theme.accent)
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("Next \(request.channel == .call ? "call" : "text")")
+                            .font(.caption).foregroundStyle(.secondary)
+                        Text(countdown)
+                            .font(.headline.monospacedDigit())
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if request.cancelable {
+                Button(action: onCancel) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Cancel next job")
+            }
+        }
+        .padding(Spacing.m)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
+                .strokeBorder(Theme.glassBorder, lineWidth: 1)
+        )
+        .onReceive(timer) { now = $0 }
+        .accessibilityHint("Opens History to see all pending jobs")
+    }
+
+    private var countdown: String {
+        let remaining = request.secondsRemaining(now: now)
+        return String(format: "%02d:%02d", remaining / 60, remaining % 60)
+    }
+}
 #endif

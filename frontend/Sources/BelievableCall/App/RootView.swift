@@ -112,7 +112,9 @@ struct MainTabView: View {
     // switching; only the selected one is visible and interactive.
     private var screens: some View {
         ZStack {
-            HomeView(vm: home, onOpenVerifiedNumber: { selection = .settings })
+            HomeView(vm: home,
+                     onOpenVerifiedNumber: { selection = .settings },
+                     onOpenHistory: { selection = .history })
                 .opacity(selection == .home ? 1 : 0)
                 .allowsHitTesting(selection == .home)
             HistoryView(vm: history)

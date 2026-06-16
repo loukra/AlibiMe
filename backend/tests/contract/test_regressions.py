@@ -55,22 +55,24 @@ def test_cannot_create_request_without_verified_primary_number(db):
         )
 
 
-def test_cannot_create_two_active_live_requests(client):
+def test_pending_jobs_capped(client):
+    """Multiple pending jobs are allowed up to the cap; one more is rejected."""
     a = signup(client)
     tid = get_template_id(client, a["headers"], "boss_travel_assignment")
-    first = client.post(
+    for i in range(3):
+        r = client.post(
+            "/v1/requests",
+            headers=a["headers"],
+            json={"client_request_id": f"c{i}", "template_id": tid, "channel": "call", "delay_seconds": 300},
+        )
+        assert r.status_code == 201, r.text
+    over = client.post(
         "/v1/requests",
         headers=a["headers"],
-        json={"client_request_id": "c1", "template_id": tid, "channel": "call", "delay_seconds": 300},
+        json={"client_request_id": "c4", "template_id": tid, "channel": "call", "delay_seconds": 300},
     )
-    assert first.status_code == 201
-    second = client.post(
-        "/v1/requests",
-        headers=a["headers"],
-        json={"client_request_id": "c2", "template_id": tid, "channel": "call", "delay_seconds": 300},
-    )
-    assert second.status_code == 409
-    assert second.json()["error"]["code"] == "active_request_exists"
+    assert over.status_code == 409
+    assert over.json()["error"]["code"] == "active_request_exists"
 
 
 def test_template_cannot_be_used_on_unsupported_channel(client):

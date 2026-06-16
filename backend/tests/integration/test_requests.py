@@ -128,18 +128,22 @@ def test_cancel_scheduled_request(client):
     assert resp.json()["status"] == "canceled"
 
 
-def test_second_active_request_blocked(client):
+def test_multiple_pending_allowed_then_capped(client):
     a = signup(client)
     tid = _boss(client, a["headers"])
-    client.post(
-        "/v1/requests",
-        headers=a["headers"],
-        json={"client_request_id": "c1", "template_id": tid, "channel": "call", "delay_seconds": 300},
-    )
+    # Several pending jobs can coexist (a queue).
+    for i in range(3):
+        r = client.post(
+            "/v1/requests",
+            headers=a["headers"],
+            json={"client_request_id": f"c{i}", "template_id": tid, "channel": "call", "delay_seconds": 300},
+        )
+        assert r.status_code == 201, r.text
+    # Over the cap is rejected.
     resp = client.post(
         "/v1/requests",
         headers=a["headers"],
-        json={"client_request_id": "c2", "template_id": tid, "channel": "call", "delay_seconds": 300},
+        json={"client_request_id": "c9", "template_id": tid, "channel": "call", "delay_seconds": 300},
     )
     assert resp.status_code == 409
     assert resp.json()["error"]["code"] == "active_request_exists"
@@ -158,3 +162,17 @@ def test_history_lists_requests(client):
     body = resp.json()
     assert len(body["items"]) == 1
     assert body["items"][0]["channel"] == "call"
+
+
+def test_history_exposes_pending_with_execute_at_and_cancelable(client):
+    a = signup(client)
+    tid = _boss(client, a["headers"])
+    client.post(
+        "/v1/requests",
+        headers=a["headers"],
+        json={"client_request_id": "p1", "template_id": tid, "channel": "call", "delay_seconds": 300},
+    )
+    items = client.get("/v1/history", headers=a["headers"]).json()["items"]
+    pending = next(i for i in items if i["final_status"] == "scheduled")
+    assert pending["execute_at"]
+    assert pending["cancelable"] is True

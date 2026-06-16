@@ -10,10 +10,15 @@ public struct HomeView: View {
     /// Invoked when the user taps the verified-number card; the tab container
     /// routes this to the Settings tab (where the number lives).
     var onOpenVerifiedNumber: (() -> Void)?
+    /// Invoked when the user taps the "next job" chip body — opens History.
+    var onOpenHistory: (() -> Void)?
 
-    public init(vm: HomeViewModel, onOpenVerifiedNumber: (() -> Void)? = nil) {
+    public init(vm: HomeViewModel,
+                onOpenVerifiedNumber: (() -> Void)? = nil,
+                onOpenHistory: (() -> Void)? = nil) {
         self.vm = vm
         self.onOpenVerifiedNumber = onOpenVerifiedNumber
+        self.onOpenHistory = onOpenHistory
     }
 
     public var body: some View {
@@ -24,13 +29,12 @@ public struct HomeView: View {
                         ErrorBanner(error)
                     }
                     verifiedNumberCard
-                    if vm.hasActiveRequest, let active = vm.activeRequest {
-                        ActiveRequestCard(request: active,
-                                          onCancel: { Task { await vm.cancelActive() } },
-                                          onRefresh: { Task { await vm.refreshActiveRequest() } })
-                    } else {
-                        requestComposer
+                    if vm.hasActiveRequest, let next = vm.activeRequest {
+                        NextJobChip(request: next,
+                                    onCancel: { Task { await vm.cancelActive() } },
+                                    onOpen: { onOpenHistory?() })
                     }
+                    requestComposer
                     creditsSummary
                 }
                 .padding(Spacing.m)

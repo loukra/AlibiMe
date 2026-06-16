@@ -210,7 +210,7 @@ public struct StatusBadge: View {
         switch status {
         case .completed: return Theme.success
         case .failed, .expired: return Theme.destructive
-        case .canceled: return .secondary
+        case .noAnswer, .canceled: return .secondary
         default: return Theme.accent
         }
     }
@@ -218,6 +218,7 @@ public struct StatusBadge: View {
         switch status {
         case .completed: return "checkmark.circle.fill"
         case .failed, .expired: return "exclamationmark.triangle.fill"
+        case .noAnswer: return "phone.down.fill"
         case .canceled: return "xmark.circle.fill"
         case .active, .providerAccepted: return "waveform"
         default: return "clock.fill"

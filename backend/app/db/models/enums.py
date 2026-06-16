@@ -53,6 +53,7 @@ class RequestStatus(StrEnum):
     provider_accepted = "provider_accepted"
     active = "active"  # call only: ringing or connected
     completed = "completed"
+    no_answer = "no_answer"  # call only: delivered but not answered (DND, declined, voicemail)
     failed = "failed"
     canceled = "canceled"
     expired = "expired"
@@ -61,6 +62,7 @@ class RequestStatus(StrEnum):
 # Terminal request states.
 TERMINAL_REQUEST_STATUSES = {
     RequestStatus.completed,
+    RequestStatus.no_answer,
     RequestStatus.failed,
     RequestStatus.canceled,
     RequestStatus.expired,

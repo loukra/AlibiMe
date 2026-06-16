@@ -1,7 +1,8 @@
 #if canImport(SwiftUI)
 import SwiftUI
 
-/// Chronological history across both channels.
+/// History across both channels: a "Pending" section of upcoming jobs (with the
+/// execution time and swipe-to-cancel) above the chronological past.
 public struct HistoryView: View {
     @Bindable var vm: HistoryViewModel
 
@@ -18,31 +19,46 @@ public struct HistoryView: View {
             }
             .bcScreenBackground()
             .navigationTitle("History")
-            // Refresh whenever the tab becomes visible (e.g. after scheduling a
-            // request on Home), in addition to pull-to-refresh. Existing rows
-            // stay on screen while the reload runs, so there's no flash.
+            // Reload whenever the tab becomes visible (e.g. after scheduling on
+            // Home), plus pull-to-refresh. Rows stay on screen during reload.
             .onAppear { Task { await vm.load() } }
         }
     }
 
     private var list: some View {
-        ScrollView {
-            LazyVStack(spacing: Spacing.s) {
-                if let error = vm.errorMessage {
-                    ErrorBanner(error)
-                }
-                ForEach(vm.items) { item in
-                    HistoryRow(item: item)
-                        .onAppear {
-                            if item.id == vm.items.last?.id { Task { await vm.loadMore() } }
-                        }
-                }
-                if vm.isLoadingMore { ProgressView().padding() }
+        List {
+            if let error = vm.errorMessage {
+                Section { ErrorBanner(error) }
             }
-            .padding(Spacing.m)
-            .bcPinScrollWidth()
+            if !vm.pendingItems.isEmpty {
+                Section("Pending") {
+                    ForEach(vm.pendingItems) { item in
+                        PendingRow(item: item)
+                            .swipeActions(edge: .trailing) {
+                                if item.cancelable {
+                                    Button(role: .destructive) {
+                                        Task { await vm.cancel(item) }
+                                    } label: { Label("Cancel", systemImage: "xmark") }
+                                }
+                            }
+                    }
+                }
+            }
+            if !vm.pastItems.isEmpty {
+                Section(vm.pendingItems.isEmpty ? "" : "Recent") {
+                    ForEach(vm.pastItems) { item in
+                        HistoryRow(item: item)
+                            .onAppear {
+                                if item.id == vm.pastItems.last?.id { Task { await vm.loadMore() } }
+                            }
+                    }
+                }
+            }
+            if vm.isLoadingMore {
+                HStack { Spacer(); ProgressView(); Spacer() }
+            }
         }
-        .bcVerticalScrollOnly()
+        .bcClearScrollBackground()
         .refreshable { await vm.refresh() }
     }
 
@@ -61,37 +77,66 @@ public struct HistoryView: View {
     }
 }
 
+/// An upcoming job: channel, template, and a live countdown to execution.
+struct PendingRow: View {
+    let item: HistoryEntry
+    @State private var now = Date()
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    var body: some View {
+        HStack(spacing: Spacing.m) {
+            Image(systemName: item.channel.systemImage)
+                .font(.title3).foregroundStyle(Theme.accent).frame(width: 28)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.templateLabel).font(.subheadline.weight(.medium))
+                Text(item.executeAt, format: .dateTime.month().day().hour().minute())
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Text(countdown)
+                .font(.subheadline.weight(.semibold).monospacedDigit())
+                .foregroundStyle(Theme.accent)
+        }
+        .onReceive(timer) { now = $0 }
+        .accessibilityElement(children: .combine)
+        .accessibilityHint("Swipe left to cancel")
+    }
+
+    private var countdown: String {
+        let remaining = max(0, Int(item.executeAt.timeIntervalSince(now)))
+        return String(format: "%02d:%02d", remaining / 60, remaining % 60)
+    }
+}
+
 struct HistoryRow: View {
     let item: HistoryEntry
 
     var body: some View {
-        Card {
-            HStack(spacing: Spacing.m) {
-                Image(systemName: item.channel.systemImage)
-                    .font(.title3)
-                    .foregroundStyle(Theme.accent)
-                    .frame(width: 28)
-                VStack(alignment: .leading, spacing: Spacing.xs) {
-                    Text(item.templateLabel)
-                        .font(.subheadline.weight(.medium))
-                    Text(item.requestedAt, format: .dateTime.month().day().hour().minute())
+        HStack(spacing: Spacing.m) {
+            Image(systemName: item.channel.systemImage)
+                .font(.title3)
+                .foregroundStyle(Theme.accent)
+                .frame(width: 28)
+            VStack(alignment: .leading, spacing: Spacing.xs) {
+                Text(item.templateLabel)
+                    .font(.subheadline.weight(.medium))
+                Text(item.requestedAt, format: .dateTime.month().day().hour().minute())
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if let preview = item.preview {
+                    Text(preview)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: Spacing.xs) {
+                StatusBadge(status: item.status, channel: item.channel)
+                if let duration = item.durationSeconds {
+                    Text("\(duration)s")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    if let preview = item.preview {
-                        Text(preview)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                }
-                Spacer()
-                VStack(alignment: .trailing, spacing: Spacing.xs) {
-                    StatusBadge(status: item.status, channel: item.channel)
-                    if let duration = item.durationSeconds {
-                        Text("\(duration)s")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
                 }
             }
         }

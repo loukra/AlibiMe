@@ -258,7 +258,9 @@ struct HistoryItemDTO: Decodable {
     let channel: String
     let template_label: String
     let requested_at: Date
+    let execute_at: Date
     let final_status: String
+    let cancelable: Bool?
     let duration_seconds: Int?
     let delivered_preview: String?
     let sender_binding_id: String?

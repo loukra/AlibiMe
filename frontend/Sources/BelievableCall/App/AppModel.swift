@@ -90,7 +90,7 @@ public final class AppModel {
     }
 
     public func makeHistoryViewModel() -> HistoryViewModel {
-        let vm = HistoryViewModel(service: env.history)
+        let vm = HistoryViewModel(service: env.history, requests: env.requests)
         vm.onSessionExpired = { [weak self] in self?.handleSessionExpired() }
         return vm
     }

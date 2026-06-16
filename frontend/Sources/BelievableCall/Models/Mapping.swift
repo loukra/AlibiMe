@@ -219,7 +219,9 @@ extension HistoryEntry {
             channel: Channel(wireValue: dto.channel) ?? .call,
             templateLabel: dto.template_label,
             requestedAt: dto.requested_at,
+            executeAt: dto.execute_at,
             status: RequestStatus(wireValue: dto.final_status),
+            cancelable: dto.cancelable ?? false,
             durationSeconds: dto.duration_seconds,
             preview: dto.delivered_preview,
             senderIdentity: sender

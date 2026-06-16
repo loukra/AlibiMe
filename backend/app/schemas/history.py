@@ -10,7 +10,9 @@ class HistoryItem(BaseModel):
     channel: str
     template_label: str
     requested_at: datetime
+    execute_at: datetime
     final_status: str
+    cancelable: bool = False
     duration_seconds: int | None = None
     delivered_preview: str | None = None
     sender_binding_id: str | None = None

@@ -366,6 +366,7 @@ public enum RequestStatus: String, Sendable {
     case providerAccepted
     case active
     case completed
+    case noAnswer
     case canceled
     case failed
     case expired
@@ -378,6 +379,7 @@ public enum RequestStatus: String, Sendable {
         case "provider_accepted": self = .providerAccepted
         case "active": self = .active
         case "completed": self = .completed
+        case "no_answer": self = .noAnswer
         case "canceled": self = .canceled
         case "failed": self = .failed
         case "expired": self = .expired
@@ -390,7 +392,7 @@ public enum RequestStatus: String, Sendable {
         switch self {
         case .scheduled, .dispatching, .providerAccepted, .active:
             return true
-        case .completed, .canceled, .failed, .expired, .unknown:
+        case .completed, .noAnswer, .canceled, .failed, .expired, .unknown:
             return false
         }
     }
@@ -406,6 +408,7 @@ public enum RequestStatus: String, Sendable {
         case .providerAccepted: return channel == .call ? "Call ringing" : "Text queued"
         case .active: return "Call in progress"
         case .completed: return "Completed"
+        case .noAnswer: return "No answer"
         case .canceled: return "Canceled"
         case .failed: return "Failed"
         case .expired: return "Expired"
@@ -516,7 +519,9 @@ public struct HistoryEntry: Equatable, Identifiable, Sendable {
     public let channel: Channel
     public let templateLabel: String
     public let requestedAt: Date
+    public let executeAt: Date
     public let status: RequestStatus
+    public let cancelable: Bool
     public let durationSeconds: Int?
     public let preview: String?
     public let senderIdentity: SenderIdentity?
@@ -525,7 +530,9 @@ public struct HistoryEntry: Equatable, Identifiable, Sendable {
                 channel: Channel,
                 templateLabel: String,
                 requestedAt: Date,
+                executeAt: Date = .distantPast,
                 status: RequestStatus,
+                cancelable: Bool = false,
                 durationSeconds: Int?,
                 preview: String?,
                 senderIdentity: SenderIdentity? = nil) {
@@ -533,11 +540,16 @@ public struct HistoryEntry: Equatable, Identifiable, Sendable {
         self.channel = channel
         self.templateLabel = templateLabel
         self.requestedAt = requestedAt
+        self.executeAt = executeAt
         self.status = status
+        self.cancelable = cancelable
         self.durationSeconds = durationSeconds
         self.preview = preview
         self.senderIdentity = senderIdentity
     }
+
+    /// A pending (not-yet-executed) job the user can still cancel.
+    public var isPending: Bool { status == .scheduled }
 }
 
 /// A purchasable (currently free) credit package, as presented in the Add

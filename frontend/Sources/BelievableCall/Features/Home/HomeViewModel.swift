@@ -82,8 +82,11 @@ public final class HomeViewModel {
     }
 
     public var canSend: Bool {
+        // Multiple jobs may be queued (up to the backend cap), so an existing
+        // pending job no longer blocks sending — the backend enforces the cap
+        // and surfaces an error if it's exceeded.
         !isSubmitting && selectedTemplate != nil && hasCredits
-            && (profile?.phone.isVerified ?? false) && !hasActiveRequest
+            && (profile?.phone.isVerified ?? false)
     }
 
     // MARK: Loading

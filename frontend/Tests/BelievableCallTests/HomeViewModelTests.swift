@@ -114,12 +114,14 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertFalse(vm.canSend)
     }
 
-    func testActiveRequestBlocksSecondSend() async {
+    func testPendingJobDoesNotBlockSending() async {
+        // Multiple jobs may be queued — a pending job no longer disables Send
+        // (the backend enforces the cap). The chip is shown alongside the composer.
         let active = Fixtures.scheduledRequest()
         let vm = makeVM(profile: Fixtures.profile(activeRequest: active))
         await vm.load()
         XCTAssertTrue(vm.hasActiveRequest)
-        XCTAssertFalse(vm.canSend)
+        XCTAssertTrue(vm.canSend)
     }
 
     func testInsufficientCreditsErrorMapsToCopy() async {

@@ -15,7 +15,7 @@ from __future__ import annotations
 import uuid
 from datetime import timedelta
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -44,16 +44,28 @@ from app.domain.users.service import require_primary_phone
 ALLOWED_DELAYS = {0, 30, 300}
 MAX_SCHEDULE_HORIZON = timedelta(hours=24)
 DEFAULT_CREDIT_COST = 1
+# How many jobs a user may have queued/in-flight at once. Multiple pending jobs
+# are allowed (a queue); this caps it so it can't grow unbounded.
+MAX_PENDING_REQUESTS = 3
 
 _LIVE_VALUES = {s.value for s in LIVE_REQUEST_STATUSES}
 
 
 def get_active_request(db: Session, user_id: uuid.UUID) -> Request | None:
+    """The soonest upcoming live request (used for the Home 'next job' chip)."""
     return db.execute(
         select(Request)
         .where(Request.user_id == user_id, Request.status.in_(_LIVE_VALUES))
-        .order_by(Request.created_at.desc())
+        .order_by(Request.execute_at.asc())
     ).scalars().first()
+
+
+def count_active_requests(db: Session, user_id: uuid.UUID) -> int:
+    return db.execute(
+        select(func.count())
+        .select_from(Request)
+        .where(Request.user_id == user_id, Request.status.in_(_LIVE_VALUES))
+    ).scalar_one()
 
 
 def get_request(db: Session, user_id: uuid.UUID, request_id: uuid.UUID) -> Request:
@@ -115,9 +127,14 @@ def create_request(
     # Destination is always the user's verified primary phone (never client-supplied).
     primary_phone = require_primary_phone(db, user_id)
 
-    # One active live request at a time.
-    if get_active_request(db, user_id) is not None:
-        raise ActiveRequestExists()
+    # Multiple pending jobs are allowed (a queue), capped so it can't grow
+    # unbounded. The idempotency check above already returned any existing job
+    # for this client_request_id, so retries don't count against the cap.
+    if count_active_requests(db, user_id) >= MAX_PENDING_REQUESTS:
+        raise ActiveRequestExists(
+            f"You can have at most {MAX_PENDING_REQUESTS} jobs queued at once. "
+            "Cancel one to schedule another."
+        )
 
     template = db.get(Template, template_id)
     if template is None or not template.active:

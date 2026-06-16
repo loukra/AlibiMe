@@ -102,3 +102,26 @@ def test_webhook_is_idempotent(client):
     second = client.post("/v1/webhooks/voice", json=event)
     assert first.json()["status"] == "processed"
     assert second.json()["status"] == "duplicate"
+
+
+def test_unanswered_call_resolves_to_no_answer(client):
+    a = signup(client)
+    tid = get_template_id(client, a["headers"], "boss_travel_assignment")
+    rid = client.post(
+        "/v1/requests",
+        headers=a["headers"],
+        json={"client_request_id": "na1", "template_id": tid, "channel": "call", "delay_seconds": 0},
+    ).json()["request_id"]
+    _dispatch_now()
+
+    call_id = _provider_call_id(rid)
+    # Rang, then ended unanswered (DND / declined).
+    for event in [
+        {"event_id": f"na-{call_id}-1", "type": "call.ringing", "provider_call_id": call_id},
+        {"event_id": f"na-{call_id}-2", "type": "call.completed", "provider_call_id": call_id,
+         "ended_reason": "customer-did-not-answer"},
+    ]:
+        assert client.post("/v1/webhooks/voice", json=event).status_code == 200
+
+    detail = client.get(f"/v1/requests/{rid}", headers=a["headers"]).json()
+    assert detail["status"] == "no_answer"
