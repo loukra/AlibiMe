@@ -88,7 +88,7 @@ public enum ErrorCopy {
         case "rate_limited":
             return "You’re going a little fast. Please wait a moment and try again."
         case "active_request_exists":
-            return "You already have a request in progress. Finish or cancel it first."
+            return "You’ve reached the limit of queued jobs. Cancel one to schedule another."
         case "template_channel_not_supported":
             return "This template can’t be sent on that channel."
         case "insufficient_credits":

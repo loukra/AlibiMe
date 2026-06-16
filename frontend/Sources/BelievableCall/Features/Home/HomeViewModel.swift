@@ -174,10 +174,9 @@ public final class HomeViewModel {
 
     public func send() async {
         guard let template = selectedTemplate else { return }
-        guard !hasActiveRequest else {
-            errorMessage = ErrorCopy.userMessage(for: .api(code: "active_request_exists", message: "", retryable: false, requestID: nil))
-            return
-        }
+        // Multiple jobs may be queued (up to the backend cap); the backend is the
+        // single source of truth and returns active_request_exists only when the
+        // cap is actually exceeded. No client-side block here.
         isSubmitting = true
         errorMessage = nil
         defer { isSubmitting = false }
