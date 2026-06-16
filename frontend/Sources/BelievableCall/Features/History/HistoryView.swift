@@ -17,6 +17,7 @@ public struct HistoryView: View {
                     list
                 }
             }
+            .bcTabBarClearance()
             .bcScreenBackground()
             .navigationTitle("History")
             // Reload whenever the tab becomes visible (e.g. after scheduling on

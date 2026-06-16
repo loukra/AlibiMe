@@ -72,6 +72,7 @@ public struct SettingsView: View {
                 }
             }
             .bcClearScrollBackground()
+            .bcTabBarClearance()
             .bcScreenBackground()
             .navigationTitle("Settings")
             .task { await vm.load() }

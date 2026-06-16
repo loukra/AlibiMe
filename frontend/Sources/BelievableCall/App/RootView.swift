@@ -156,8 +156,18 @@ struct MainTabView: View {
                 .opacity(selection == .settings ? 1 : 0)
                 .allowsHitTesting(selection == .settings)
         }
-        // Reserve room so scrolling content clears the floating bar.
-        .safeAreaInset(edge: .bottom) {
+        // NOTE: clearance for the floating bar is reserved *inside* each screen
+        // via `.bcTabBarClearance()` — a safeAreaInset here wouldn't reach the
+        // scroll/list content nested in each screen's own NavigationStack.
+    }
+}
+
+extension View {
+    /// Reserve bottom space so a screen's scroll/list content can clear the
+    /// floating tab bar (and not hide its last rows behind it). Apply to the
+    /// scrollable container inside each screen's NavigationStack.
+    func bcTabBarClearance() -> some View {
+        safeAreaInset(edge: .bottom) {
             Color.clear.frame(height: FloatingTabBar.reservedClearance)
         }
     }

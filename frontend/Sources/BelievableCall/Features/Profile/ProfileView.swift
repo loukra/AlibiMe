@@ -58,6 +58,7 @@ public struct ProfileView: View {
                 }
             }
             .bcClearScrollBackground()
+            .bcTabBarClearance()
             .bcScreenBackground()
             .navigationTitle("Profile")
             .toolbar {

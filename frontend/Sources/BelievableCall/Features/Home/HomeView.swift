@@ -23,17 +23,18 @@ public struct HomeView: View {
 
     public var body: some View {
         NavigationStack {
+            // The next-job control is always present (idle state when no job) so
+            // nothing below it shifts. Normal vertical scrolling keeps the CTA
+            // reachable on every screen size.
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.l) {
                     if let error = vm.errorMessage {
                         ErrorBanner(error)
                     }
                     verifiedNumberCard
-                    if vm.hasActiveRequest, let next = vm.activeRequest {
-                        NextJobChip(request: next,
-                                    onCancel: { Task { await vm.cancelActive() } },
-                                    onOpen: { onOpenHistory?() })
-                    }
+                    NextJobChip(request: vm.hasActiveRequest ? vm.activeRequest : nil,
+                                onCancel: { Haptics.play(.warning); Task { await vm.cancelActive() } },
+                                onOpen: { onOpenHistory?() })
                     requestComposer
                     creditsSummary
                 }
@@ -41,6 +42,7 @@ public struct HomeView: View {
                 .bcPinScrollWidth()
             }
             .bcVerticalScrollOnly()
+            .bcTabBarClearance()
             .bcScreenBackground()
             .navigationTitle(greeting)
             .refreshable { await vm.refresh() }

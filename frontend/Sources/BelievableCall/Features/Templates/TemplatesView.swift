@@ -37,6 +37,7 @@ public struct TemplatesView: View {
             }
         }
         .bcClearScrollBackground()
+        .bcTabBarClearance()
         .bcScreenBackground()
         .navigationTitle("Templates")
         .toolbar {
