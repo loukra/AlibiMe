@@ -39,7 +39,8 @@ from app.db.models.service_identity import ServiceIdentity
 from app.db.models.template import Template, TemplateVersion
 from app.db.models.user import User
 from app.domain.billing import credits
-from app.domain.templates.service import build_request_plan_snapshot
+from app.domain.profile import context as profile_context
+from app.domain.templates.service import build_call_variables, build_request_plan_snapshot
 from app.providers.factory import get_message_provider, get_voice_provider
 from app.providers.messaging.base import MessageProvider
 from app.providers.types import (
@@ -125,6 +126,21 @@ def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None)
         service_identity_type=identity.identity_type if identity else None,
         target_phone_number_id=str(phone.id),
     )
+    # Live call variables (template params + the user's optional context) so the
+    # Vapi assistant can adapt the whole call. Built only for calls.
+    call_variables: dict = {}
+    if request.channel == Channel.call.value:
+        context = profile_context.context_dict(db, user.id)
+        call_variables = build_call_variables(
+            template=template,
+            version=version,
+            locale=user.locale,
+            first_name=user.display_name,
+            timezone=getattr(user, "timezone", None),
+            rendered_opening_line=snapshot.get("rendered_opening_line"),
+            context=context,
+        )
+        snapshot["call_variables"] = call_variables
     request.request_plan_snapshot_json = snapshot
 
     return RequestPlan(
@@ -142,6 +158,7 @@ def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None)
         voice_profile_code=snapshot.get("voice_profile_code"),
         max_duration_seconds=snapshot.get("max_duration_seconds"),
         supports_interruptions=snapshot.get("supports_interruptions", False),
+        call_variables=call_variables,
         service_identity_value=snapshot.get("service_identity_value"),
         service_identity_type=snapshot.get("service_identity_type"),
         target_phone_e164=target_e164,

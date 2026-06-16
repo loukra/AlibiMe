@@ -284,3 +284,140 @@ def build_request_plan_snapshot(
             }
         )
     return snapshot
+
+
+# Banned topics the Vapi assistant must never raise (spec safety rules).
+_FORBIDDEN_FACTS = {
+    "en": (
+        "specific illnesses or medical details; police, legal, or court matters; "
+        "financial fraud or bank issues; accidents or injuries; and any named "
+        "people, employers, or places not provided above"
+    ),
+    "de": (
+        "konkrete Krankheiten oder medizinische Details; Polizei-, Rechts- oder "
+        "Gerichtsangelegenheiten; Finanzbetrug oder Bankprobleme; Unfälle oder "
+        "Verletzungen; sowie alle Namen von Personen, Arbeitgebern oder Orten, "
+        "die oben nicht genannt sind"
+    ),
+}
+
+# Profile fields shown per allowed context module (label, code-field).
+_PROFILE_MODULE_FIELDS = {
+    "work": [
+        ("Industry", "work_industry_code"), ("Role", "work_role_level_code"),
+        ("Setting", "work_setting_code"), ("Schedule", "work_schedule_code"),
+        ("Travel", "work_travel_scope_code"),
+    ],
+    "home": [
+        ("Living setup", "living_setup_code"),
+        ("Responsibilities", "home_responsibility_codes_json"),
+        ("Dependents", "dependent_context_codes_json"),
+    ],
+    "family": [
+        ("Family support", "family_support_level_code"),
+        ("Family proximity", "family_proximity_code"),
+    ],
+    "relationship": [
+        ("Relationship visibility", "relationship_visibility_code"),
+        ("Relationship stage", "relationship_stage_code"),
+        ("Privacy preference", "privacy_preference_code"),
+    ],
+    "transition": [
+        ("Life transition", "transition_state_code"),
+        ("Transition horizon", "transition_horizon_code"),
+    ],
+}
+
+
+def _humanize(code: str | None) -> str:
+    return (code or "").replace("_", " ").strip()
+
+
+def _profile_summary(context: dict, modules: list[str], locale: str) -> str:
+    """Compact, human-readable summary of *present* profile fields, limited to
+    the template's allowed context modules. Empty -> a 'none' note."""
+    lines: list[str] = []
+    for module in modules or []:
+        for label, field in _PROFILE_MODULE_FIELDS.get(module, []):
+            value = context.get(field)
+            if not value:
+                continue
+            if isinstance(value, list):
+                text = ", ".join(_humanize(v) for v in value)
+            else:
+                text = _humanize(value)
+            if text:
+                lines.append(f"- {label}: {text}")
+    if not lines:
+        return "None provided." if locale == "en" else "Keine angegeben."
+    return "\n".join(lines)
+
+
+def _turn_count(max_seconds: int | None) -> str:
+    seconds = max_seconds or 60
+    return str(max(2, min(8, round(seconds / 12))))
+
+
+def build_call_variables(
+    *,
+    template: Template,
+    version: TemplateVersion,
+    locale: str,
+    first_name: str | None,
+    timezone: str | None,
+    rendered_opening_line: str | None,
+    context: dict | None = None,
+) -> dict:
+    """Flat string variables passed to the Vapi assistant so it can adapt the
+    whole call from the template's coded parameters + the user's optional
+    context. All values are safe codes/labels/approved content — never raw user
+    text."""
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    loc = locale if locale in ("en", "de") else "en"
+    context = context or {}
+    modules = template.context_modules_json or []
+
+    try:
+        now = datetime.now(ZoneInfo(timezone or "UTC"))
+    except Exception:
+        now = datetime.now(ZoneInfo("UTC"))
+    local_time = now.strftime("%A %H:%M")
+
+    persona_label = rendering._label(rendering.PERSONA_LABELS, loc, template.caller_persona)
+    reason_label = rendering._label(rendering.REASON_LABELS, loc, template.reason_code)
+    facts = version.call_followup_facts_json or []
+
+    variables = {
+        # identity / relationship
+        "caller_label": persona_label,
+        "relationship_label": persona_label,
+        "caller_persona": template.caller_persona,
+        # scenario meaning (coded -> humanized for the model)
+        "reason_summary": reason_label,
+        "reason_code": template.reason_code,
+        "category": template.category,
+        "urgency": _humanize(template.urgency_code) or "normal",
+        "outcome": _humanize(template.outcome_code) or "step out briefly",
+        "setting": _humanize(template.setting_code),
+        "tone": _humanize(template.tone_code) or "calm",
+        "detail_level": _humanize(template.detail_profile_code) or "minimal",
+        "discretion": _humanize(template.discretion_level_code) or "normal",
+        "formality": _humanize(template.formality_code) or "neutral",
+        "expected_response": _humanize(template.expected_response_code) or "no reply needed",
+        "followup_behavior": _humanize(template.followup_behavior_code) or "one touch only",
+        "continuity_scope": _humanize(template.continuity_scope_code) or "one off",
+        # content
+        "opening_line": rendered_opening_line or "",
+        "allowed_facts": "; ".join(facts) if facts else ("None." if loc == "en" else "Keine."),
+        "forbidden_facts": _FORBIDDEN_FACTS[loc],
+        # reusable user context (gated by the template's allowed modules)
+        "user_context": _profile_summary(context, modules, loc),
+        # misc
+        "name": first_name or "",
+        "locale": loc,
+        "local_time": local_time,
+        "target_turn_count": _turn_count(version.call_max_duration_seconds),
+    }
+    return {k: str(v) for k, v in variables.items() if v is not None}

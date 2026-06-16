@@ -74,18 +74,11 @@ class VapiVoiceProvider(VoiceProvider):
             overrides["firstMessage"] = plan.rendered_opening_line
         if plan.max_duration_seconds:
             overrides["maxDurationSeconds"] = plan.max_duration_seconds
-        variables = {
-            k: v
-            for k, v in {
-                "caller": plan.caller_persona,
-                "reason": plan.reason_code,
-                "name": plan.user_first_name or "",
-                "locale": plan.locale,
-            }.items()
-            if v is not None
-        }
-        if variables:
-            overrides["variableValues"] = variables
+        # The template-parameter + context variable set is the single source of
+        # truth for the call; the assistant's dashboard prompt references these
+        # via {{...}}. (Built in build_call_variables / threaded via RequestPlan.)
+        if plan.call_variables:
+            overrides["variableValues"] = dict(plan.call_variables)
         if overrides:
             body["assistantOverrides"] = overrides
 

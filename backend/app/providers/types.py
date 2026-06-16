@@ -61,6 +61,8 @@ class RequestPlan:
     voice_profile_code: str | None = None
     max_duration_seconds: int | None = None
     supports_interruptions: bool = False
+    # Flat string variables for the Vapi assistant (template params + context).
+    call_variables: dict[str, str] = field(default_factory=dict)
     # sender + destination (internal only)
     service_identity_value: str | None = None
     service_identity_type: str | None = None

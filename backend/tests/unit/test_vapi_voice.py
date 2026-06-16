@@ -31,6 +31,12 @@ def _plan(to: str = "+14155550123") -> RequestPlan:
         reason_code="family_checkin",
         rendered_opening_line="Hey, it's your sibling — can you talk?",
         max_duration_seconds=60,
+        call_variables={
+            "caller_label": "your sibling",
+            "reason_summary": "a family check-in",
+            "tone": "warm",
+            "outcome": "step out briefly",
+        },
         target_phone_e164=to,
         user_first_name="Alex",
     )
@@ -78,7 +84,8 @@ def test_create_call_success(vapi_creds, monkeypatch):
     assert body["customer"]["number"] == "+14155550123"
     assert body["assistantOverrides"]["firstMessage"].startswith("Hey, it's your sibling")
     assert body["assistantOverrides"]["maxDurationSeconds"] == 60
-    assert body["assistantOverrides"]["variableValues"]["caller"] == "sibling"
+    assert body["assistantOverrides"]["variableValues"]["caller_label"] == "your sibling"
+    assert body["assistantOverrides"]["variableValues"]["tone"] == "warm"
     assert captured["headers"]["Authorization"] == "Bearer vapi_key"
 
 

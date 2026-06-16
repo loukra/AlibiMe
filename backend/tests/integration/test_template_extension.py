@@ -105,3 +105,34 @@ def test_no_profile_falls_back_to_generic(client):
     created = _create(client, a["headers"], persona="partner", context_modules=["home"]).json()
     assert created["preview_opening_line"]
     assert "roommate" not in (created["preview_opening_line"] or "").lower()
+
+
+def test_call_variables_threaded_to_plan(client, db):
+    """A dispatched call carries the full coded-parameter + context variable set."""
+    import uuid
+    from app.db.models.request import Request
+    from app.workers.dispatch import _build_plan, _resolve_dispatch_identity
+
+    a = signup(client)
+    # Set some context so it flows into the variables.
+    client.put("/v1/me/context-profile", headers=a["headers"],
+               json={"work_setting_code": "site_field"})
+    created = _create(client, a["headers"], persona="manager", reason="work_urgent_task",
+                      category="work", context_modules=["work"], channels=["call"]).json()
+    resp = client.post("/v1/requests", headers=a["headers"], json={
+        "client_request_id": "cv-1", "template_id": created["id"],
+        "channel": "call", "delay_seconds": 0,
+    })
+    rid = uuid.UUID(resp.json()["request_id"])
+
+    db.expire_all()
+    request = db.get(Request, rid)
+    identity = _resolve_dispatch_identity(db, request)
+    plan = _build_plan(db, request, identity)
+    v = plan.call_variables
+    assert v["caller_label"]
+    assert v["reason_summary"]
+    assert v["outcome"] == "leave now"        # from the rich draft
+    assert v["forbidden_facts"]
+    assert "site field" in v["user_context"]  # profile anchor surfaced
+    assert v["target_turn_count"]
