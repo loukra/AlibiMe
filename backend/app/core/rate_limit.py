@@ -14,6 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.clock import utcnow
+from app.core.config import settings
 from app.core.errors import RateLimited
 from app.db.models.rate_limit import RateLimitCounter
 
@@ -28,7 +29,8 @@ class Limit:
 # MVP limits (see spec "Rate limits").
 OTP_START = Limit("otp_start", 5, timedelta(hours=1))            # per phone hash
 OTP_CONFIRM = Limit("otp_confirm", 10, timedelta(hours=1))       # per verification id
-REQUEST_CREATE = Limit("request_create", 5, timedelta(hours=1))  # per user
+# Per user; configurable (env REQUEST_CREATE_MAX_PER_HOUR) so dev can loosen it.
+REQUEST_CREATE = Limit("request_create", settings.request_create_max_per_hour, timedelta(hours=1))
 SESSION_CREATE = Limit("session_create", 10, timedelta(hours=1)) # per device/phone
 
 

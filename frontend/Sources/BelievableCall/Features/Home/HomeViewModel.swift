@@ -17,6 +17,11 @@ public final class HomeViewModel {
     public private(set) var isSubmitting = false
     public var errorMessage: String?
 
+    /// Bumps each time a job is successfully created; the channel of that job is
+    /// in `lastCreatedChannel`. Drives the "fly to History" animation.
+    public private(set) var createdJobCount = 0
+    public private(set) var lastCreatedChannel: Channel = .call
+
     private let templateService: TemplateServicing
     private let requestService: RequestServicing
     private let profileService: ProfileServicing
@@ -184,6 +189,8 @@ public final class HomeViewModel {
         do {
             let request = try await requestService.create(draft)
             activeRequest = request
+            lastCreatedChannel = request.channel
+            createdJobCount += 1
             prefs.lastChannel = channel.rawValue
             prefs.lastTimingDelay = timing.delaySeconds
             // Reflect the credit spend immediately if the backend reported it.

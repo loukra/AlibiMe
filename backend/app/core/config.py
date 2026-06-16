@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     # Feature flags
     feature_free_test_request: bool = True
     free_test_credits: int = 3
+    # Max request-create calls per user per hour. 5 is the production default;
+    # raise it in dev (env REQUEST_CREATE_MAX_PER_HOUR) for rapid testing.
+    request_create_max_per_hour: int = 5
     supported_countries: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["DE", "US", "GB", "AT", "CH"]
     )

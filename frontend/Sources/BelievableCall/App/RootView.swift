@@ -79,6 +79,8 @@ struct MainTabView: View {
     @State private var profile: ProfileViewModel
     @State private var settings: SettingsViewModel
     @State private var selection: Tab = .home
+    /// Set when a job is created, to drive the one-shot "fly to History" badge.
+    @State private var flyingJob: (id: Int, channel: Channel)?
 
     init(app: AppModel) {
         _home = State(initialValue: app.makeHomeViewModel())
@@ -94,6 +96,21 @@ struct MainTabView: View {
             FloatingTabBar(selection: $selection)
                 .padding(.bottom, Spacing.xs)
         }
+        // A job, when created on Home, animates a badge flying into the History
+        // tab (front-most so it reads over everything; never intercepts taps).
+        .overlay {
+            if let flyingJob {
+                GeometryReader { geo in
+                    FlyingJobBadge(
+                        systemImage: flyingJob.channel.systemImage,
+                        start: CGPoint(x: geo.size.width * 0.5, y: geo.size.height * 0.52),
+                        end: CGPoint(x: geo.size.width * 0.18, y: geo.size.height - 54)
+                    )
+                    .id(flyingJob.id)
+                }
+                .allowsHitTesting(false)
+            }
+        }
         .tint(Theme.accent)
         // The screens stay resident, so onAppear only fires once. Refresh the
         // relevant view model each time its tab becomes visible so balances,
@@ -104,6 +121,15 @@ struct MainTabView: View {
             case .history: Task { await history.load() }
             case .templates: Task { await templates.load() }
             case .profile, .settings: break
+            }
+        }
+        // Launch the fly-to-History animation whenever a job is created.
+        .onChange(of: home.createdJobCount) { _, count in
+            guard count > 0 else { return }
+            flyingJob = (id: count, channel: home.lastCreatedChannel)
+            Task {
+                try? await Task.sleep(nanoseconds: 800_000_000)
+                if flyingJob?.id == count { flyingJob = nil }
             }
         }
     }
@@ -137,6 +163,32 @@ struct MainTabView: View {
     }
 }
 
+/// A one-shot badge that flies from the compose area into the History tab when a
+/// job is created — quick visual confirmation that it's queued. Purely cosmetic.
+struct FlyingJobBadge: View {
+    let systemImage: String
+    let start: CGPoint
+    let end: CGPoint
+    @State private var arrived = false
+
+    var body: some View {
+        Image(systemName: systemImage)
+            .font(.headline)
+            .foregroundStyle(.white)
+            .padding(12)
+            .background(Theme.accent, in: Circle())
+            .overlay(Circle().strokeBorder(Theme.glassBorder, lineWidth: 1))
+            .shadow(color: Theme.cardShadow, radius: 10, x: 0, y: 6)
+            .scaleEffect(arrived ? 0.3 : 1)
+            .opacity(arrived ? 0 : 1)
+            .position(arrived ? end : start)
+            .onAppear {
+                Haptics.play(.success)
+                withAnimation(.easeIn(duration: 0.65)) { arrived = true }
+            }
+    }
+}
+
 /// A detached, glassy tab bar that floats above the screen backdrop. Chrome only
 /// — Home is a raised circular button in the middle (showing the app logo),
 /// symmetrically flanked by two destinations on each side.
@@ -164,6 +216,9 @@ struct FloatingTabBar: View {
             .padding(.horizontal, Spacing.m)
             .padding(.vertical, Spacing.s)
             .bcGlassCapsule()
+            // Absorb every tap inside the capsule (gaps, padding, center notch)
+            // so nothing behind the floating bar receives it.
+            .contentShape(Capsule())
             .shadow(color: Theme.cardShadow, radius: 18, x: 0, y: 10)
 
             homeButton
@@ -193,6 +248,7 @@ struct FloatingTabBar: View {
                     )
                 )
                 .shadow(color: Theme.cardShadow, radius: 12, x: 0, y: 6)
+                .contentShape(Circle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Home")
@@ -212,6 +268,8 @@ struct FloatingTabBar: View {
             }
             .foregroundStyle(isSelected ? Theme.accent : Color.secondary)
             .frame(maxWidth: .infinity)
+            .padding(.vertical, Spacing.xs)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)
