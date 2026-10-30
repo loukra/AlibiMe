@@ -7,3 +7,7 @@
 // Simulator builds don't need this.
 DEVELOPMENT_TEAM = YOUR_TEAM_ID
 CODE_SIGN_STYLE = Automatic
+
+// The API domain for Release builds (TestFlight, App Store). Without it the
+// app points at a placeholder and every request fails.
+// BC_BACKEND_URL[config=Release] = https:/$()/api.your-domain.tld

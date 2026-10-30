@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- The backend base URL, from the BC_BACKEND_URL build setting
+	     (Signing.xcconfig, overridable in Local.xcconfig). -->
+	<key>BCBackendURL</key>
+	<string>$(BC_BACKEND_URL)</string>
 	<!-- Allow the app to reach the local dev backend over http://127.0.0.1. -->
 	<key>NSAppTransportSecurity</key>
 	<dict>

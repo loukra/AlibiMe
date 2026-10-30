@@ -4,8 +4,8 @@ import BelievableCall
 /// iOS app entry point. The whole app lives in the `BelievableCall` Swift
 /// package; this target is the thin runnable shell that hosts it.
 ///
-/// The backend base URL defaults to the local dev server. For a device build,
-/// set `BC_BACKEND_URL` in the scheme's environment, or change the default.
+/// The backend base URL comes from the `BC_BACKEND_URL` build setting (see
+/// Signing.xcconfig): the local dev server for Debug, the API domain for Release.
 /// Debug builds use mock purchases unless `BC_PURCHASES=storekit` (e.g. with
 /// the AlibiMe.storekit configuration selected in the scheme).
 @main
@@ -20,13 +20,19 @@ struct BelievableCallApp: App {
 }
 
 enum Backend {
-    /// `BC_BACKEND_URL` from the scheme, else from the app's defaults (set with
-    /// `xcrun simctl spawn booted defaults write com.believablecall.app
-    /// BC_BACKEND_URL <url>`), else the local dev server.
+    /// The build setting baked into Info.plist. Debug builds can override it
+    /// with `BC_BACKEND_URL` in the scheme's environment or the app's defaults
+    /// (`xcrun simctl spawn booted defaults write com.believablecall.app
+    /// BC_BACKEND_URL <url>`); Release builds always use the build setting.
     static var url: URL {
-        let urlString = ProcessInfo.processInfo.environment["BC_BACKEND_URL"]
+        #if DEBUG
+        let override = ProcessInfo.processInfo.environment["BC_BACKEND_URL"]
             ?? UserDefaults.standard.string(forKey: "BC_BACKEND_URL")
-            ?? "http://127.0.0.1:8000"
+        #else
+        let override: String? = nil
+        #endif
+        let configured = Bundle.main.object(forInfoDictionaryKey: "BCBackendURL") as? String
+        let urlString = override ?? configured ?? "http://127.0.0.1:8000"
         return URL(string: urlString) ?? URL(string: "http://127.0.0.1:8000")!
     }
 

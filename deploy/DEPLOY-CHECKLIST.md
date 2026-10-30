@@ -25,7 +25,9 @@ port, domain and database there; `deploy/README.md` has the steps.
   dev default or `PHONE_ENCRYPTION_KEY` is empty.
 - [x] **No double charge when the backend is down during a purchase.** The
   paid purchase stays unfinished, the sheet says the payment went through and
-  the button only retries adding the credits. Unit tested; simulator test in 2.
+  the button only retries adding the credits. Unit tested, and against the
+  local API: the same transaction twice adds the credits once, another account
+  gets `transaction_already_redeemed`. Simulator click-through in 2.
 - [x] **No free credits for virtual numbers** (carrier lookup via Twilio when
   the number starts its verification) and, with DeviceCheck, once per iPhone.
   Tested with mocks.
@@ -33,17 +35,29 @@ port, domain and database there; `deploy/README.md` has the steps.
   (`CROSS_BORDER_CALL_MAX_SECONDS`).
 - [x] **Account deletion** in Settings (`DELETE /v1/me`), as the App Store
   requires.
+- [x] **Worker end to end with mocks.** A call and a text go from the API
+  through the worker to the mock provider and end `completed`, charged 2 and 1
+  credits. Locally a request waits at `provider_accepted` until
+  `python scripts/cli.py simulate <request id>` sends the mock delivery
+  events; without that, reconciliation marks it failed after 30 minutes.
+- [x] **Backend URL per build configuration.** `BC_BACKEND_URL` in
+  `App/Signing.xcconfig`: the local server for Debug, a placeholder
+  (`api.alibime.example`) for Release. Only Debug builds accept an override
+  from the scheme or `defaults write`.
 
 ## 2. Still to test locally (simulator, StoreKit scheme)
 
 - [ ] Backend stopped during a purchase: "Add my credits" appears, a retry
-  after restarting adds them once, nothing is charged twice.
-- [ ] Free credits: a second number on the same simulator gets none; a VoIP
-  number (`+445612345678`) gets none.
+  after restarting adds them once, nothing is charged twice. (Backend side and
+  view model done, see 1; the click-through is left.)
+- [x] Free credits, against the local API with the app's calls and mock
+  DeviceCheck: the first number gets 3, a second number on the same device 0,
+  a VoIP number 0.
 - [ ] Ask to Buy: enable it in `App/AlibiMe.storekit`, buy, approve in Xcode's
   transaction manager; the credits arrive without restarting the app.
 - [ ] Failed and interrupted purchases (StoreKit file options): a clear
-  message, no credits, no charge.
+  message, no credits, no charge. (Unit tested: a cancel stays quiet, a
+  pending purchase explains itself, a server error keeps the paid purchase.)
 
 ## 3. Needs your accounts
 
@@ -120,10 +134,19 @@ Tests that need these accounts:
 
 ## 5. Before submitting to the App Store
 
-- [ ] The app's backend URL points at the server for Release builds.
+- [ ] The API domain in `App/Local.xcconfig` (gitignored):
+  `BC_BACKEND_URL[config=Release] = https:/$()/api.<domain>`. Without it a
+  Release build talks to the placeholder and nothing works.
 - [ ] Real support and privacy URLs (Settings still links to
-  `believablecall.example`) and a privacy policy that names Twilio, Vapi and
-  the model provider.
+  `believablecall.example`).
+- [ ] Privacy policy: the draft is `docs/privacy-policy.md`. Fill in the
+  brackets (controller, hosting, transfer basis per US provider), have it
+  checked once, put it online, and add a German version.
+- [ ] **Decide on call transcripts.** Vapi may record calls and keep
+  transcripts in its account by default (no `artifactPlan` is sent), and the
+  backend keeps raw Vapi webhooks, which can include the transcript, for 30
+  days (`webhook_events`). Either switch recording off and store only the
+  fields the backend needs, or name both in the privacy policy.
 - [ ] Privacy nutrition labels: phone number, purchases, call content
   (processed by Vapi), no tracking.
 - [ ] Review notes: a demo account the reviewer can sign in with, and how the

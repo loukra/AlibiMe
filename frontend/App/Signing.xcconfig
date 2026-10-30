@@ -7,4 +7,12 @@
 //
 // The include is optional (`#include?`), so builds without a Local.xcconfig
 // still succeed (e.g. simulator-only, or CI).
+
+// The backend the app talks to, read at runtime from Info.plist (BCBackendURL).
+// Debug points at the local dev server. Release points at a placeholder until
+// the real API domain exists; set it in Local.xcconfig, not here, so the public
+// repo never names the server. `$()` keeps the `//` from starting a comment.
+BC_BACKEND_URL = https:/$()/api.alibime.example
+BC_BACKEND_URL[config=Debug] = http:/$()/127.0.0.1:8000
+
 #include? "Local.xcconfig"
