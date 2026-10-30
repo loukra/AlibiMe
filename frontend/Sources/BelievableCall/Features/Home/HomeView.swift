@@ -7,6 +7,9 @@ public struct HomeView: View {
     @Bindable var vm: HomeViewModel
     @State private var showTemplatePicker = false
     @State private var showSchedule = false
+    /// The taller of the two cards (next job, template); both take it, so
+    /// the screen keeps its shape whatever they show.
+    @State private var cardHeight: CGFloat = 0
     /// Invoked from the number and credits pills; the tab container opens the
     /// Settings tab at the part that was tapped.
     var onOpenSettings: ((SettingsFocus) -> Void)?
@@ -64,6 +67,7 @@ public struct HomeView: View {
                 ErrorBanner(error)
             }
             NextJobChip(request: vm.hasActiveRequest ? vm.activeRequest : nil,
+                        minHeight: cardHeight,
                         onCancel: { Haptics.play(.warning); Task { await vm.cancelActive() } },
                         onOpen: { onOpenHistory?() })
             requestComposer
@@ -73,6 +77,7 @@ public struct HomeView: View {
         .padding(.horizontal, Spacing.m)
         .padding(.top, Spacing.s)
         .padding(.bottom, Spacing.m)
+        .onPreferenceChange(CardHeightKey.self) { cardHeight = $0 }
     }
 
     /// The verified number and the credits, as two small pills. Each opens
@@ -174,7 +179,7 @@ public struct HomeView: View {
     }
 
     @ViewBuilder private var selectedTemplateCard: some View {
-        Card {
+        Card(minHeight: cardHeight) {
             HStack(spacing: Spacing.m) {
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     if let template = vm.selectedTemplate {

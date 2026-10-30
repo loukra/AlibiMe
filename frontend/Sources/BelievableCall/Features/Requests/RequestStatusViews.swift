@@ -76,11 +76,15 @@ public struct NextJobChip: View {
     let request: RequestSummary?
     let onCancel: () -> Void
     let onOpen: () -> Void
+    /// See `Card`: lets the chip match the cards around it.
+    var minHeight: CGFloat?
     @State private var now = Date()
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    public init(request: RequestSummary?, onCancel: @escaping () -> Void, onOpen: @escaping () -> Void) {
+    public init(request: RequestSummary?, minHeight: CGFloat? = nil,
+                onCancel: @escaping () -> Void, onOpen: @escaping () -> Void) {
         self.request = request
+        self.minHeight = minHeight
         self.onCancel = onCancel
         self.onOpen = onOpen
     }
@@ -97,14 +101,20 @@ public struct NextJobChip: View {
                 // is a clearly visible horizontal slide.
                 .transition(rowTransition)
         }
-        .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
         .padding(Spacing.m)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+        .reportsCardHeight(minHeight != nil)
+        .frame(minHeight: minHeight)
+        .fixedSize(horizontal: false, vertical: true)
+        // Same glass, corners and shadow as `Card`, so it pairs with the
+        // template card below it.
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
+            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                 .strokeBorder(Theme.glassBorder, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+        .shadow(color: Theme.cardShadow, radius: 16, x: 0, y: 8)
         .animation(.spring(response: 0.38, dampingFraction: 0.74), value: request?.id)
         .onReceive(timer) { now = $0 }
         .accessibilityHint(request == nil ? "Opens History" : "Opens History to see all pending jobs")

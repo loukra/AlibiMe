@@ -4,11 +4,20 @@ import SwiftUI
 /// A translucent, softly elevated "glass" card surface.
 public struct Card<Content: View>: View {
     private let content: Content
-    public init(@ViewBuilder content: () -> Content) { self.content = content() }
+    private let minHeight: CGFloat?
+    /// `minHeight` (padding included) lets cards that sit together share one
+    /// height: such a card reports its natural height (`CardHeightKey`), the
+    /// screen passes the tallest back in, and the content is centered in it.
+    public init(minHeight: CGFloat? = nil, @ViewBuilder content: () -> Content) {
+        self.content = content()
+        self.minHeight = minHeight
+    }
     public var body: some View {
         content
             .padding(Spacing.m)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .reportsCardHeight(minHeight != nil)
+            .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .leading)
+            .fixedSize(horizontal: false, vertical: true)
             .background(
                 .ultraThinMaterial,
                 in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
@@ -18,6 +27,28 @@ public struct Card<Content: View>: View {
                     .strokeBorder(Theme.glassBorder, lineWidth: 1)
             )
             .shadow(color: Theme.cardShadow, radius: 16, x: 0, y: 8)
+    }
+}
+
+/// The tallest natural height among cards that share one (see `Card`).
+public struct CardHeightKey: PreferenceKey {
+    public static let defaultValue: CGFloat = 0
+    public static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+extension View {
+    /// Measured before the shared minimum is applied, so a card never reports
+    /// back the height it was given.
+    @ViewBuilder func reportsCardHeight(_ enabled: Bool = true) -> some View {
+        if enabled {
+            background(GeometryReader { proxy in
+                Color.clear.preference(key: CardHeightKey.self, value: proxy.size.height)
+            })
+        } else {
+            self
+        }
     }
 }
 
