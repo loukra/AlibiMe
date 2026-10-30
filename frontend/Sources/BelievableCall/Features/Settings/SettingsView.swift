@@ -7,6 +7,7 @@ public struct SettingsView: View {
     /// Non-nil while the Add Credits sheet is open (`.sheet(item:)`, so the
     /// sheet never renders before the view model exists).
     @State private var creditPackagesVM: CreditPackagesViewModel?
+    @State private var confirmingDelete = false
     private let locales = ["en", "de"]
 
     public init(vm: SettingsViewModel) { self.vm = vm }
@@ -71,12 +72,31 @@ public struct SettingsView: View {
                         Text("Sign out")
                     }
                 }
+                Section {
+                    Button(role: .destructive) {
+                        confirmingDelete = true
+                    } label: {
+                        HStack {
+                            Text("Delete account")
+                            if vm.isDeleting { Spacer(); ProgressView() }
+                        }
+                    }
+                    .disabled(vm.isDeleting)
+                } footer: {
+                    Text("Deletes your number, history, custom templates and any credits left.")
+                }
             }
             .bcClearScrollBackground()
             .bcTabBarClearance()
             .bcScreenBackground()
             .navigationTitle("Settings")
             .task { await vm.load() }
+            .confirmationDialog("Delete your account?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+                Button("Delete account", role: .destructive) { Task { await vm.deleteAccount() } }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Your number, history, custom templates and remaining credits are deleted. Credits you bought are not refunded. This can't be undone.")
+            }
             .sheet(item: $creditPackagesVM) { packagesVM in
                 AddCreditsSheet(
                     vm: packagesVM,

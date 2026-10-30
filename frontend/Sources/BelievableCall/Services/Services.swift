@@ -56,6 +56,8 @@ public protocol HistoryServicing: Sendable {
 public protocol ProfileServicing: Sendable {
     func me() async throws -> UserProfile
     func update(locale: String?, timezone: String?, displayName: String?) async throws -> UserProfile
+    /// Deletes the account and all its data on the backend.
+    func deleteAccount() async throws
 }
 
 public protocol DeviceServicing: Sendable {
@@ -259,6 +261,10 @@ public struct LiveProfileService: ProfileServicing {
         )
         let dto = try await client.send(Endpoint(.PATCH, "v1/me", body: body), as: MeResponseDTO.self)
         return UserProfile(dto: dto)
+    }
+
+    public func deleteAccount() async throws {
+        try await client.sendExpectingNoContent(Endpoint(.DELETE, "v1/me"))
     }
 }
 

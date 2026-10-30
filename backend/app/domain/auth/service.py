@@ -215,7 +215,7 @@ def confirm_phone_verification(
     )
 
     if is_new_user:
-        grant_free_test_allowance(db, user.id)
+        grant_free_test_allowance(db, user.id, verification.phone_hash)
 
     verification.status = "confirmed"
     verification.confirmed_at = utcnow()

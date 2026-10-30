@@ -256,6 +256,11 @@ public final class MockProfileService: ProfileServicing, @unchecked Sendable {
         if let timezone { profile.timezone = timezone }
         return profile
     }
+    public private(set) var deleted = false
+    public func deleteAccount() async throws {
+        if let error { throw error }
+        deleted = true
+    }
 }
 
 public final class MockDeviceService: DeviceServicing, @unchecked Sendable {

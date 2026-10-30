@@ -95,3 +95,34 @@ final class QuickAlibiTests: XCTestCase {
         XCTAssertNil(prefs.quickAlibi)
     }
 }
+
+@MainActor
+final class AccountDeletionTests: XCTestCase {
+    func testDeleteSignsOutAndClearsLocalPicks() async {
+        let profile = MockProfileService()
+        let prefs = InMemoryPreferences()
+        prefs.quickAlibi = QuickAlibi(templateID: "t1", templateName: "Boss", channel: .call, delaySeconds: 0)
+        prefs.selectedTemplateID = "t1"
+        let vm = SettingsViewModel(profileService: profile, auth: MockAuthService(),
+                                   creditPackages: MockCreditPackagesService(), prefs: prefs)
+        var signedOut = false
+        vm.onSignOut = { signedOut = true }
+        await vm.deleteAccount()
+        XCTAssertTrue(profile.deleted)
+        XCTAssertTrue(signedOut)
+        XCTAssertNil(prefs.quickAlibi)
+        XCTAssertNil(prefs.selectedTemplateID)
+    }
+
+    func testFailedDeleteStaysSignedIn() async {
+        let profile = MockProfileService()
+        profile.error = APIError.transport(message: "offline")
+        let vm = SettingsViewModel(profileService: profile, auth: MockAuthService(),
+                                   creditPackages: MockCreditPackagesService())
+        var signedOut = false
+        vm.onSignOut = { signedOut = true }
+        await vm.deleteAccount()
+        XCTAssertFalse(signedOut)
+        XCTAssertNotNil(vm.errorMessage)
+    }
+}

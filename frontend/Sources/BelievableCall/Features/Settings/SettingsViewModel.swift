@@ -143,6 +143,24 @@ public final class SettingsViewModel {
         }
     }
 
+    public private(set) var isDeleting = false
+
+    /// Deletes the account for good, then signs out. Local picks that point at
+    /// the old account (the quick alibi) are cleared too.
+    public func deleteAccount() async {
+        isDeleting = true
+        errorMessage = nil
+        defer { isDeleting = false }
+        do {
+            try await profileService.deleteAccount()
+            storeQuickAlibi(nil)
+            prefs.selectedTemplateID = nil
+            onSignOut?()
+        } catch {
+            handle(error)
+        }
+    }
+
     public func signOut() async {
         // Best-effort server logout; the session is cleared locally regardless.
         try? await auth.logout()

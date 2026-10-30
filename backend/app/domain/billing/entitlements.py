@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.db.models.credit_ledger import CreditLedger
+from app.db.models.free_allowance_claim import FreeAllowanceClaim
 from app.db.models.entitlement import Entitlement
 from app.db.models.enums import (
     CreditReferenceType,
@@ -37,8 +38,14 @@ def entitlement_summary(db: Session, user_id: uuid.UUID) -> dict:
     }
 
 
-def grant_free_test_allowance(db: Session, user_id: uuid.UUID) -> None:
-    """Grant the one-time free onboarding allowance, if enabled and not used."""
+def grant_free_test_allowance(
+    db: Session, user_id: uuid.UUID, phone_hash: str | None = None
+) -> None:
+    """Grant the one-time free onboarding allowance, if enabled and not used.
+
+    With ``phone_hash`` the allowance is once per phone number, so a deleted and
+    recreated account doesn't get it again.
+    """
     if not settings.feature_free_test_request or settings.free_test_credits <= 0:
         return
     already = db.execute(
@@ -46,6 +53,10 @@ def grant_free_test_allowance(db: Session, user_id: uuid.UUID) -> None:
     ).first()
     if already:
         return
+    if phone_hash is not None:
+        if db.get(FreeAllowanceClaim, phone_hash) is not None:
+            return
+        db.add(FreeAllowanceClaim(phone_hash=phone_hash))
     free_plan = db.execute(select(Plan).where(Plan.code == "free")).scalar_one_or_none()
     ent = Entitlement(
         user_id=user_id,

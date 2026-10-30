@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentContext, get_current_context, get_db
 from app.domain.billing.entitlements import entitlement_summary
 from app.domain.profile import context as profile_context
 from app.domain.requests.service import get_active_request
-from app.domain.users.service import masked_primary_number
+from app.domain.users.service import delete_account, masked_primary_number
 from app.schemas.context_profile import ContextProfileBody, ContextProfileOut
 from app.schemas.me import (
     ActiveRequestSummary,
@@ -65,6 +65,16 @@ def patch_me(
         user.display_name = body.display_name
     db.commit()
     return _build_me(db, user)
+
+
+@router.delete("", status_code=204)
+def delete_me(
+    ctx: CurrentContext = Depends(get_current_context),
+    db: Session = Depends(get_db),
+) -> Response:
+    """Delete the account and its data. The session token stops working."""
+    delete_account(db, ctx.user.id)
+    return Response(status_code=204)
 
 
 @router.get("/context-profile", response_model=ContextProfileOut)
