@@ -5,8 +5,10 @@ import SwiftUI
 /// templates, with a ＋ to create a new one and swipe-to-delete for customs.
 public struct TemplatesView: View {
     @Bindable var vm: TemplatesViewModel
+    /// Non-nil while the editor sheet is open. `.sheet(item:)` hands the view
+    /// model straight to the sheet; `isPresented` + `if let` rendered an empty
+    /// sheet on first open because the closure read a stale `nil`.
     @State private var editorVM: CustomTemplateEditorViewModel?
-    @State private var showEditor = false
 
     public init(vm: TemplatesViewModel) { self.vm = vm }
 
@@ -44,7 +46,6 @@ public struct TemplatesView: View {
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     editorVM = vm.makeEditorViewModel()
-                    showEditor = true
                 } label: {
                     Image(systemName: "plus")
                 }
@@ -53,17 +54,15 @@ public struct TemplatesView: View {
         }
         .task { await vm.load() }
         .refreshable { await vm.load() }
-        .sheet(isPresented: $showEditor) {
-            if let editorVM {
-                CustomTemplateEditorView(
-                    vm: editorVM,
-                    onClose: { showEditor = false },
-                    onCreated: { _ in
-                        showEditor = false
-                        Task { await vm.load() }
-                    }
-                )
-            }
+        .sheet(item: $editorVM) { editor in
+            CustomTemplateEditorView(
+                vm: editor,
+                onClose: { editorVM = nil },
+                onCreated: { _ in
+                    editorVM = nil
+                    Task { await vm.load() }
+                }
+            )
         }
     }
 }

@@ -8,7 +8,7 @@ version: 1
 locale: de
 supports_call: true
 supports_sms: true
-call_opening_line_template: "Hey {first_name}, hier ist {caller_persona_label}! Ich bin draußen und {reason_label} — kommst du kurz raus?"
+call_opening_line_template: "Hey {first_name}, hier ist {caller_persona_label}! Ich steh direkt draußen — kommst du kurz raus?"
 call_system_prompt_template: "Du bist {caller_persona_label} und {reason_label}. Gut gelaunt und locker, halte es kurz und beende dann das Gespräch."
 call_followup_facts:
   - "Ich bin direkt draußen."
@@ -16,6 +16,6 @@ call_followup_facts:
 call_voice_profile_code: "warm_de"
 call_max_duration_seconds: 60
 call_supports_interruptions: true
-sms_body_template: "{caller_persona_label}: Ich bin draußen — {reason_label}. Kommst du kurz raus?"
+sms_body_template: "{caller_persona_label}: Ich steh direkt draußen. Kommst du kurz raus?"
 sms_followup_body_template: null
 sms_sender_style: "casual"

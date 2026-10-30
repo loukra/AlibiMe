@@ -32,7 +32,7 @@ Two halves:
   host).
 
 The authoritative behaviour specs are `backend/BACKEND_SPEC.md`,
-`frontend/FRONTEND_SPEC.md`, and `SENDER_CONTACT_FEATURE_SPEC.md`; the two
+`docs/specs/FRONTEND_SPEC.md`, and `docs/specs/SENDER_CONTACT_FEATURE_SPEC.md`; the two
 `README.md` files describe the current design.
 
 ---
@@ -562,7 +562,7 @@ Continuity is **backend-bound** and never depends on whether a contact is saved.
   identifiers stay on device. `NSContactsUsageDescription` is set in
   `frontend/App/Info.plist`.
 
-The full intent and rules are in `SENDER_CONTACT_FEATURE_SPEC.md`; the design
+The full intent and rules are in `docs/specs/SENDER_CONTACT_FEATURE_SPEC.md`; the design
 summaries are in both READMEs.
 
 ---

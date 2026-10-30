@@ -68,7 +68,7 @@ public final class TemplatesViewModel {
 /// backend-validated choices — never free-form prompt/SMS text.
 @MainActor
 @Observable
-public final class CustomTemplateEditorViewModel {
+public final class CustomTemplateEditorViewModel: Identifiable {
     public enum Phase: Equatable { case idle, loadingOptions, ready, submitting, failure }
 
     public private(set) var phase: Phase = .idle

@@ -41,3 +41,6 @@ Local.xcconfig
 # Editors
 .vscode/
 .idea/
+
+# Local SQLite databases (data, not source)
+*.db

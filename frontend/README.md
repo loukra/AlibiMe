@@ -2,7 +2,7 @@
 
 A native SwiftUI app that lets a user receive a believable **call** or **text**
 on their **own verified number**, by choosing a prebuilt template, a channel,
-and timing. Built to `FRONTEND_SPEC.md`, connected to the FastAPI backend in
+and timing. Built to [`docs/specs/FRONTEND_SPEC.md`](../docs/specs/FRONTEND_SPEC.md), connected to the FastAPI backend in
 `../backend`.
 
 ## Layout

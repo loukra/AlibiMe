@@ -62,7 +62,9 @@ PLANS = [
 
 SERVICE_IDENTITY = {
     "provider": "mock",
-    "identity_value": "+10000000000",
+    # 555-0100..0199 is reserved for fiction, so the mock sender looks real in
+    # demos and screenshots without belonging to anyone.
+    "identity_value": "+15550100123",
     "identity_type": IdentityType.phone_number,
 }
 

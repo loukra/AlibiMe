@@ -38,12 +38,14 @@ struct WelcomeView: View {
         VStack(alignment: .leading, spacing: Spacing.l) {
             Spacer()
             VStack(alignment: .leading, spacing: Spacing.m) {
-                Image(systemName: "phone.badge.waveform.fill")
-                    .font(.system(size: 44))
-                    .foregroundStyle(Theme.accent)
-                Text("BelievableCall")
+                Image("AppLogo", bundle: .module)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 64, height: 64)
+                    .accessibilityHidden(true)
+                Text("AlibiMe")
                     .font(.largeTitle.bold())
-                Text("Receive a believable call or text to your own number. Choose a template and timing — for work, family, social, logistics, or safety reasons.")
+                Text("A believable call or text to your own phone, right on cue — your way out of an awkward or unsafe moment.")
                     .font(.body)
                     .foregroundStyle(.secondary)
             }
