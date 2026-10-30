@@ -52,6 +52,32 @@ extension View {
     }
 }
 
+/// A symbol in a soft accent circle: the leading badge of list cards.
+public struct IconBadge: View {
+    let systemName: String
+    public init(_ systemName: String) { self.systemName = systemName }
+    public var body: some View {
+        Image(systemName: systemName)
+            .font(.body.weight(.semibold))
+            .foregroundStyle(Theme.accent)
+            .frame(width: 40, height: 40)
+            .background(Theme.accent.opacity(0.14), in: Circle())
+            .accessibilityHidden(true)
+    }
+}
+
+extension View {
+    /// Draws a List row as its own card on the screen gradient. Unlike a
+    /// ScrollView of cards, swipe actions keep working.
+    func bcCardRow() -> some View {
+        Card { self }
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets(top: Spacing.xs, leading: Spacing.m,
+                                      bottom: Spacing.xs, trailing: Spacing.m))
+    }
+}
+
 /// The large home CTA. Adapts color to enabled/destructive state.
 public struct PrimaryButton: View {
     let title: String

@@ -32,33 +32,40 @@ public struct HistoryView: View {
                 Section { ErrorBanner(error) }
             }
             if !vm.pendingItems.isEmpty {
-                Section("Pending") {
+                Section {
                     ForEach(vm.pendingItems) { item in
                         PendingRow(item: item)
+                            .bcCardRow()
                             .swipeActions(edge: .trailing) {
                                 if item.cancelable {
                                     Button(role: .destructive) {
                                         Task { await vm.cancel(item) }
                                     } label: { Label("Cancel", systemImage: "xmark") }
+                                    .tint(Theme.destructive)
                                 }
                             }
                     }
-                }
+                } header: { SectionHeader("Pending") }
             }
             if !vm.pastItems.isEmpty {
-                Section(vm.pendingItems.isEmpty ? "" : "Recent") {
+                Section {
                     ForEach(vm.pastItems) { item in
                         HistoryRow(item: item)
+                            .bcCardRow()
                             .onAppear {
                                 if item.id == vm.pastItems.last?.id { Task { await vm.loadMore() } }
                             }
                     }
+                } header: {
+                    if !vm.pendingItems.isEmpty { SectionHeader("Recent") }
                 }
             }
             if vm.isLoadingMore {
                 HStack { Spacer(); ProgressView(); Spacer() }
+                    .listRowBackground(Color.clear)
             }
         }
+        .listStyle(.plain)
         .bcClearScrollBackground()
         .refreshable { await vm.refresh() }
     }
@@ -86,10 +93,9 @@ struct PendingRow: View {
 
     var body: some View {
         HStack(spacing: Spacing.m) {
-            Image(systemName: item.channel.systemImage)
-                .font(.title3).foregroundStyle(Theme.accent).frame(width: 28)
+            IconBadge(item.channel.outlineSymbol)
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.templateLabel).font(.subheadline.weight(.medium))
+                Text(item.templateLabel).font(.subheadline.weight(.medium)).lineLimit(1)
                 Text(item.executeAt, format: .dateTime.month().day().hour().minute())
                     .font(.caption).foregroundStyle(.secondary)
             }
@@ -104,8 +110,7 @@ struct PendingRow: View {
     }
 
     private var countdown: String {
-        let remaining = max(0, Int(item.executeAt.timeIntervalSince(now)))
-        return String(format: "%02d:%02d", remaining / 60, remaining % 60)
+        NextJobChip.countdown(max(0, Int(item.executeAt.timeIntervalSince(now))))
     }
 }
 
@@ -114,13 +119,11 @@ struct HistoryRow: View {
 
     var body: some View {
         HStack(spacing: Spacing.m) {
-            Image(systemName: item.channel.systemImage)
-                .font(.title3)
-                .foregroundStyle(Theme.accent)
-                .frame(width: 28)
+            IconBadge(item.channel.outlineSymbol)
             VStack(alignment: .leading, spacing: Spacing.xs) {
                 Text(item.templateLabel)
                     .font(.subheadline.weight(.medium))
+                    .lineLimit(1)
                 Text(item.requestedAt, format: .dateTime.month().day().hour().minute())
                     .font(.caption)
                     .foregroundStyle(.secondary)

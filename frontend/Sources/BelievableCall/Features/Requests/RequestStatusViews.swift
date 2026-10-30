@@ -168,7 +168,7 @@ public struct NextJobChip: View {
 
     private var leadingIcon: String {
         guard let request else { return "moon.stars" }
-        return request.channel.systemImage
+        return request.channel.outlineSymbol
     }
     private var captionText: String {
         guard let request else { return "Upcoming" }
