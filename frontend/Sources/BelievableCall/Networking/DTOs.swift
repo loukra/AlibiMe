@@ -299,10 +299,21 @@ struct CreditPackageDTO: Decodable {
     let badge_text: String?
     let active: Bool
     let sort_order: Int
+    let store_product_id: String?
+}
+
+struct CreditCostsDTO: Decodable {
+    let call: Int
+    let sms: Int
 }
 
 struct CreditPackagesResponseDTO: Decodable {
     let packages: [CreditPackageDTO]
+    let credit_costs: CreditCostsDTO?
+}
+
+struct RedeemRequestDTO: Encodable {
+    let signed_transaction: String
 }
 
 struct AcquirePackageRequestDTO: Encodable {

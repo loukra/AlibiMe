@@ -17,6 +17,7 @@ from app.api.routes import (
     me,
     requests,
     templates,
+    webhooks_app_store,
     webhooks_revenuecat,
     webhooks_sms,
     webhooks_voice,
@@ -88,6 +89,7 @@ for module in (
     webhooks_voice,
     webhooks_sms,
     webhooks_revenuecat,
+    webhooks_app_store,
 ):
     app.include_router(module.router)
 

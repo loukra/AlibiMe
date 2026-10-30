@@ -127,8 +127,8 @@ class PlanKind(StrEnum):
 
 class FulfillmentMode(StrEnum):
     """How a credit package is paid for. ``free_dev`` grants immediately and must
-    be disabled before a public paid release; ``app_store_iap`` requires a
-    validated store transaction (added in a later pass)."""
+    be disabled before a public paid release; ``app_store_iap`` grants only for a
+    verified App Store transaction (``app.domain.billing.store``)."""
 
     free_dev = "free_dev"
     app_store_iap = "app_store_iap"
@@ -139,6 +139,7 @@ class CreditPackageClaimStatus(StrEnum):
     granted = "granted"
     failed = "failed"
     canceled = "canceled"
+    refunded = "refunded"
 
 
 class EntitlementSource(StrEnum):

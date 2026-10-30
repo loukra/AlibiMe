@@ -29,6 +29,10 @@ tui = [
 postgres = [
     "psycopg[binary]>=3.1",
 ]
+# Real App Store purchase verification (STORE_VERIFIER=app_store).
+appstore = [
+    "app-store-server-library>=1.5",
+]
 
 [build-system]
 requires = ["setuptools>=68"]

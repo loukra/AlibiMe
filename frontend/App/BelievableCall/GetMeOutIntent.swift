@@ -12,7 +12,7 @@ struct GetMeOutIntent: AppIntent {
     var timing: AlibiTiming?
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        let runner = QuickAlibiRunner(env: .live(baseURL: Backend.url))
+        let runner = QuickAlibiRunner(env: .live(baseURL: Backend.url, storeKit: false))
         do {
             let message = try await runner.run(delaySeconds: timing?.delaySeconds)
             return .result(dialog: IntentDialog(stringLiteral: message))

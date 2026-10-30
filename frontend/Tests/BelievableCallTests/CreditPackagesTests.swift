@@ -3,35 +3,89 @@ import XCTest
 
 @MainActor
 final class CreditPackagesViewModelTests: XCTestCase {
-    func testLoadPopulatesPackagesAndSelectsFirst() async {
+    private let devPack = CreditPackage(code: "dev_5", displayName: "5 Credits", credits: 5,
+                                        fulfillmentMode: "free_dev", priceLabel: "Free for now",
+                                        badgeText: nil, sortOrder: 1)
+
+    func testLoadPopulatesPackagesCostsAndSelectsFirst() async {
         let vm = CreditPackagesViewModel(service: MockCreditPackagesService())
         await vm.load()
         XCTAssertEqual(vm.phase, .ready)
-        XCTAssertEqual(vm.packages.count, 4)
-        XCTAssertEqual(vm.selectedCode, "credits_5")
-        XCTAssertEqual(vm.primaryButtonTitle, "Add 5 Credits")
+        XCTAssertEqual(vm.packages.count, 3)
+        XCTAssertEqual(vm.selectedCode, "credits_12")
+        XCTAssertEqual(vm.primaryButtonTitle, "Buy 12 Credits for 2.99 EUR")
+        XCTAssertEqual(vm.costsNote, "A call uses 4 credits, a text 1.")
         XCTAssertTrue(vm.canSubmit)
     }
 
-    func testSelectUpdatesPrimaryButton() async {
-        let vm = CreditPackagesViewModel(service: MockCreditPackagesService())
+    func testStorePriceReplacesBackendLabel() async {
+        let purchases = MockPurchaseService(storePrices: ["com.believablecall.app.credits40": "7,99 €"])
+        let vm = CreditPackagesViewModel(service: MockCreditPackagesService(), purchases: purchases)
         await vm.load()
-        vm.select("credits_30")
-        XCTAssertEqual(vm.selectedCode, "credits_30")
-        XCTAssertEqual(vm.primaryButtonTitle, "Add 30 Credits")
+        vm.select("credits_40")
+        XCTAssertEqual(vm.primaryButtonTitle, "Buy 40 Credits for 7,99 €")
+        XCTAssertEqual(vm.price(for: vm.packages[0]), "2.99 EUR")  // store doesn't know it
     }
 
-    func testAcquireGrantsAndReportsBalance() async {
+    func testPurchaseIsRedeemedThenFinished() async {
         let service = MockCreditPackagesService(balance: 3)
-        let vm = CreditPackagesViewModel(service: service)
+        let purchases = MockPurchaseService()
+        let vm = CreditPackagesViewModel(service: service, purchases: purchases)
         await vm.load()
-        vm.select("credits_15")
+        vm.select("credits_40")
         let ok = await vm.acquire()
         XCTAssertTrue(ok)
         XCTAssertEqual(vm.phase, .success)
-        XCTAssertEqual(vm.lastGranted?.grantedCredits, 15)
-        XCTAssertEqual(vm.lastGranted?.creditsAvailable, 18)
-        XCTAssertEqual(service.acquiredCodes, ["credits_15"])
+        XCTAssertEqual(vm.lastGranted?.grantedCredits, 40)
+        XCTAssertEqual(vm.lastGranted?.creditsAvailable, 43)
+        XCTAssertEqual(service.redeemed.count, 1)
+        XCTAssertTrue(service.redeemed[0].hasPrefix("mock:com.believablecall.app.credits40:"))
+        XCTAssertEqual(purchases.finished.count, 1)
+        XCTAssertTrue(service.acquiredCodes.isEmpty)  // never the free path
+    }
+
+    func testFailedRedeemLeavesTransactionUnfinished() async {
+        let service = MockCreditPackagesService()
+        service.acquireError = APIError.transport(message: "offline")
+        let purchases = MockPurchaseService()
+        let vm = CreditPackagesViewModel(service: service, purchases: purchases)
+        await vm.load()
+        let ok = await vm.acquire()
+        XCTAssertFalse(ok)
+        XCTAssertTrue(purchases.finished.isEmpty)  // redeemed again on next launch
+        XCTAssertNotNil(vm.errorMessage)
+    }
+
+    func testCancelledPurchaseIsQuiet() async {
+        let purchases = MockPurchaseService()
+        purchases.outcome = .cancelled
+        let vm = CreditPackagesViewModel(service: MockCreditPackagesService(), purchases: purchases)
+        await vm.load()
+        let ok = await vm.acquire()
+        XCTAssertFalse(ok)
+        XCTAssertEqual(vm.phase, .ready)
+        XCTAssertNil(vm.errorMessage)
+    }
+
+    func testPendingPurchaseExplains() async {
+        let purchases = MockPurchaseService()
+        purchases.outcome = .pending
+        let vm = CreditPackagesViewModel(service: MockCreditPackagesService(), purchases: purchases)
+        await vm.load()
+        _ = await vm.acquire()
+        XCTAssertEqual(vm.phase, .ready)
+        XCTAssertNotNil(vm.pendingNotice)
+    }
+
+    func testFreeDevPackStillUsesAcquire() async {
+        let service = MockCreditPackagesService(packages: [devPack], balance: 3)
+        let vm = CreditPackagesViewModel(service: service)
+        await vm.load()
+        XCTAssertEqual(vm.primaryButtonTitle, "Add 5 Credits")
+        let ok = await vm.acquire()
+        XCTAssertTrue(ok)
+        XCTAssertEqual(service.acquiredCodes, ["dev_5"])
+        XCTAssertEqual(vm.lastGranted?.creditsAvailable, 8)
     }
 
     func testLoadFailureSurfacesRetryState() async {
@@ -48,14 +102,14 @@ final class CreditPackagesViewModelTests: XCTestCase {
         let service = MockCreditPackagesService()
         let vm = CreditPackagesViewModel(service: service)
         await vm.load()
-        vm.select("credits_15")
+        vm.select("credits_40")
         service.acquireError = APIError.api(code: "rate_limited", message: "slow down",
                                             retryable: true, requestID: nil)
         let ok = await vm.acquire()
         XCTAssertFalse(ok)
         XCTAssertEqual(vm.phase, .failure)
-        XCTAssertFalse(vm.packages.isEmpty)          // sheet stays usable
-        XCTAssertEqual(vm.selectedCode, "credits_15") // selection preserved
+        XCTAssertFalse(vm.packages.isEmpty)
+        XCTAssertEqual(vm.selectedCode, "credits_40")
         XCTAssertNotNil(vm.errorMessage)
     }
 

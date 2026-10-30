@@ -564,6 +564,8 @@ public struct CreditPackage: Identifiable, Equatable, Sendable {
     public let priceLabel: String
     public let badgeText: String?
     public let sortOrder: Int
+    /// App Store product for paid packs; nil for free dev packs.
+    public let storeProductID: String?
 
     public init(code: String,
                 displayName: String,
@@ -571,7 +573,8 @@ public struct CreditPackage: Identifiable, Equatable, Sendable {
                 fulfillmentMode: String,
                 priceLabel: String,
                 badgeText: String?,
-                sortOrder: Int) {
+                sortOrder: Int,
+                storeProductID: String? = nil) {
         self.code = code
         self.displayName = displayName
         self.credits = credits
@@ -579,6 +582,26 @@ public struct CreditPackage: Identifiable, Equatable, Sendable {
         self.priceLabel = priceLabel
         self.badgeText = badgeText
         self.sortOrder = sortOrder
+        self.storeProductID = storeProductID
+    }
+
+    /// Bought through the App Store rather than granted for free.
+    public var isStorePurchase: Bool { fulfillmentMode == "app_store_iap" && storeProductID != nil }
+}
+
+/// What a call and a text cost, in credits.
+public struct CreditCosts: Equatable, Sendable {
+    public let call: Int
+    public let text: Int
+    public init(call: Int, text: Int) { self.call = call; self.text = text }
+}
+
+public struct CreditCatalog: Equatable, Sendable {
+    public let packages: [CreditPackage]
+    public let costs: CreditCosts?
+    public init(packages: [CreditPackage], costs: CreditCosts?) {
+        self.packages = packages
+        self.costs = costs
     }
 }
 

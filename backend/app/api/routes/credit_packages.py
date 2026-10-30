@@ -4,12 +4,15 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentContext, get_current_context, get_db
+from app.core.config import settings
 from app.domain.billing import credit_packages
 from app.schemas.credit_packages import (
     AcquirePackageBody,
     AcquirePackageResponse,
+    CreditCosts,
     CreditPackageOut,
     CreditPackagesResponse,
+    RedeemBody,
 )
 
 router = APIRouter(prefix="/v1/credit-packages", tags=["credit-packages"])
@@ -32,10 +35,23 @@ def list_packages(
                 badge_text=p.badge_text,
                 active=p.active,
                 sort_order=p.sort_order,
+                store_product_id=credit_packages.store_product_id(p),
             )
             for p in packages
-        ]
+        ],
+        credit_costs=CreditCosts(call=settings.call_credit_cost, sms=settings.sms_credit_cost),
     )
+
+
+@router.post("/redeem", response_model=AcquirePackageResponse)
+def redeem(
+    body: RedeemBody,
+    ctx: CurrentContext = Depends(get_current_context),
+    db: Session = Depends(get_db),
+) -> AcquirePackageResponse:
+    """Grant the credits of an App Store purchase (StoreKit 2 signed transaction)."""
+    result = credit_packages.redeem_store_transaction(db, ctx.user.id, body.signed_transaction)
+    return AcquirePackageResponse(**result)
 
 
 @router.post("/{code}/acquire", response_model=AcquirePackageResponse)

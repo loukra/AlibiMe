@@ -103,5 +103,14 @@ def release(db: Session, user_id: uuid.UUID, amount: int, request_id: uuid.UUID)
     )
 
 
+def refund(db: Session, user_id: uuid.UUID, amount: int, claim_id: uuid.UUID) -> CreditLedger:
+    """Take back credits of a refunded store purchase."""
+    return _append(
+        db, user_id, CreditEntryType.refund, -amount,
+        reference_type=CreditReferenceType.purchase, reference_id=claim_id,
+        notes="App Store refund",
+    )
+
+
 def has_credits(db: Session, user_id: uuid.UUID, amount: int) -> bool:
     return current_balance(db, user_id) >= amount

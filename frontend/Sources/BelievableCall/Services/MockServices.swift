@@ -121,18 +121,18 @@ public enum Fixtures {
     ]
 
     public static let creditPackages: [CreditPackage] = [
-        CreditPackage(code: "credits_5", displayName: "5 Credits", credits: 5,
-                      fulfillmentMode: "free_dev", priceLabel: "Free for now",
-                      badgeText: "Free", sortOrder: 10),
-        CreditPackage(code: "credits_15", displayName: "15 Credits", credits: 15,
-                      fulfillmentMode: "free_dev", priceLabel: "Free for now",
-                      badgeText: "Free", sortOrder: 20),
-        CreditPackage(code: "credits_30", displayName: "30 Credits", credits: 30,
-                      fulfillmentMode: "free_dev", priceLabel: "Free for now",
-                      badgeText: "Free", sortOrder: 30),
-        CreditPackage(code: "credits_60", displayName: "60 Credits", credits: 60,
-                      fulfillmentMode: "free_dev", priceLabel: "Free for now",
-                      badgeText: "Free", sortOrder: 40),
+        CreditPackage(code: "credits_12", displayName: "12 Credits", credits: 12,
+                      fulfillmentMode: "app_store_iap", priceLabel: "2.99 EUR",
+                      badgeText: nil, sortOrder: 10,
+                      storeProductID: "com.believablecall.app.credits12"),
+        CreditPackage(code: "credits_40", displayName: "40 Credits", credits: 40,
+                      fulfillmentMode: "app_store_iap", priceLabel: "7.99 EUR",
+                      badgeText: "Popular", sortOrder: 20,
+                      storeProductID: "com.believablecall.app.credits40"),
+        CreditPackage(code: "credits_100", displayName: "100 Credits", credits: 100,
+                      fulfillmentMode: "app_store_iap", priceLabel: "17.99 EUR",
+                      badgeText: "Best value", sortOrder: 30,
+                      storeProductID: "com.believablecall.app.credits100"),
     ]
 }
 
@@ -311,6 +311,8 @@ public final class MockCreditPackagesService: CreditPackagesServicing, @unchecke
     public var packages: [CreditPackage]
     public var listError: Error?
     public var acquireError: Error?
+    public var costs: CreditCosts? = CreditCosts(call: 4, text: 1)
+    public private(set) var redeemed: [String] = []
     /// Running balance the mock reports after each grant, so view models can
     /// assert the post-grant value.
     public var balance: Int
@@ -321,9 +323,20 @@ public final class MockCreditPackagesService: CreditPackagesServicing, @unchecke
         self.balance = balance
     }
 
-    public func list() async throws -> [CreditPackage] {
+    public func catalog() async throws -> CreditCatalog {
         if let listError { throw listError }
-        return packages
+        return CreditCatalog(packages: packages, costs: costs)
+    }
+
+    public func redeem(signedTransaction: String) async throws -> CreditAcquisition {
+        if let acquireError { throw acquireError }
+        redeemed.append(signedTransaction)
+        let product = signedTransaction.split(separator: ":").dropFirst().first.map(String.init)
+        let pack = packages.first { $0.storeProductID == product }
+        balance += pack?.credits ?? 0
+        return CreditAcquisition(claimID: "claim-\(signedTransaction)", status: "granted",
+                                 grantedCredits: pack?.credits ?? 0, creditsAvailable: balance,
+                                 planCode: pack?.code ?? "")
     }
 
     public func acquire(code: String, clientRequestID: String) async throws -> CreditAcquisition {

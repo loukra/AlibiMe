@@ -31,31 +31,32 @@ logger = get_logger("seeds")
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
 
-# Credit-package metadata (display_name/badge/sort/fulfillment) is set for the
-# one-time packs so they appear in the Add Credits sheet. `free` and the
-# subscription stub carry no package metadata and are excluded from the catalog.
-_FREE_DEV = FulfillmentMode.free_dev
+# Credit packs are consumable App Store products. Prices are set in App Store
+# Connect; price_minor/currency here are only the fallback label until StoreKit
+# has loaded the localized price. See docs/pricing.md for how they were chosen.
+# `free` and the subscription stub carry no package metadata and are excluded
+# from the catalog.
+_IAP = FulfillmentMode.app_store_iap
+_PRODUCT = "com.believablecall.app.credits"
 PLANS = [
     {"code": "free", "kind": PlanKind.one_time, "included_credit_units": 0},
     {
-        "code": "credits_5", "kind": PlanKind.one_time, "included_credit_units": 5,
-        "display_name": "5 Credits", "badge_text": "Free", "fulfillment_mode": _FREE_DEV,
+        "code": "credits_12", "kind": PlanKind.one_time, "included_credit_units": 12,
+        "display_name": "12 Credits", "badge_text": None, "fulfillment_mode": _IAP,
+        "store_product_id": f"{_PRODUCT}12", "price_minor": 299, "currency_code": "EUR",
         "sort_order": 10,
     },
     {
-        "code": "credits_15", "kind": PlanKind.one_time, "included_credit_units": 15,
-        "display_name": "15 Credits", "badge_text": "Free", "fulfillment_mode": _FREE_DEV,
+        "code": "credits_40", "kind": PlanKind.one_time, "included_credit_units": 40,
+        "display_name": "40 Credits", "badge_text": "Popular", "fulfillment_mode": _IAP,
+        "store_product_id": f"{_PRODUCT}40", "price_minor": 799, "currency_code": "EUR",
         "sort_order": 20,
     },
     {
-        "code": "credits_30", "kind": PlanKind.one_time, "included_credit_units": 30,
-        "display_name": "30 Credits", "badge_text": "Free", "fulfillment_mode": _FREE_DEV,
+        "code": "credits_100", "kind": PlanKind.one_time, "included_credit_units": 100,
+        "display_name": "100 Credits", "badge_text": "Best value", "fulfillment_mode": _IAP,
+        "store_product_id": f"{_PRODUCT}100", "price_minor": 1799, "currency_code": "EUR",
         "sort_order": 30,
-    },
-    {
-        "code": "credits_60", "kind": PlanKind.one_time, "included_credit_units": 60,
-        "display_name": "60 Credits", "badge_text": "Free", "fulfillment_mode": _FREE_DEV,
-        "sort_order": 40,
     },
     {"code": "starter_monthly", "kind": PlanKind.subscription, "included_credit_units": 30},
 ]
@@ -84,6 +85,15 @@ def seed_plans(db: Session) -> int:
         plan.badge_text = spec.get("badge_text")
         plan.fulfillment_mode = spec.get("fulfillment_mode", FulfillmentMode.free_dev).value
         plan.sort_order = spec.get("sort_order", 0)
+        plan.price_minor = spec.get("price_minor")
+        plan.currency_code = spec.get("currency_code")
+        product = spec.get("store_product_id")
+        plan.store_product_ids_json = {"app_store": product} if product else None
+    # Retire packs that are no longer in the catalog (e.g. the old free packs).
+    listed = {spec["code"] for spec in PLANS}
+    for plan in db.execute(select(Plan)).scalars():
+        if plan.code not in listed:
+            plan.active = False
     db.flush()
     return count
 

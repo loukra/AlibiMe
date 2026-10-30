@@ -12,10 +12,23 @@ class CreditPackageOut(BaseModel):
     badge_text: str | None = None
     active: bool
     sort_order: int
+    # App Store product to buy for app_store_iap packs; the app shows the
+    # store's localized price instead of price_label when it has it.
+    store_product_id: str | None = None
+
+
+class CreditCosts(BaseModel):
+    call: int
+    sms: int
 
 
 class CreditPackagesResponse(BaseModel):
     packages: list[CreditPackageOut]
+    credit_costs: CreditCosts
+
+
+class RedeemBody(BaseModel):
+    signed_transaction: str = Field(min_length=1, max_length=20000)
 
 
 class AcquirePackageBody(BaseModel):

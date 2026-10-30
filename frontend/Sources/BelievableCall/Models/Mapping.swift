@@ -255,7 +255,8 @@ extension CreditPackage {
             fulfillmentMode: dto.fulfillment_mode,
             priceLabel: dto.price_label,
             badgeText: dto.badge_text,
-            sortOrder: dto.sort_order
+            sortOrder: dto.sort_order,
+            storeProductID: dto.store_product_id
         )
     }
 }

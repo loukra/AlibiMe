@@ -65,10 +65,13 @@ public protocol DeviceServicing: Sendable {
 }
 
 public protocol CreditPackagesServicing: Sendable {
-    func list() async throws -> [CreditPackage]
+    /// The packs plus what a call and a text cost.
+    func catalog() async throws -> CreditCatalog
     /// Acquire a package. `clientRequestID` makes the grant idempotent on the
     /// backend so repeated taps never double-grant.
     func acquire(code: String, clientRequestID: String) async throws -> CreditAcquisition
+    /// Grant the credits of an App Store purchase (backend verifies it).
+    func redeem(signedTransaction: String) async throws -> CreditAcquisition
 }
 
 public protocol ContextProfileServicing: Sendable {
@@ -305,12 +308,22 @@ public struct LiveCreditPackagesService: CreditPackagesServicing {
     let client: APIClient
     public init(client: APIClient) { self.client = client }
 
-    public func list() async throws -> [CreditPackage] {
+    public func catalog() async throws -> CreditCatalog {
         let dto = try await client.send(
             Endpoint(.GET, "v1/credit-packages"),
             as: CreditPackagesResponseDTO.self
         )
-        return dto.packages.map(CreditPackage.init(dto:))
+        return CreditCatalog(packages: dto.packages.map(CreditPackage.init(dto:)),
+                             costs: dto.credit_costs.map { CreditCosts(call: $0.call, text: $0.sms) })
+    }
+
+    public func redeem(signedTransaction: String) async throws -> CreditAcquisition {
+        let body = try BCCoding.encoder.encode(RedeemRequestDTO(signed_transaction: signedTransaction))
+        let dto = try await client.send(
+            Endpoint(.POST, "v1/credit-packages/redeem", body: body),
+            as: AcquirePackageResponseDTO.self
+        )
+        return CreditAcquisition(dto: dto)
     }
 
     public func acquire(code: String, clientRequestID: String) async throws -> CreditAcquisition {

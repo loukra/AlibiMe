@@ -2,8 +2,9 @@ import Foundation
 import Observation
 
 /// Drives the Add Credits bottom sheet: loads the backend package catalog,
-/// tracks the selection, and submits an (idempotent) acquisition. The backend
-/// remains the source of truth for the resulting balance.
+/// tracks the selection, buys paid packs through the App Store and has the
+/// backend verify and grant them. The backend remains the source of truth for
+/// the resulting balance.
 @MainActor
 @Observable
 public final class CreditPackagesViewModel: Identifiable {
@@ -22,12 +23,34 @@ public final class CreditPackagesViewModel: Identifiable {
     public var selectedCode: String?
     public private(set) var errorMessage: String?
     public private(set) var lastGranted: CreditAcquisition?
+    public private(set) var costs: CreditCosts?
+    /// Localized App Store prices by product id, once StoreKit has them.
+    public private(set) var storePrices: [String: String] = [:]
+    /// Set while a purchase waits for approval (Ask to Buy).
+    public private(set) var pendingNotice: String?
 
     private let service: CreditPackagesServicing
+    private let purchases: PurchaseServicing
+    private let accountToken: UUID?
     public var onSessionExpired: (() -> Void)?
 
-    public init(service: CreditPackagesServicing) {
+    public init(service: CreditPackagesServicing,
+                purchases: PurchaseServicing = MockPurchaseService(),
+                accountToken: UUID? = nil) {
         self.service = service
+        self.purchases = purchases
+        self.accountToken = accountToken
+    }
+
+    /// The store's localized price when known, else the backend's label.
+    public func price(for package: CreditPackage) -> String {
+        package.storeProductID.flatMap { storePrices[$0] } ?? package.priceLabel
+    }
+
+    /// "A call uses 4 credits, a text 1."
+    public var costsNote: String? {
+        guard let costs else { return nil }
+        return "A call uses \(costs.call) credits, a text \(costs.text)."
     }
 
     public var selectedPackage: CreditPackage? {
@@ -47,7 +70,9 @@ public final class CreditPackagesViewModel: Identifiable {
     public var isEmptyCatalog: Bool { phase == .ready && packages.isEmpty }
 
     public var primaryButtonTitle: String {
-        if let pkg = selectedPackage { return "Add \(pkg.credits) Credits" }
+        if let pkg = selectedPackage {
+            return pkg.isStorePurchase ? "Buy \(pkg.credits) Credits for \(price(for: pkg))" : "Add \(pkg.credits) Credits"
+        }
         return "Add Credits"
     }
 
@@ -55,8 +80,14 @@ public final class CreditPackagesViewModel: Identifiable {
         phase = .loadingPackages
         errorMessage = nil
         do {
-            let list = try await service.list()
+            let catalog = try await service.catalog()
+            let list = catalog.packages
             packages = list
+            costs = catalog.costs
+            let productIDs = list.compactMap(\.storeProductID)
+            if !productIDs.isEmpty {
+                storePrices = await purchases.prices(for: productIDs)
+            }
             // Preserve a still-valid selection, else default to the first pack.
             if selectedCode == nil || !list.contains(where: { $0.code == selectedCode }) {
                 selectedCode = list.first?.code
@@ -82,11 +113,34 @@ public final class CreditPackagesViewModel: Identifiable {
         guard let pkg = selectedPackage, phase != .submitting else { return false }
         phase = .submitting
         errorMessage = nil
+        pendingNotice = nil
         do {
-            let result = try await service.acquire(code: pkg.code, clientRequestID: UUID().uuidString)
+            let result: CreditAcquisition
+            if pkg.isStorePurchase, let productID = pkg.storeProductID {
+                switch try await purchases.purchase(productID: productID, accountToken: accountToken) {
+                case let .purchased(purchase):
+                    result = try await service.redeem(signedTransaction: purchase.signedTransaction)
+                    // Only finish once the credits are ours; an unfinished
+                    // transaction is redeemed again on the next launch.
+                    await purchases.finish(transactionID: purchase.transactionID)
+                case .cancelled:
+                    phase = .ready
+                    return false
+                case .pending:
+                    pendingNotice = "Waiting for approval. The credits arrive once it's approved."
+                    phase = .ready
+                    return false
+                }
+            } else {
+                result = try await service.acquire(code: pkg.code, clientRequestID: UUID().uuidString)
+            }
             lastGranted = result
             phase = .success
             return true
+        } catch PurchaseError.productUnavailable {
+            errorMessage = "This pack isn't available in the App Store right now."
+            phase = .failure
+            return false
         } catch {
             handle(error)
             return false

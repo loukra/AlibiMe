@@ -25,6 +25,8 @@ public final class SettingsViewModel {
     private let creditPackages: CreditPackagesServicing
     private let templates: TemplateServicing?
     private let prefs: PreferencesStoring
+    private let purchases: PurchaseServicing
+    private let accountToken: UUID?
     public var onSignOut: (() -> Void)?
     public var onSessionExpired: (() -> Void)?
 
@@ -32,19 +34,24 @@ public final class SettingsViewModel {
                 auth: AuthServicing,
                 creditPackages: CreditPackagesServicing,
                 templates: TemplateServicing? = nil,
-                prefs: PreferencesStoring = InMemoryPreferences()) {
+                prefs: PreferencesStoring = InMemoryPreferences(),
+                purchases: PurchaseServicing = MockPurchaseService(),
+                accountToken: UUID? = nil) {
         self.profileService = profileService
         self.auth = auth
         self.creditPackages = creditPackages
         self.templates = templates
         self.prefs = prefs
+        self.purchases = purchases
+        self.accountToken = accountToken
         self.quickAlibi = prefs.quickAlibi
     }
 
     /// A fresh view model for the Add Credits bottom sheet, wired to the same
     /// session-expiry handling as the rest of Settings.
     public func makeCreditPackagesViewModel() -> CreditPackagesViewModel {
-        let vm = CreditPackagesViewModel(service: creditPackages)
+        let vm = CreditPackagesViewModel(service: creditPackages, purchases: purchases,
+                                         accountToken: accountToken)
         vm.onSessionExpired = { [weak self] in self?.onSessionExpired?() }
         return vm
     }

@@ -6,8 +6,9 @@ Every acquisition is recorded as a ``CreditPackageClaim`` (audit trail +
 idempotency) and credits are granted through the normal ledger path — even while
 packages are free in the current ``free_dev`` phase.
 
-The same claim + ledger path is what a future ``app_store_iap`` flow will reuse
-after validating a store transaction; only the fulfillment branch changes.
+Paid packs (``app_store_iap``) go through ``redeem_store_transaction``: the app
+buys with StoreKit, we verify Apple's signed transaction and grant through the
+same claim + ledger path. Refunds take the credits back.
 """
 from __future__ import annotations
 
@@ -27,6 +28,7 @@ from app.db.models.enums import (
 )
 from app.db.models.plan import Plan
 from app.domain.billing import credits
+from app.domain.billing.store import InvalidStoreTransaction, StoreVerifier, get_store_verifier
 
 
 class PackageNotAcquirable(AppError):
@@ -52,6 +54,10 @@ def price_label(plan: Plan) -> str:
     if plan.price_minor is not None and plan.currency_code:
         return f"{plan.price_minor / 100:.2f} {plan.currency_code}"
     return "—"
+
+
+def store_product_id(plan: Plan) -> str | None:
+    return (plan.store_product_ids_json or {}).get("app_store")
 
 
 def list_active_packages(db: Session) -> list[Plan]:
@@ -133,9 +139,82 @@ def acquire_package(
         db.commit()
         return _claim_result(db, claim, user_id)
 
-    # Paid fulfillment is not implemented in this pass. Record the failed intent
-    # so the audit trail is complete, then surface a clear error.
+    # Paid packs are bought in the App Store and redeemed with the signed
+    # transaction; this free path can't hand them out.
     claim.status = CreditPackageClaimStatus.failed.value
-    claim.failure_reason = "store purchase not supported yet"
+    claim.failure_reason = "paid package needs a store transaction"
     db.commit()
-    raise PackageNotAcquirable("Paid purchases aren't available yet.")
+    raise PackageNotAcquirable("This package is bought in the App Store.")
+
+
+class TransactionAlreadyRedeemed(AppError):
+    code = "transaction_already_redeemed"
+    http_status = 409
+    default_message = "This purchase was already used on another account."
+
+
+def redeem_store_transaction(
+    db: Session,
+    user_id: uuid.UUID,
+    signed_transaction: str,
+    verifier: StoreVerifier | None = None,
+) -> dict:
+    """Grant the credits of a verified App Store purchase. Idempotent per
+    transaction: the app may send the same one again (e.g. after a crash before
+    it finished the transaction) and gets the same claim back."""
+    tx = (verifier or get_store_verifier()).verify_transaction(signed_transaction)
+    if tx.revoked:
+        raise InvalidStoreTransaction("This purchase was refunded.")
+    if tx.app_account_token and tx.app_account_token.lower() != str(user_id).lower():
+        raise TransactionAlreadyRedeemed()
+
+    existing = db.execute(
+        select(CreditPackageClaim).where(CreditPackageClaim.store_transaction_id == tx.transaction_id)
+    ).scalars().first()
+    if existing is not None:
+        if existing.user_id != user_id:
+            raise TransactionAlreadyRedeemed()
+        return _claim_result(db, existing, user_id)
+
+    plan = next((p for p in list_active_packages(db) if store_product_id(p) == tx.product_id), None)
+    if plan is None or plan.fulfillment_mode != FulfillmentMode.app_store_iap.value:
+        raise NotFound("No credit package for this product.")
+
+    claim = CreditPackageClaim(
+        user_id=user_id,
+        plan_id=plan.id,
+        plan_code=plan.code,
+        credits_granted=plan.included_credit_units,
+        fulfillment_mode=plan.fulfillment_mode,
+        status=CreditPackageClaimStatus.granted.value,
+        client_request_id=f"appstore:{tx.transaction_id}",
+        store_transaction_id=tx.transaction_id,
+        granted_at=utcnow(),
+    )
+    db.add(claim)
+    db.flush()
+    credits.grant(
+        db,
+        user_id,
+        plan.included_credit_units,
+        reference_type=CreditReferenceType.purchase,
+        reference_id=claim.id,
+        notes=f"App Store {tx.product_id} ({tx.transaction_id})",
+    )
+    db.commit()
+    return _claim_result(db, claim, user_id)
+
+
+def refund_store_transaction(db: Session, transaction_id: str) -> bool:
+    """Take back the credits of a refunded purchase. The balance may go below
+    zero if they were already spent; new requests are then refused until the
+    user tops up. Returns False when there was nothing to refund."""
+    claim = db.execute(
+        select(CreditPackageClaim).where(CreditPackageClaim.store_transaction_id == transaction_id)
+    ).scalars().first()
+    if claim is None or claim.status != CreditPackageClaimStatus.granted.value:
+        return False
+    credits.refund(db, claim.user_id, claim.credits_granted, claim.id)
+    claim.status = CreditPackageClaimStatus.refunded.value
+    db.commit()
+    return True

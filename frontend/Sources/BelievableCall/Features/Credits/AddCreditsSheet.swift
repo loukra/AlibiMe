@@ -71,6 +71,7 @@ public struct AddCreditsSheet: View {
                 VStack(spacing: Spacing.s) {
                     ForEach(vm.packages) { package in
                         PackageCard(package: package,
+                                    price: vm.price(for: package),
                                     isSelected: package.code == vm.selectedCode) {
                             vm.select(package.code)
                             Haptics.play(.impact)
@@ -88,6 +89,12 @@ public struct AddCreditsSheet: View {
             if let error = vm.errorMessage {
                 ErrorBanner(error)
             }
+            if let notice = vm.pendingNotice {
+                Text(notice)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
             PrimaryButton(vm.primaryButtonTitle, isLoading: vm.isSubmitting) {
                 Haptics.play(.impact)
                 Task {
@@ -98,10 +105,12 @@ public struct AddCreditsSheet: View {
             }
             .disabled(!vm.canSubmit)
             .opacity(vm.canSubmit ? 1 : 0.5)
-            Text("For now, credit packages are free in this build.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+            if let note = vm.costsNote {
+                Text(note)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
         }
         .padding(.horizontal, Spacing.l)
         .padding(.bottom, Spacing.l)
@@ -135,6 +144,7 @@ public struct AddCreditsSheet: View {
 
 struct PackageCard: View {
     let package: CreditPackage
+    let price: String
     let isSelected: Bool
     let onSelect: () -> Void
 
@@ -144,7 +154,7 @@ struct PackageCard: View {
                 HStack(spacing: Spacing.m) {
                     VStack(alignment: .leading, spacing: Spacing.xs) {
                         Text(package.displayName).font(.headline)
-                        Text("\(package.credits) credits")
+                        Text(price)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -170,7 +180,7 @@ struct PackageCard: View {
                 .strokeBorder(isSelected ? Theme.accent : Color.clear, lineWidth: 2)
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(package.displayName), \(package.priceLabel)")
+        .accessibilityLabel("\(package.displayName), \(price)")
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }

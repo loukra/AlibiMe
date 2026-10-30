@@ -20,13 +20,15 @@ public final class AppEnvironment: @unchecked Sendable {
     public let contacts: ContactsServicing
     public let creditPackages: CreditPackagesServicing
     public let contextProfile: ContextProfileServicing
+    public let purchases: PurchaseServicing
 
     public init(baseURL: URL,
                 transport: HTTPTransport = URLSession.shared,
                 sessionStore: SessionStoring,
                 prefs: PreferencesStoring,
                 contactLinks: ContactLinkStoring? = nil,
-                contacts: ContactsServicing? = nil) {
+                contacts: ContactsServicing? = nil,
+                purchases: PurchaseServicing? = nil) {
         self.baseURL = baseURL
         self.sessionStore = sessionStore
         self.prefs = prefs
@@ -44,6 +46,7 @@ public final class AppEnvironment: @unchecked Sendable {
         self.contacts = contacts ?? Self.defaultContactsService()
         self.creditPackages = LiveCreditPackagesService(client: client)
         self.contextProfile = LiveContextProfileService(client: client)
+        self.purchases = purchases ?? MockPurchaseService()
     }
 
     private static func defaultContactLinkStore() -> ContactLinkStoring {
@@ -60,12 +63,20 @@ public final class AppEnvironment: @unchecked Sendable {
 
     /// Convenience for the default local backend. Override the URL for device
     /// builds pointed at a deployed backend.
-    public static func live(baseURL: URL = URL(string: "http://127.0.0.1:8000")!) -> AppEnvironment {
+    /// `storeKit: false` swaps in mock purchases, for local runs without App
+    /// Store Connect products (the backend's mock verifier accepts them).
+    public static func live(baseURL: URL = URL(string: "http://127.0.0.1:8000")!,
+                            storeKit: Bool = true) -> AppEnvironment {
         #if canImport(Security)
         let store: SessionStoring = KeychainSessionStore()
         #else
         let store: SessionStoring = InMemorySessionStore()
         #endif
-        return AppEnvironment(baseURL: baseURL, sessionStore: store, prefs: UserDefaultsPreferences())
+        var purchases: PurchaseServicing = MockPurchaseService()
+        #if canImport(StoreKit)
+        if storeKit { purchases = StoreKitPurchaseService() }
+        #endif
+        return AppEnvironment(baseURL: baseURL, sessionStore: store, prefs: UserDefaultsPreferences(),
+                              purchases: purchases)
     }
 }

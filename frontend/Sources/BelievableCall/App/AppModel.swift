@@ -32,6 +32,7 @@ public final class AppModel {
             session = stored
             env.tokenHolder.update(stored.token)
             phase = .authenticated
+            redeemUnfinishedPurchasesInBackground()
         } else {
             phase = .unauthenticated
         }
@@ -44,6 +45,7 @@ public final class AppModel {
         sessionExpiredNotice = false
         phase = .authenticated
         registerDeviceInBackground()
+        redeemUnfinishedPurchasesInBackground()
     }
 
     public func signOut() {
@@ -68,6 +70,21 @@ public final class AppModel {
         let devices = env.devices
         let deviceID = env.prefs.deviceID
         Task { try? await devices.register(deviceID: deviceID, pushToken: nil, appVersion: nil, osVersion: nil) }
+    }
+
+    /// Purchases StoreKit delivered that never reached the backend (app killed
+    /// mid-purchase, Ask to Buy approved later). Redeeming is idempotent per
+    /// transaction, so sending one twice is harmless.
+    private func redeemUnfinishedPurchasesInBackground() {
+        let purchases = env.purchases
+        let packages = env.creditPackages
+        Task {
+            for purchase in await purchases.unfinished() {
+                if (try? await packages.redeem(signedTransaction: purchase.signedTransaction)) != nil {
+                    await purchases.finish(transactionID: purchase.transactionID)
+                }
+            }
+        }
     }
 
     // MARK: View-model factories (wire session-expiry routing once)
@@ -112,7 +129,9 @@ public final class AppModel {
                                    auth: env.auth,
                                    creditPackages: env.creditPackages,
                                    templates: env.templates,
-                                   prefs: env.prefs)
+                                   prefs: env.prefs,
+                                   purchases: env.purchases,
+                                   accountToken: session.flatMap { UUID(uuidString: $0.userID) })
         vm.onSignOut = { [weak self] in self?.signOut() }
         vm.onSessionExpired = { [weak self] in self?.handleSessionExpired() }
         return vm

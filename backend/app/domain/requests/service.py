@@ -21,6 +21,7 @@ from sqlalchemy.orm import Session
 
 from app.core import rate_limit
 from app.core.clock import utcnow
+from app.core.config import settings
 from app.core.errors import (
     ActiveRequestExists,
     NotFound,
@@ -43,7 +44,6 @@ from app.domain.users.service import require_primary_phone
 
 ALLOWED_DELAYS = {0, 30, 300}
 MAX_SCHEDULE_HORIZON = timedelta(hours=24)
-DEFAULT_CREDIT_COST = 1
 # How many jobs a user may have queued/in-flight at once. Multiple pending jobs
 # are allowed (a queue); this caps it so it can't grow unbounded.
 MAX_PENDING_REQUESTS = 3
@@ -145,7 +145,7 @@ def create_request(
     now = utcnow()
     execute_at, scheduled_kind = _resolve_execute_at(delay_seconds, scheduled_at, now)
 
-    cost = DEFAULT_CREDIT_COST
+    cost = credit_cost(channel)
     if not credits.has_credits(db, user_id, cost):
         from app.core.errors import InsufficientCredits
 
@@ -206,6 +206,10 @@ def create_request(
         raise
     db.commit()
     return request
+
+
+def credit_cost(channel: str) -> int:
+    return settings.call_credit_cost if channel == Channel.call.value else settings.sms_credit_cost
 
 
 def sender_identity_payload(db: Session, request: Request) -> dict | None:

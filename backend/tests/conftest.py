@@ -19,6 +19,11 @@ os.environ["VOICE_PROVIDER"] = "mock"
 os.environ["MESSAGE_PROVIDER"] = "mock"
 os.environ["FEATURE_FREE_TEST_REQUEST"] = "true"
 os.environ["FREE_TEST_CREDITS"] = "3"
+# Most tests count requests, not money: one credit each. Per-channel costs have
+# their own tests.
+os.environ["CALL_CREDIT_COST"] = "1"
+os.environ["SMS_CREDIT_COST"] = "1"
+os.environ["STORE_VERIFIER"] = "mock"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

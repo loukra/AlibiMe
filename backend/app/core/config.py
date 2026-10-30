@@ -41,7 +41,12 @@ class Settings(BaseSettings):
 
     # Feature flags
     feature_free_test_request: bool = True
-    free_test_credits: int = 3
+    # Enough for one call, so a new user can try the real thing once.
+    free_test_credits: int = 4
+    # What a request costs. A call costs more because calls to non-US mobiles
+    # are the expensive part (see docs/pricing.md).
+    call_credit_cost: int = 4
+    sms_credit_cost: int = 1
     # Max request-create calls per user per hour. 5 is the production default;
     # raise it in dev (env REQUEST_CREATE_MAX_PER_HOUR) for rapid testing.
     request_create_max_per_hour: int = 5
@@ -83,6 +88,14 @@ class Settings(BaseSettings):
     eval_judge_model: str = "gpt-4o-mini"
     openai_api_key: str | None = None
     anthropic_api_key: str | None = None
+
+    # In-app purchases. "mock" accepts mock:<product>:<id> tokens (never in
+    # production); "app_store" verifies Apple's signed transactions.
+    store_verifier: str = "mock"
+    app_store_bundle_id: str = "com.believablecall.app"
+    app_store_app_apple_id: int | None = None  # required for Production
+    app_store_environment: str = "Sandbox"  # or "Production"
+    app_store_root_certs_dir: str | None = None
     revenuecat_webhook_secret: str | None = None
     sentry_dsn: str | None = None
     otel_exporter_otlp_endpoint: str | None = None
