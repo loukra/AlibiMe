@@ -50,9 +50,14 @@ public final class ProfileViewModel {
         phase = .saving
         errorMessage = nil
         didSave = false
+        // The screen saves after every answer, so another answer can come in
+        // while this one is on its way: keep it rather than overwrite it with
+        // the server's reply to the older state.
+        let sent = profile
         do {
-            profile = try await service.update(profile)
-            saved = profile
+            let stored = try await service.update(sent)
+            saved = stored
+            if profile == sent { profile = stored }
             didSave = true
             phase = .ready
         } catch {

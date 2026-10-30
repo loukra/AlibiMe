@@ -70,6 +70,18 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(body?["device_id"] as? String, "d1")
     }
 
+    func testProfileSaveSendsClearedAnswersAsNull() async throws {
+        let stub = StubTransport(statusCode: 200, body: Data("{}".utf8))
+        let client = APIClient(baseURL: URL(string: "http://x")!, transport: stub,
+                               tokenProvider: TestTokenProvider("tok"))
+        let service = LiveContextProfileService(client: client)
+        _ = try await service.update(ContextProfile(workSetting: "office"))
+        let body = try JSONSerialization.jsonObject(with: stub.lastRequest?.httpBody ?? Data()) as? [String: Any]
+        XCTAssertEqual(body?["work_setting_code"] as? String, "office")
+        // A removed answer must reach the backend as null, not be left out.
+        XCTAssertTrue(body?["living_setup_code"] is NSNull)
+    }
+
     func testThrowsMappedAPIErrorOnFailure() async {
         let stub = StubTransport(statusCode: 402, body: Data("""
         {"error":{"code":"insufficient_credits","message":"x","retryable":false,"request_id":"r"}}

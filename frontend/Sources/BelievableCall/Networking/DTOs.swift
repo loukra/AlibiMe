@@ -199,6 +199,33 @@ struct ContextProfileDTO: Codable {
     var transition_horizon_code: String?
 }
 
+extension ContextProfileDTO {
+    /// Every field goes out, empty ones as `null`: the backend only writes the
+    /// fields it receives, so a left-out field would keep its old answer and
+    /// removing an answer (or clearing them all) would never reach it.
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        func put<T: Encodable>(_ value: T?, _ key: CodingKeys) throws {
+            if let value { try c.encode(value, forKey: key) } else { try c.encodeNil(forKey: key) }
+        }
+        try put(work_industry_code, .work_industry_code)
+        try put(work_role_level_code, .work_role_level_code)
+        try put(work_setting_code, .work_setting_code)
+        try put(work_schedule_code, .work_schedule_code)
+        try put(work_travel_scope_code, .work_travel_scope_code)
+        try put(living_setup_code, .living_setup_code)
+        try put(home_responsibility_codes_json, .home_responsibility_codes_json)
+        try put(dependent_context_codes_json, .dependent_context_codes_json)
+        try put(family_support_level_code, .family_support_level_code)
+        try put(family_proximity_code, .family_proximity_code)
+        try put(relationship_visibility_code, .relationship_visibility_code)
+        try put(relationship_stage_code, .relationship_stage_code)
+        try put(privacy_preference_code, .privacy_preference_code)
+        try put(transition_state_code, .transition_state_code)
+        try put(transition_horizon_code, .transition_horizon_code)
+    }
+}
+
 // MARK: Requests
 
 struct CreateRequestBodyDTO: Encodable {

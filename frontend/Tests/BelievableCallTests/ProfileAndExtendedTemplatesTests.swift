@@ -3,6 +3,50 @@ import XCTest
 
 @MainActor
 final class ProfileViewModelTests: XCTestCase {
+    func testAnAnswerPickedDuringASaveIsKept() async {
+        let vm = ProfileViewModel(service: SlowContextProfileService(),
+                                  templates: MockTemplateService())
+        await vm.load()
+        vm.profile.workSetting = "office"
+        let saving = Task { await vm.save() }
+        await Task.yield()
+        vm.profile.livingSetup = "with_partner"   // picked while "office" is saving
+        await saving.value
+        XCTAssertEqual(vm.profile.livingSetup, "with_partner")
+        XCTAssertTrue(vm.hasChanges)               // so the screen saves it next
+        await vm.save()
+        XCTAssertFalse(vm.hasChanges)
+    }
+
+    func testQuestionsListOnlyWhatIsAnswered() async {
+        let vm = ProfileViewModel(service: MockContextProfileService(),
+                                  templates: MockTemplateService())
+        await vm.load()
+        let questions = ProfileQuestion.all(vm.options)
+        XCTAssertFalse(questions.contains { $0.isAnswered(in: vm.profile) })
+
+        let setting = questions.first { $0.id == "setting" }!
+        let code = setting.options[0].code
+        setting.toggle(code, in: &vm.profile)
+        XCTAssertEqual(questions.filter { $0.isAnswered(in: vm.profile) }.map(\.id), ["setting"])
+        XCTAssertEqual(setting.answerText(in: vm.profile), setting.options[0].label)
+
+        setting.clear(in: &vm.profile)
+        XCTAssertNil(vm.profile.workSetting)
+    }
+
+    func testMultipleChoiceQuestionsAddAndRemove() async {
+        let vm = ProfileViewModel(service: MockContextProfileService(),
+                                  templates: MockTemplateService())
+        await vm.load()
+        let question = ProfileQuestion.all(vm.options).first { $0.isMultiple }!
+        let code = question.options[0].code
+        question.toggle(code, in: &vm.profile)
+        XCTAssertTrue(question.isSelected(code, in: vm.profile))
+        question.toggle(code, in: &vm.profile)
+        XCTAssertFalse(question.isAnswered(in: vm.profile))
+    }
+
     func testLoadPopulatesProfileAndOptions() async {
         let vm = ProfileViewModel(service: MockContextProfileService(),
                                   templates: MockTemplateService())
@@ -80,5 +124,16 @@ final class ExtendedCustomTemplateTests: XCTestCase {
         let vm = TemplatesViewModel(service: MockTemplateService(), contextProfile: ctx)
         await vm.load()
         XCTAssertFalse(vm.showProfileNote)
+    }
+}
+
+/// Answers after a short delay, so a test can change the profile mid-save.
+private final class SlowContextProfileService: ContextProfileServicing, @unchecked Sendable {
+    private var stored = ContextProfile()
+    func get() async throws -> ContextProfile { stored }
+    func update(_ profile: ContextProfile) async throws -> ContextProfile {
+        try await Task.sleep(nanoseconds: 50_000_000)
+        stored = profile
+        return profile
     }
 }

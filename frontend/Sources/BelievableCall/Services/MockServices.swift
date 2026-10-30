@@ -85,6 +85,8 @@ public enum Fixtures {
                           TemplateOption(code: "office", label: "Office")]
         p.livingSetups = [TemplateOption(code: "with_roommate", label: "With roommate"),
                           TemplateOption(code: "alone", label: "Alone")]
+        p.homeResponsibilities = [TemplateOption(code: "dog", label: "A dog"),
+                                  TemplateOption(code: "keys_access", label: "Keys")]
         o.profile = p
         return o
     }()
