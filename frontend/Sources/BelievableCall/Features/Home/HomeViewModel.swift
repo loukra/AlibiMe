@@ -169,8 +169,12 @@ public final class HomeViewModel {
     }
 
     /// Templates grouped by category in display order — used by the picker.
+    /// The user's own templates; the picker lists them before the built-in ones.
+    public var customTemplates: [TemplateSummary] { templates.filter(\.isCustom) }
+
+    /// The built-in templates by category (custom ones are in `customTemplates`).
     public var templatesByCategory: [(category: TemplateCategory, templates: [TemplateSummary])] {
-        Dictionary(grouping: templates, by: \.category)
+        Dictionary(grouping: templates.filter { !$0.isCustom }, by: \.category)
             .map { ($0.key, $0.value.sorted { $0.displayName < $1.displayName }) }
             .sorted { $0.category.sortOrder < $1.category.sortOrder }
     }

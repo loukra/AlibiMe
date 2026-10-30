@@ -181,4 +181,16 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertEqual(order.first, .work)         // work sorts first
         XCTAssertEqual(order.last, .safety)        // safety sorts last
     }
+
+    func testOwnTemplatesAreListedApartFromTheBuiltInOnes() async {
+        let own = TemplateSummary(id: "own-1", code: "own", displayName: "My boss",
+                                  description: nil, category: .work, callerPersona: "boss",
+                                  reasonCode: "custom", isCustom: true, supportedChannels: [.call],
+                                  callMaxDurationSeconds: nil, previewOpeningLine: nil,
+                                  previewSMSBody: nil)
+        let vm = makeVM(templates: Fixtures.templates + [own])
+        await vm.load()
+        XCTAssertEqual(vm.customTemplates.map(\.id), ["own-1"])
+        XCTAssertFalse(vm.templatesByCategory.flatMap(\.templates).contains { $0.isCustom })
+    }
 }

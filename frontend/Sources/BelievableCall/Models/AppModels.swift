@@ -65,6 +65,17 @@ public enum TemplateCategory: String, CaseIterable, Sendable {
         }
     }
 
+    /// The symbol in a template's round badge: who is calling, at a glance.
+    public var systemImage: String {
+        switch self {
+        case .work: return "briefcase.fill"
+        case .family: return "heart.fill"
+        case .social: return "person.2.fill"
+        case .logistics: return "key.fill"
+        case .safety: return "shield.lefthalf.filled"
+        }
+    }
+
     /// Display order for grouping in the picker.
     public var sortOrder: Int {
         switch self {

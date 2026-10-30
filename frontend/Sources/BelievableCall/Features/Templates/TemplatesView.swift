@@ -71,25 +71,68 @@ struct TemplateRow: View {
     let template: TemplateSummary
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text(template.displayName).font(.body.weight(.medium))
-            if let description = template.description {
-                Text(description).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+        HStack(spacing: Spacing.m) {
+            TemplateBadge(category: template.category)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(template.displayName).font(.body.weight(.semibold))
+                if let description = template.description {
+                    Text(description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+                ChannelGlyphs(channels: template.supportedChannels)
+                    .padding(.top, 2)
             }
-            HStack(spacing: Spacing.xs) {
-                ForEach(Array(template.supportedChannels).sorted { $0.rawValue < $1.rawValue }) { channel in
-                    Label(channel.title, systemImage: channel.systemImage)
-                        .font(.caption2.weight(.medium))
-                        .padding(.horizontal, Spacing.s)
-                        .padding(.vertical, 2)
-                        .background(Theme.accent.opacity(0.12))
-                        .foregroundStyle(Theme.accent)
-                        .clipShape(Capsule())
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.vertical, Spacing.xs)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// Round badge with the template's category symbol (briefcase for work, …).
+struct TemplateBadge: View {
+    let category: TemplateCategory
+
+    var body: some View {
+        Image(systemName: category.systemImage)
+            .font(.body.weight(.semibold))
+            .foregroundStyle(Theme.accent)
+            .frame(width: 40, height: 40)
+            .background(Theme.accent.opacity(0.14), in: Circle())
+            .accessibilityHidden(true)
+    }
+}
+
+/// A quiet line naming the channels a template supports, call first. Built by
+/// hand: a `Label` inside a List spreads icon and title far apart.
+struct ChannelGlyphs: View {
+    let channels: Set<Channel>
+
+    var body: some View {
+        HStack(spacing: Spacing.m) {
+            ForEach(Channel.allCases.filter(channels.contains)) { channel in
+                HStack(spacing: 4) {
+                    Image(systemName: channel.outlineSymbol)
+                    Text(channel.title)
                 }
             }
         }
-        .padding(.vertical, 2)
-        .accessibilityElement(children: .combine)
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .accessibilityElement()
+        .accessibilityLabel(Channel.allCases.filter(channels.contains).map(\.title).joined(separator: " and "))
+    }
+}
+
+extension Channel {
+    /// The light outline symbol used in lists; buttons keep `systemImage`.
+    var outlineSymbol: String {
+        switch self {
+        case .call: return "phone"
+        case .text: return "bubble.left"
+        }
     }
 }
 
