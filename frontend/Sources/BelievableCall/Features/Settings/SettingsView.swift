@@ -55,6 +55,7 @@ public struct SettingsView: View {
                 } footer: {
                     Text("Credits are used each time you request a call or text.")
                 }
+                quickAlibiSection
                 if let error = vm.errorMessage {
                     Section { ErrorBanner(error) }
                 }
@@ -87,6 +88,46 @@ public struct SettingsView: View {
                 )
                 .bcSheetDetents()
             }
+        }
+    }
+}
+
+private extension SettingsView {
+    var quickAlibiSection: some View {
+        Section {
+            Picker("Alibi", selection: Binding(
+                get: { vm.quickAlibi?.templateID ?? "" },
+                set: { vm.setQuickAlibi(templateID: $0.isEmpty ? nil : $0) }
+            )) {
+                Text("Off").tag("")
+                ForEach(vm.quickAlibiTemplates) { template in
+                    Text(template.displayName).tag(template.id)
+                }
+            }
+            if let alibi = vm.quickAlibi {
+                if vm.quickAlibiChannels.count > 1 {
+                    Picker("Send as", selection: Binding(
+                        get: { alibi.channel },
+                        set: { vm.setQuickAlibiChannel($0) }
+                    )) {
+                        Text("Call").tag(Channel.call)
+                        Text("Text").tag(Channel.text)
+                    }
+                    .pickerStyle(.segmented)
+                }
+                Picker("When", selection: Binding(
+                    get: { alibi.timing.delaySeconds ?? 0 },
+                    set: { vm.setQuickAlibiDelay($0) }
+                )) {
+                    ForEach(TimingOption.presets) { option in
+                        Text(option.shortTitle).tag(option.delaySeconds ?? 0)
+                    }
+                }
+            }
+        } header: {
+            Text("Action Button")
+        } footer: {
+            Text("In the iPhone Settings under Action Button, choose Shortcut and pick AlibiMe's \"Get Me Out\". Siri and the Shortcuts app can run it too.")
         }
     }
 }

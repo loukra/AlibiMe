@@ -7,6 +7,8 @@ public protocol PreferencesStoring: AnyObject, Sendable {
     var selectedTemplateID: String? { get set }
     var lastChannel: String? { get set }
     var lastTimingDelay: Int? { get set }
+    /// The alibi the Action Button sends; nil until picked in Settings.
+    var quickAlibi: QuickAlibi? { get set }
     var deviceID: String { get }
 }
 
@@ -16,6 +18,7 @@ public final class UserDefaultsPreferences: PreferencesStoring, @unchecked Senda
         static let template = "bc.selectedTemplateID"
         static let channel = "bc.lastChannel"
         static let timing = "bc.lastTimingDelay"
+        static let quickAlibi = "bc.quickAlibi"
         static let device = "bc.deviceID"
     }
 
@@ -38,6 +41,16 @@ public final class UserDefaultsPreferences: PreferencesStoring, @unchecked Senda
         set { defaults.set(newValue, forKey: Key.timing) }
     }
 
+    public var quickAlibi: QuickAlibi? {
+        get {
+            defaults.data(forKey: Key.quickAlibi)
+                .flatMap { try? JSONDecoder().decode(QuickAlibi.self, from: $0) }
+        }
+        set {
+            defaults.set(newValue.flatMap { try? JSONEncoder().encode($0) }, forKey: Key.quickAlibi)
+        }
+    }
+
     public var deviceID: String {
         if let existing = defaults.string(forKey: Key.device) {
             return existing
@@ -53,6 +66,7 @@ public final class InMemoryPreferences: PreferencesStoring, @unchecked Sendable 
     public var selectedTemplateID: String?
     public var lastChannel: String?
     public var lastTimingDelay: Int?
+    public var quickAlibi: QuickAlibi?
     public let deviceID: String
     public init(deviceID: String = UUID().uuidString) { self.deviceID = deviceID }
 }

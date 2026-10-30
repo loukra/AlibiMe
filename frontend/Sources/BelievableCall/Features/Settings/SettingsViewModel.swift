@@ -16,18 +16,29 @@ public final class SettingsViewModel {
     /// Lightweight success note shown in the credits section after a top-up.
     public private(set) var creditSuccessMessage: String?
 
+    /// Templates to pick the Action Button's quick alibi from.
+    public private(set) var quickAlibiTemplates: [TemplateSummary] = []
+    public private(set) var quickAlibi: QuickAlibi?
+
     private let profileService: ProfileServicing
     private let auth: AuthServicing
     private let creditPackages: CreditPackagesServicing
+    private let templates: TemplateServicing?
+    private let prefs: PreferencesStoring
     public var onSignOut: (() -> Void)?
     public var onSessionExpired: (() -> Void)?
 
     public init(profileService: ProfileServicing,
                 auth: AuthServicing,
-                creditPackages: CreditPackagesServicing) {
+                creditPackages: CreditPackagesServicing,
+                templates: TemplateServicing? = nil,
+                prefs: PreferencesStoring = InMemoryPreferences()) {
         self.profileService = profileService
         self.auth = auth
         self.creditPackages = creditPackages
+        self.templates = templates
+        self.prefs = prefs
+        self.quickAlibi = prefs.quickAlibi
     }
 
     /// A fresh view model for the Add Credits bottom sheet, wired to the same
@@ -59,9 +70,51 @@ public final class SettingsViewModel {
         do {
             let profile = try await profileService.me()
             apply(profile)
+            if let templates {
+                quickAlibiTemplates = try await templates.list()
+            }
         } catch {
             handle(error)
         }
+    }
+
+    // MARK: Quick alibi (Action Button)
+
+    /// Channels the chosen template can send on, call first.
+    public var quickAlibiChannels: [Channel] {
+        guard let id = quickAlibi?.templateID,
+              let template = quickAlibiTemplates.first(where: { $0.id == id }) else { return [] }
+        return Channel.allCases.filter(template.supports)
+    }
+
+    /// Pick the template; nil turns the quick alibi off.
+    public func setQuickAlibi(templateID: String?) {
+        guard let templateID,
+              let template = quickAlibiTemplates.first(where: { $0.id == templateID }) else {
+            storeQuickAlibi(nil)
+            return
+        }
+        let current = quickAlibi?.channel ?? .call
+        let channel = template.supports(current) ? current : (Channel.allCases.first(where: template.supports) ?? .call)
+        storeQuickAlibi(QuickAlibi(templateID: template.id, templateName: template.displayName,
+                                   channel: channel, delaySeconds: quickAlibi?.delaySeconds ?? 0))
+    }
+
+    public func setQuickAlibiChannel(_ channel: Channel) {
+        guard var alibi = quickAlibi, quickAlibiChannels.contains(channel) else { return }
+        alibi.channel = channel
+        storeQuickAlibi(alibi)
+    }
+
+    public func setQuickAlibiDelay(_ seconds: Int) {
+        guard var alibi = quickAlibi else { return }
+        alibi.delaySeconds = seconds
+        storeQuickAlibi(alibi)
+    }
+
+    private func storeQuickAlibi(_ alibi: QuickAlibi?) {
+        quickAlibi = alibi
+        prefs.quickAlibi = alibi
     }
 
     private func apply(_ profile: UserProfile) {

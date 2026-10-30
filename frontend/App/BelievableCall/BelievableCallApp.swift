@@ -8,16 +8,19 @@ import BelievableCall
 /// set `BC_BACKEND_URL` in the scheme's environment, or change the default.
 @main
 struct BelievableCallApp: App {
-    @State private var app: AppModel = {
-        let urlString = ProcessInfo.processInfo.environment["BC_BACKEND_URL"]
-            ?? "http://127.0.0.1:8000"
-        let baseURL = URL(string: urlString) ?? URL(string: "http://127.0.0.1:8000")!
-        return AppModel(env: .live(baseURL: baseURL))
-    }()
+    @State private var app = AppModel(env: .live(baseURL: Backend.url))
 
     var body: some Scene {
         WindowGroup {
             RootView(app: app)
         }
+    }
+}
+
+enum Backend {
+    static var url: URL {
+        let urlString = ProcessInfo.processInfo.environment["BC_BACKEND_URL"]
+            ?? "http://127.0.0.1:8000"
+        return URL(string: urlString) ?? URL(string: "http://127.0.0.1:8000")!
     }
 }
