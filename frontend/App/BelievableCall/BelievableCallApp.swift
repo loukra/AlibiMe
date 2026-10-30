@@ -20,8 +20,12 @@ struct BelievableCallApp: App {
 }
 
 enum Backend {
+    /// `BC_BACKEND_URL` from the scheme, else from the app's defaults (set with
+    /// `xcrun simctl spawn booted defaults write com.believablecall.app
+    /// BC_BACKEND_URL <url>`), else the local dev server.
     static var url: URL {
         let urlString = ProcessInfo.processInfo.environment["BC_BACKEND_URL"]
+            ?? UserDefaults.standard.string(forKey: "BC_BACKEND_URL")
             ?? "http://127.0.0.1:8000"
         return URL(string: urlString) ?? URL(string: "http://127.0.0.1:8000")!
     }

@@ -325,7 +325,10 @@ Credit packs are consumable App Store products
 the signed transaction to `POST /v1/credit-packages/redeem`;
 `domain/billing/store.py` verifies it with Apple's app-store-server-library
 (`STORE_VERIFIER=app_store`) or, locally, a mock that accepts
-`mock:<product>:<id>` and refuses to run in production. Redemption is
+`mock:<product>:<id>` and refuses to run in production. Purchases from the
+app's StoreKit scheme are signed by Xcode, not Apple; verify those with
+`STORE_VERIFIER=app_store` and `APP_STORE_ENVIRONMENT=Xcode`, which needs no
+certificates and also refuses production. Redemption is
 idempotent per transaction and bound to the account through `appAccountToken`.
 App Store Server Notifications (`POST /v1/webhooks/app-store`) take refunded
 credits back. `free_dev` packs still work through `/acquire` for local builds.
@@ -552,8 +555,11 @@ Each feature folder pairs an `@Observable` view model with SwiftUI views:
   through `PurchaseServicing` (`Services/Purchases.swift`: `StoreKitPurchaseService`
   or `MockPurchaseService`), redeems the signed transaction with the backend,
   and only then finishes it. `AppModel` redeems unfinished transactions on
-  launch. Debug builds use the mock unless `BC_PURCHASES=storekit`
-  (`App/AlibiMe.storekit` has the products for StoreKit testing).
+  launch and listens to `Transaction.updates` while the app runs (Ask to Buy,
+  purchases from another device). Debug builds use the mock; the
+  "BelievableCall StoreKit" scheme sets `BC_PURCHASES=storekit` and loads
+  `App/AlibiMe.storekit`, so the real purchase sheet runs in the simulator.
+  Start it from Xcode, since only Xcode applies the StoreKit file.
 - **Quick alibi** (`Features/QuickAlibi/`): `QuickAlibiRunner` sends the alibi
   picked in Settings. The app target's `GetMeOutIntent` (an App Intent with an
   `AppShortcutsProvider`) runs it without opening the app, which is what the

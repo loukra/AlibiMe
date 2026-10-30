@@ -100,7 +100,7 @@ class Settings(BaseSettings):
     store_verifier: str = "mock"
     app_store_bundle_id: str = "com.believablecall.app"
     app_store_app_apple_id: int | None = None  # required for Production
-    app_store_environment: str = "Sandbox"  # or "Production"
+    app_store_environment: str = "Sandbox"  # "Production", or "Xcode" for local StoreKit testing
     app_store_root_certs_dir: str | None = None
     revenuecat_webhook_secret: str | None = None
     sentry_dsn: str | None = None

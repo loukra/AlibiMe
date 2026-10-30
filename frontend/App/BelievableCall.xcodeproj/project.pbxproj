@@ -11,6 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		100000000000000000000C6 /* AlibiMe.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = AlibiMe.storekit; sourceTree = "<group>"; };
 		100000000000000000000C5 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		100000000000000000000D4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		100000000000000000000E1 /* BelievableCallApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BelievableCallApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -42,6 +43,7 @@
 				100000000000000000000D1 /* BelievableCall */,
 				100000000000000000000D4 /* Info.plist */,
 				100000000000000000000C5 /* Signing.xcconfig */,
+				100000000000000000000C6 /* AlibiMe.storekit */,
 				100000000000000000000D3 /* Products */,
 			);
 			sourceTree = "<group>";

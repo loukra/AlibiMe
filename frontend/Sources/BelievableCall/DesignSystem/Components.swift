@@ -236,6 +236,7 @@ public struct ErrorBanner: View {
         HStack(alignment: .top, spacing: Spacing.s) {
             Image(systemName: "exclamationmark.circle.fill")
             Text(message).font(.subheadline)
+                .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
         .foregroundStyle(Theme.destructive)

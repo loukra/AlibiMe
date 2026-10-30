@@ -75,16 +75,24 @@ class AppStoreVerifier:  # pragma: no cover - needs Apple's certificates
         from appstoreserverlibrary.models.Environment import Environment
         from appstoreserverlibrary.signed_data_verifier import SignedDataVerifier
 
-        certs_dir = settings.app_store_root_certs_dir
-        if not certs_dir:
-            raise RuntimeError("Set APP_STORE_ROOT_CERTS_DIR to Apple's root certificates.")
-        roots = [p.read_bytes() for p in sorted(Path(certs_dir).glob("*.cer"))]
-        if not roots:
-            raise RuntimeError(f"No .cer files in {certs_dir}.")
+        environment = Environment(settings.app_store_environment)
+        # Purchases from an Xcode StoreKit configuration are signed by Xcode,
+        # not Apple: the library skips the signature, so never in production.
+        if environment == Environment.XCODE:
+            if settings.app_env == "production":
+                raise RuntimeError("APP_STORE_ENVIRONMENT=Xcode must not run in production.")
+            roots = []
+        else:
+            certs_dir = settings.app_store_root_certs_dir
+            if not certs_dir:
+                raise RuntimeError("Set APP_STORE_ROOT_CERTS_DIR to Apple's root certificates.")
+            roots = [p.read_bytes() for p in sorted(Path(certs_dir).glob("*.cer"))]
+            if not roots:
+                raise RuntimeError(f"No .cer files in {certs_dir}.")
         self._verifier = SignedDataVerifier(
             roots,
             enable_online_checks=True,
-            environment=Environment(settings.app_store_environment),
+            environment=environment,
             bundle_id=settings.app_store_bundle_id,
             app_apple_id=settings.app_store_app_apple_id,
         )

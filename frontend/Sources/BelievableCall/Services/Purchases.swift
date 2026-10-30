@@ -35,6 +35,9 @@ public protocol PurchaseServicing: Sendable {
     /// Purchases StoreKit delivered but we never finished (app killed mid-way,
     /// Ask to Buy approved later). Redeemed on launch.
     func unfinished() async -> [StorePurchase]
+    /// Purchases that arrive while the app runs but outside `purchase`
+    /// (Ask to Buy approved, bought on another device).
+    func updates() -> AsyncStream<StorePurchase>
 }
 
 public enum PurchaseError: Error, Equatable {
@@ -61,6 +64,8 @@ public final class MockPurchaseService: PurchaseServicing, @unchecked Sendable {
     public func finish(transactionID: String) async { finished.append(transactionID) }
 
     public func unfinished() async -> [StorePurchase] { pending }
+
+    public func updates() -> AsyncStream<StorePurchase> { AsyncStream { $0.finish() } }
 }
 
 #if canImport(StoreKit)
@@ -109,6 +114,21 @@ public final class StoreKitPurchaseService: PurchaseServicing, @unchecked Sendab
             }
         }
         return out
+    }
+
+    public func updates() -> AsyncStream<StorePurchase> {
+        AsyncStream { continuation in
+            let task = Task {
+                for await result in Transaction.updates {
+                    if case let .verified(transaction) = result, transaction.productType == .consumable {
+                        continuation.yield(StorePurchase(signedTransaction: result.jwsRepresentation,
+                                                         transactionID: String(transaction.id)))
+                    }
+                }
+                continuation.finish()
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
     }
 }
 #endif

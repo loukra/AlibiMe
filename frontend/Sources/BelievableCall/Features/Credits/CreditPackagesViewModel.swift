@@ -48,7 +48,7 @@ public final class CreditPackagesViewModel: Identifiable {
         package.storeProductID.flatMap { storePrices[$0] } ?? package.priceLabel
     }
 
-    /// "A call uses 4 credits, a text 1."
+    /// "A call uses 2 credits, a text 1."
     public var costsNote: String? {
         guard let costs else { return nil }
         return "A call uses \(costs.call) credits, a text \(costs.text)."

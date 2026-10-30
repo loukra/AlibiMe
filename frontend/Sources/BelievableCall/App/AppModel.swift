@@ -19,6 +19,7 @@ public final class AppModel {
     public private(set) var sessionExpiredNotice = false
 
     public let env: AppEnvironment
+    private var purchaseUpdates: Task<Void, Never>?
 
     public init(env: AppEnvironment) {
         self.env = env
@@ -33,6 +34,7 @@ public final class AppModel {
             env.tokenHolder.update(stored.token)
             phase = .authenticated
             redeemUnfinishedPurchasesInBackground()
+            listenForPurchaseUpdates()
             syncTimezoneInBackground()
         } else {
             phase = .unauthenticated
@@ -47,6 +49,7 @@ public final class AppModel {
         phase = .authenticated
         registerDeviceInBackground()
         redeemUnfinishedPurchasesInBackground()
+        listenForPurchaseUpdates()
         syncTimezoneInBackground()
     }
 
@@ -93,6 +96,23 @@ public final class AppModel {
         let packages = env.creditPackages
         Task {
             for purchase in await purchases.unfinished() {
+                if (try? await packages.redeem(signedTransaction: purchase.signedTransaction)) != nil {
+                    await purchases.finish(transactionID: purchase.transactionID)
+                }
+            }
+        }
+    }
+
+    /// Runs for the app's lifetime once someone is signed in. A purchase that
+    /// arrives while signed out stays unfinished and is redeemed at the next
+    /// sign-in.
+    private func listenForPurchaseUpdates() {
+        guard purchaseUpdates == nil else { return }
+        let purchases = env.purchases
+        let packages = env.creditPackages
+        purchaseUpdates = Task { [weak self] in
+            for await purchase in purchases.updates() {
+                guard self?.phase == .authenticated else { continue }
                 if (try? await packages.redeem(signedTransaction: purchase.signedTransaction)) != nil {
                     await purchases.finish(transactionID: purchase.transactionID)
                 }
