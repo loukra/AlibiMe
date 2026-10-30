@@ -64,7 +64,10 @@ as App Store in-app purchases, and the backend checks Apple's signed
 transaction before granting them. New numbers get free credits for one text and
 one call, the first purchase comes with a bonus, and accounts can be deleted
 from Settings. How the prices were worked out
-is in [`docs/pricing.md`](docs/pricing.md).
+is in [`docs/pricing.md`](docs/pricing.md). Free credits go once per phone
+number and once per iPhone (Apple's DeviceCheck), not to virtual numbers, and
+the server refuses to start while any provider is still a mock. Running it on a
+server, and everything still open before launch, is in [`deploy/`](deploy/).
 
 ```mermaid
 flowchart LR

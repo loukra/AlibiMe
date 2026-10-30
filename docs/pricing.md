@@ -90,16 +90,11 @@ cheaper; these are worst cases on list prices with an estimated exchange rate.
 
 ## What to do before launch
 
-1. **Verify** whether an EEA Twilio number (not German, which needs proof of
-   address) can call German users. Without it, free calls to German users cost
-   more than buyers bring in.
-2. Calls into another country are already capped at 55 seconds so they bill as
-   one minute (`CROSS_BORDER_CALL_MAX_SECONDS`, the templates allow up to 90).
-3. Enrol in the App Store Small Business Program before the first sale.
-4. Create the three consumable products in App Store Connect with the ids in
-   `backend/app/seeds/seed.py` and the prices above.
-5. After the first real calls, compare `estimated_cost_minor` on the call and
-   message attempts with the Vapi and Twilio invoices. Credit costs, free
-   credits and the bonus are settings (`CALL_CREDIT_COST`, `SMS_CREDIT_COST`,
-   `FREE_TEST_CREDITS`, `FIRST_PURCHASE_BONUS_CREDITS`) and need no app update;
-   prices change in App Store Connect.
+The steps (EEA line, Small Business Program, products in App Store Connect,
+checking the first invoices) are in
+[`deploy/DEPLOY-CHECKLIST.md`](../deploy/DEPLOY-CHECKLIST.md). Calls into
+another country are already capped at 55 seconds so they bill as one minute
+(`CROSS_BORDER_CALL_MAX_SECONDS`). Credit costs, free credits and the bonus are
+settings (`CALL_CREDIT_COST`, `SMS_CREDIT_COST`, `FREE_TEST_CREDITS`,
+`FIRST_PURCHASE_BONUS_CREDITS`) and need no app update; prices change in App
+Store Connect.

@@ -1,0 +1,39 @@
+# The API, behind nginx (deploy/nginx-alibime.conf).
+#
+# The server may run other apps, so it gets its own user, its own folder and
+# its own port, and sees nothing of the others. The .env with the keys
+# sits in the working directory (backend/), where the settings read it, mode
+# 0600 and owned by alibime.
+#
+#   systemctl enable --now alibime-api alibime-worker
+#   journalctl -u alibime-api -n 50
+[Unit]
+Description=AlibiMe API
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=alibime
+WorkingDirectory=/opt/alibime/backend
+# Only nginx talks to it. --proxy-headers trusts X-Forwarded-For from nginx on
+# loopback and from nowhere else.
+ExecStart=/opt/alibime/backend/.venv/bin/uvicorn app.main:app \
+    --host 127.0.0.1 --port 8010 --workers 2 \
+    --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=on-failure
+RestartSec=5
+
+# Belt and braces: the settings also refuse to start outside local/test while a
+# mock is configured (app/core/config.py, assert_deployable).
+Environment=APP_ENV=production
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+# Apple's root certificates and the DeviceCheck key live here (read only).
+ReadOnlyPaths=/opt/alibime/secrets
+
+[Install]
+WantedBy=multi-user.target

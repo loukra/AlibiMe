@@ -1,0 +1,24 @@
+# The worker: places scheduled calls and texts when they're due, reconciles
+# stuck attempts and cleans up. One instance only; it is the scheduler.
+[Unit]
+Description=AlibiMe worker
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=alibime
+WorkingDirectory=/opt/alibime/backend
+ExecStart=/opt/alibime/backend/.venv/bin/python -m app.workers.run
+Restart=on-failure
+RestartSec=5
+Environment=APP_ENV=production
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/opt/alibime/secrets
+
+[Install]
+WantedBy=multi-user.target

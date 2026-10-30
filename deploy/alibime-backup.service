@@ -1,0 +1,7 @@
+[Unit]
+Description=AlibiMe database backup
+
+[Service]
+Type=oneshot
+User=alibime
+ExecStart=/opt/alibime/deploy/backup-alibime.sh
