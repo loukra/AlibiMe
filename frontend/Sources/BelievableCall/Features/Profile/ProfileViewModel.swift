@@ -12,6 +12,9 @@ public final class ProfileViewModel {
     public private(set) var options = ProfileOptions()
     public var errorMessage: String?
     public private(set) var didSave = false
+    /// The profile as the server last had it, so the screen knows whether
+    /// there is anything to save.
+    private var saved = ContextProfile()
 
     public enum Phase: Equatable { case idle, loading, ready, saving, failure }
 
@@ -25,6 +28,7 @@ public final class ProfileViewModel {
     }
 
     public var isSaving: Bool { phase == .saving }
+    public var hasChanges: Bool { profile != saved }
 
     public func load() async {
         phase = .loading
@@ -34,6 +38,7 @@ public final class ProfileViewModel {
             async let optionsTask = templates.options()
             let (loaded, opts) = try await (profileTask, optionsTask)
             profile = loaded
+            saved = loaded
             options = opts.profile
             phase = .ready
         } catch {
@@ -47,6 +52,7 @@ public final class ProfileViewModel {
         didSave = false
         do {
             profile = try await service.update(profile)
+            saved = profile
             didSave = true
             phase = .ready
         } catch {

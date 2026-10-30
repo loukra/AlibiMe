@@ -129,6 +129,99 @@ def humanize(code: str) -> str:
     return code.replace("_", " ").capitalize()
 
 
+# What the Profile screen shows for each answer. The codes read fine to the
+# agent ("primary support contact") but not as answers to the questions the
+# app asks ("Do you help your family?"). Codes not listed are humanized.
+PROFILE_OPTION_LABELS = {
+    "en": {
+        # work
+        "office_admin": "Office / admin",
+        "tech_product": "Tech",
+        "finance_business": "Finance / business",
+        "food_service": "Food service",
+        "construction_trades": "Construction / trades",
+        "warehouse_logistics": "Warehouse / logistics",
+        "transport_driving": "Transport / driving",
+        "media_creative": "Media / creative",
+        "freelance_contractor": "Freelance",
+        "staff": "Team member",
+        "lead": "Team lead",
+        "owner_founder": "Owner / founder",
+        "on_call_worker": "On call",
+        "store_shopfloor": "Store / shop floor",
+        "restaurant_bar": "Restaurant / bar",
+        "clinic_hospital": "Clinic / hospital",
+        "school_campus": "School / campus",
+        "site_field": "On site / in the field",
+        "client_site": "At clients",
+        "regular_daytime": "Regular daytime",
+        "early_shift": "Early shifts",
+        "late_shift": "Late shifts",
+        "night_shift": "Night shifts",
+        "rotating_shift": "Rotating shifts",
+        "flexible": "Flexible hours",
+        "on_call": "On call",
+        "local": "Around town",
+        "regional": "In the region",
+        "multi_day": "Trips of a few days",
+        "international": "Abroad",
+        # home
+        "with_roommate": "With a roommate",
+        "with_partner": "With my partner",
+        "with_family": "With family",
+        "landlord_building": "Landlord / building",
+        "keys_access": "Keys",
+        "moving_setup": "Moving in",
+        "dog": "A dog",
+        "cat": "A cat",
+        "multiple_pets": "Several pets",
+        "childcare": "Kids",
+        "elder_support": "An older relative",
+        # family
+        "occasional_help": "Now and then",
+        "regular_support": "Regularly",
+        "primary_support_contact": "I'm their main contact",
+        "same_home": "We live together",
+        "same_city": "Same city",
+        "nearby": "Nearby",
+        "out_of_town": "Out of town",
+        # partner
+        "private": "Nobody",
+        "close_circle_knows": "Close friends",
+        "mostly_public": "Everyone",
+        "new": "Just started",
+        "developing": "A few months",
+        "established": "Long-term",
+        "low": "Details are fine",
+        "medium": "A little",
+        "high": "Keep it vague",
+        # recent changes
+        "new_job_recently": "New job",
+        "training_onboarding_phase": "In training",
+        "moved_recently": "Just moved",
+        "settling_new_place": "Settling into a new place",
+        "more_travel_than_usual": "Traveling more than usual",
+        "new_routine_phase": "New routine",
+        "today_only": "Just today",
+        "few_days": "A few days",
+        "one_week": "About a week",
+        "two_weeks": "About two weeks",
+    },
+}
+
+
+def profile_labeled(codes: list[str], locale: str = "en") -> list[dict]:
+    """[{code, label}] for the Profile screen's answers."""
+    table = PROFILE_OPTION_LABELS
+    return [
+        {
+            "code": code,
+            "label": table.get(locale, {}).get(code) or table["en"].get(code) or humanize(code),
+        }
+        for code in codes
+    ]
+
+
 def labeled(codes: list[str], locale: str = "en", label_table: dict | None = None) -> list[dict]:
     """Turn codes into [{code, label}]. Personas/reasons pass their localized
     label table; everything else humanizes the code for display."""

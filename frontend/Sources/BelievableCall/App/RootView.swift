@@ -139,7 +139,7 @@ struct MainTabView: View {
     private var screens: some View {
         ZStack {
             HomeView(vm: home,
-                     onOpenVerifiedNumber: { selection = .settings },
+                     onOpenSettings: { selection = .settings },
                      onOpenHistory: { selection = .history })
                 .opacity(selection == .home ? 1 : 0)
                 .allowsHitTesting(selection == .home)
@@ -199,6 +199,15 @@ struct FlyingJobBadge: View {
     }
 }
 
+/// Grows the whole label a little while pressed, like Liquid Glass does.
+struct PressScaleStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 1.12 : 1)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
+    }
+}
+
 /// A detached, glassy tab bar that floats above the screen backdrop. Chrome only
 /// — Home is a raised circular button in the middle (showing the app logo),
 /// symmetrically flanked by two destinations on each side.
@@ -250,7 +259,10 @@ struct FloatingTabBar: View {
                 .scaledToFit()
                 .padding(centerDiameter * 0.22)
                 .frame(width: centerDiameter, height: centerDiameter)
-                .bcGlassCircle(interactive: true)
+                // Not the interactive glass: it grows on press on its own and
+                // leaves the selection ring behind. PressScaleStyle scales
+                // glass, logo and ring together.
+                .bcGlassCircle()
                 .overlay(
                     Circle().strokeBorder(
                         isSelected ? Theme.accent : Color.clear,
@@ -260,7 +272,7 @@ struct FloatingTabBar: View {
                 .shadow(color: Theme.cardShadow, radius: 12, x: 0, y: 6)
                 .contentShape(Circle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleStyle())
         .accessibilityLabel("Home")
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }

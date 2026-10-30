@@ -79,8 +79,21 @@ public enum Radius {
 public extension View {
     /// The standard screen backdrop: the soft gradient, extended under the safe
     /// areas so content (and the floating tab bar) float above a continuous wash.
+    /// Fills the screen even when the content is small (an empty state), or the
+    /// gradient would only sit behind that content.
     func bcScreenBackground() -> some View {
-        background(Theme.backgroundGradient.ignoresSafeArea())
+        frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Theme.backgroundGradient.ignoresSafeArea())
+    }
+
+    /// Hides the navigation bar on a screen that draws its own header. iOS only;
+    /// the macOS test host has no navigation bar to hide.
+    @ViewBuilder func bcHiddenNavigationBar() -> some View {
+        #if os(iOS)
+        toolbar(.hidden, for: .navigationBar)
+        #else
+        self
+        #endif
     }
 }
 #endif

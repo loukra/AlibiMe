@@ -270,7 +270,7 @@ def options(locale: str) -> dict:
 
 
 def profile_options(locale: str) -> dict:
-    lab = catalogs.labeled
+    lab = catalogs.profile_labeled
     return {
         "work_industries": lab(catalogs.WORK_INDUSTRIES, locale),
         "work_role_levels": lab(catalogs.WORK_ROLE_LEVELS, locale),

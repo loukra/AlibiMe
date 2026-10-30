@@ -7,45 +7,37 @@ public struct HomeView: View {
     @Bindable var vm: HomeViewModel
     @State private var showTemplatePicker = false
     @State private var showSchedule = false
-    /// Invoked when the user taps the verified-number card; the tab container
-    /// routes this to the Settings tab (where the number lives).
-    var onOpenVerifiedNumber: (() -> Void)?
+    /// Invoked from the number and credits pills; the tab container routes this
+    /// to the Settings tab, where the number and the credits live.
+    var onOpenSettings: (() -> Void)?
     /// Invoked when the user taps the "next job" chip body — opens History.
     var onOpenHistory: (() -> Void)?
 
     public init(vm: HomeViewModel,
-                onOpenVerifiedNumber: (() -> Void)? = nil,
+                onOpenSettings: (() -> Void)? = nil,
                 onOpenHistory: (() -> Void)? = nil) {
         self.vm = vm
-        self.onOpenVerifiedNumber = onOpenVerifiedNumber
+        self.onOpenSettings = onOpenSettings
         self.onOpenHistory = onOpenHistory
     }
 
     public var body: some View {
         NavigationStack {
-            // The next-job control is always present (idle state when no job) so
-            // nothing below it shifts. Normal vertical scrolling keeps the CTA
-            // reachable on every screen size.
-            ScrollView {
-                VStack(alignment: .leading, spacing: Spacing.l) {
-                    if let error = vm.errorMessage {
-                        ErrorBanner(error)
-                    }
-                    verifiedNumberCard
-                    NextJobChip(request: vm.hasActiveRequest ? vm.activeRequest : nil,
-                                onCancel: { Haptics.play(.warning); Task { await vm.cancelActive() } },
-                                onOpen: { onOpenHistory?() })
-                    requestComposer
-                    creditsSummary
+            // One screen, no scrolling: a compact header instead of a large
+            // title, the button pinned above the tab bar. Only a screen too short
+            // for it (iPhone SE, large text) falls back to scrolling.
+            ViewThatFits(in: .vertical) {
+                composer(pinned: true)
+                ScrollView {
+                    composer(pinned: false)
+                        .bcPinScrollWidth()
                 }
-                .padding(Spacing.m)
-                .bcPinScrollWidth()
+                .bcVerticalScrollOnly()
+                .refreshable { await vm.refresh() }
             }
-            .bcVerticalScrollOnly()
             .bcTabBarClearance()
             .bcScreenBackground()
-            .navigationTitle(greeting)
-            .refreshable { await vm.refresh() }
+            .bcHiddenNavigationBar()
             .task { if vm.templates.isEmpty { await vm.load() } }
             .sheet(isPresented: $showTemplatePicker) {
                 TemplatePickerView(vm: vm) { showTemplatePicker = false }
@@ -64,38 +56,55 @@ public struct HomeView: View {
         }
     }
 
-    private var greeting: String {
-        if let name = vm.profile?.displayName, !name.isEmpty { return "Hi, \(name)" }
-        return "Alibi"
+    /// `pinned` pushes the send button to the bottom of the screen.
+    private func composer(pinned: Bool) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.m) {
+            header
+            if let error = vm.errorMessage {
+                ErrorBanner(error)
+            }
+            NextJobChip(request: vm.hasActiveRequest ? vm.activeRequest : nil,
+                        onCancel: { Haptics.play(.warning); Task { await vm.cancelActive() } },
+                        onOpen: { onOpenHistory?() })
+            requestComposer
+            if pinned { Spacer(minLength: Spacing.s) }
+            sendButton
+        }
+        .padding(.horizontal, Spacing.m)
+        .padding(.top, Spacing.s)
+        .padding(.bottom, Spacing.m)
     }
 
-    private var verifiedNumberCard: some View {
-        Button {
-            onOpenVerifiedNumber?()
-        } label: {
-            Card {
-                HStack(spacing: Spacing.m) {
-                    Image(systemName: "checkmark.shield.fill")
-                        .font(.title2)
-                        .foregroundStyle(Theme.success)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Your verified number")
-                            .font(.subheadline.weight(.medium))
-                        Text(vm.maskedNumber ?? "Not verified")
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    if onOpenVerifiedNumber != nil {
-                        Image(systemName: "chevron.right").foregroundStyle(.secondary)
-                    }
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityHint("Opens your number in Settings")
+    /// The verified number and the credits, as two small pills. Both open
+    /// Settings, where the number and the credits live.
+    private var header: some View {
+        HStack(spacing: Spacing.s) {
+            pill(systemImage: "checkmark.shield.fill", tint: Theme.success,
+                 text: vm.maskedNumber ?? "Not verified")
+                .accessibilityLabel("Your verified number, \(vm.maskedNumber ?? "not verified")")
+            Spacer(minLength: 0)
+            pill(systemImage: "creditcard.fill",
+                 tint: vm.hasCredits ? Color.secondary : Theme.destructive,
+                 text: vm.creditsAvailable == 1 ? "1 credit" : "\(vm.creditsAvailable) credits")
+                .accessibilityLabel("\(vm.creditsAvailable) credits available")
+        }
+    }
+
+    private func pill(systemImage: String, tint: Color, text: String) -> some View {
+        Button { onOpenSettings?() } label: {
+            HStack(spacing: Spacing.xs + 2) {
+                Image(systemName: systemImage).foregroundStyle(tint)
+                Text(text).foregroundStyle(.primary)
             }
+            .font(.subheadline.weight(.medium))
+            .padding(.horizontal, Spacing.m)
+            .padding(.vertical, Spacing.s)
+            .bcGlassCapsule()
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .disabled(onOpenVerifiedNumber == nil)
+        .disabled(onOpenSettings == nil)
+        .accessibilityHint("Opens Settings")
     }
 
     @ViewBuilder private var requestComposer: some View {
@@ -125,17 +134,24 @@ public struct HomeView: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder private var sendButton: some View {
+        if !vm.hasCredits {
+            Button { onOpenSettings?() } label: {
+                Text("You’re out of credits. Add more in Settings.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.plain)
+        }
         PrimaryButton(vm.primaryCTATitle, systemImage: vm.channel.systemImage, isLoading: vm.isSubmitting) {
             Haptics.play(.impact)
             Task { await vm.send() }
         }
         .disabled(!vm.canSend)
         .opacity(vm.canSend ? 1 : 0.5)
-        if !vm.hasCredits {
-            Text("You’re out of credits. Add more in Settings to keep sending.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-        }
     }
 
     private var isScheduling: Bool {
@@ -178,18 +194,6 @@ public struct HomeView: View {
                 Image(systemName: "chevron.right").foregroundStyle(.secondary)
             }
         }
-    }
-
-    private var creditsSummary: some View {
-        HStack {
-            Image(systemName: "creditcard.fill").foregroundStyle(.secondary)
-            Text("\(vm.creditsAvailable) credits available")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Spacer()
-        }
-        .padding(.horizontal, Spacing.xs)
-        .accessibilityElement(children: .combine)
     }
 }
 
