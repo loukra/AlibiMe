@@ -57,9 +57,33 @@ class Settings(BaseSettings):
     twilio_sms_from_number: str | None = None
     twilio_status_callback_url: str | None = None
     vapi_api_key: str | None = None
-    vapi_assistant_id: str | None = None
+    vapi_assistant_id: str | None = None  # unused since the agent config moved into app/agent
+    # Fallback caller line when a sender line has neither its own Vapi number
+    # nor Twilio credentials to place the call from.
     vapi_phone_number_id: str | None = None
     vapi_webhook_secret: str | None = None
+    # Public https base of this API; Vapi posts call events to <base>/v1/webhooks/voice.
+    public_base_url: str | None = None
+
+    # Voice agent (sent to Vapi with every call; see app/agent)
+    agent_llm_provider: str = "openai"
+    agent_llm_model: str = "gpt-4o"
+    agent_llm_temperature: float = 0.8
+    agent_llm_max_tokens: int = 120
+    agent_voice_provider: str = "11labs"
+    agent_voice_model: str = "eleven_multilingual_v2"
+    # ElevenLabs voice ids per style. Placeholders until real voices are picked.
+    agent_voice_id_warm: str = "EXAVITQu4vr4xnSDxMaL"
+    agent_voice_id_neutral: str = "21m00Tcm4TlvDq8ikWAM"
+    agent_transcriber_provider: str = "deepgram"
+    agent_transcriber_model: str = "nova-3"
+
+    # Eval harness (backend/evals); "mock" runs offline with scripted replies.
+    eval_llm_provider: str = "mock"
+    eval_llm_model: str = "gpt-4o"
+    eval_judge_model: str = "gpt-4o-mini"
+    openai_api_key: str | None = None
+    anthropic_api_key: str | None = None
     revenuecat_webhook_secret: str | None = None
     sentry_dsn: str | None = None
     otel_exporter_otlp_endpoint: str | None = None

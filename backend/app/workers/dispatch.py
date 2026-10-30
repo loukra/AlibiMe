@@ -22,6 +22,7 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.agent.prompt import PROMPT_VERSION, build_system_prompt
 from app.core.clock import utcnow
 from app.core.errors import InsufficientCredits
 from app.core.logging import get_logger
@@ -141,6 +142,10 @@ def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None)
             context=context,
         )
         snapshot["call_variables"] = call_variables
+        # The agent prompt (app/agent) supersedes the template's short prompt;
+        # snapshot it with its version so history shows what the agent was told.
+        snapshot["call_system_prompt"] = build_system_prompt(call_variables)
+        snapshot["agent_prompt_version"] = PROMPT_VERSION
     request.request_plan_snapshot_json = snapshot
 
     return RequestPlan(
@@ -161,6 +166,7 @@ def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None)
         call_variables=call_variables,
         service_identity_value=snapshot.get("service_identity_value"),
         service_identity_type=snapshot.get("service_identity_type"),
+        sender_vapi_phone_number_id=identity.vapi_phone_number_id if identity else None,
         target_phone_e164=target_e164,
         target_phone_number_id=snapshot["target_phone_number_id"],
         user_first_name=user.display_name,

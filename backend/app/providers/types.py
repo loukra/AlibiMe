@@ -66,6 +66,8 @@ class RequestPlan:
     # sender + destination (internal only)
     service_identity_value: str | None = None
     service_identity_type: str | None = None
+    # The sender line's own Vapi number, when it was imported into Vapi.
+    sender_vapi_phone_number_id: str | None = None
     target_phone_e164: str | None = None  # decrypted at dispatch; never logged
     target_phone_number_id: str | None = None
     # optional personalization

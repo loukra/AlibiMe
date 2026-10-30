@@ -8,7 +8,7 @@ version: 1
 locale: en
 supports_call: true
 supports_sms: true
-call_opening_line_template: "Hey {first_name}, it's {caller_persona_label}. We've got {reason_label} with a client and I really need a hand right now."
+call_opening_line_template: "Hey, sorry, quick one. We've got a problem with a client and I really need you on this right now."
 call_system_prompt_template: "You are {caller_persona_label} calling about {reason_label}. Sound stressed but professional, keep it short, then end the call."
 call_followup_facts:
   - "The client is waiting on a reply."
@@ -16,6 +16,6 @@ call_followup_facts:
 call_voice_profile_code: "neutral_en"
 call_max_duration_seconds: 75
 call_supports_interruptions: true
-sms_body_template: "{caller_persona_label}: we've got {reason_label} with the client. Can you jump on this?"
+sms_body_template: "We've got a problem with the client. Can you jump on this?"
 sms_followup_body_template: null
 sms_sender_style: "casual_professional"

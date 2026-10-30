@@ -8,7 +8,7 @@ version: 1
 locale: de
 supports_call: true
 supports_sms: true
-call_opening_line_template: "Hey {first_name}, hier ist {caller_persona_label}. Es gibt {reason_label} — kannst du zurückkommen? Ich könnte dich hier echt gebrauchen."
+call_opening_line_template: "Hey, ich bin's. Hier zuhause ist was los, kannst du kommen? Ich bräuchte dich echt."
 call_system_prompt_template: "Du bist {caller_persona_label} und rufst wegen {reason_label} an. Etwas aufgeregt, praktisch, halte es kurz und beende dann das Gespräch."
 call_followup_facts:
   - "Es ist machbar, aber ich brauche dich."
@@ -16,6 +16,6 @@ call_followup_facts:
 call_voice_profile_code: "neutral_de"
 call_max_duration_seconds: 75
 call_supports_interruptions: true
-sms_body_template: "{caller_persona_label}: Es gibt {reason_label}. Kannst du bald zurückkommen?"
+sms_body_template: "Hier zuhause ist was los. Kannst du bald kommen?"
 sms_followup_body_template: null
 sms_sender_style: "casual"

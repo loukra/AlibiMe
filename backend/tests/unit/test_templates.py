@@ -56,7 +56,8 @@ def test_build_snapshot_for_call(db):
     )
     assert snap["template_code"] == "boss_travel_assignment"
     assert snap["channel"] == "call"
-    assert snap["rendered_opening_line"] and "Sam" in snap["rendered_opening_line"]
+    assert snap["rendered_opening_line"]
+    assert "your manager" not in snap["rendered_opening_line"]
     assert snap["max_duration_seconds"] == 90
     assert snap["target_phone_number_id"] == "abc"
 

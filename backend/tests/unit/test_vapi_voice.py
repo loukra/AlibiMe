@@ -45,8 +45,10 @@ def _plan(to: str = "+14155550123") -> RequestPlan:
 @pytest.fixture
 def vapi_creds(monkeypatch):
     monkeypatch.setattr(settings, "vapi_api_key", "vapi_key")
-    monkeypatch.setattr(settings, "vapi_assistant_id", "asst_1")
     monkeypatch.setattr(settings, "vapi_phone_number_id", "pn_1")
+    monkeypatch.setattr(settings, "twilio_account_sid", None)
+    monkeypatch.setattr(settings, "twilio_auth_token", None)
+    monkeypatch.setattr(settings, "public_base_url", None)
 
 
 def test_init_requires_api_key(monkeypatch):
@@ -55,16 +57,8 @@ def test_init_requires_api_key(monkeypatch):
         VapiVoiceProvider()
 
 
-def test_init_requires_assistant_and_number(monkeypatch):
-    monkeypatch.setattr(settings, "vapi_api_key", "k")
-    monkeypatch.setattr(settings, "vapi_assistant_id", None)
-    monkeypatch.setattr(settings, "vapi_phone_number_id", None)
-    with pytest.raises(RuntimeError):
-        VapiVoiceProvider()
-
-
-def test_create_call_success(vapi_creds, monkeypatch):
-    captured = {}
+def _capture_post(monkeypatch) -> dict:
+    captured: dict = {}
 
     def fake_post(url, headers=None, json=None, timeout=None):
         captured["url"] = url
@@ -73,21 +67,71 @@ def test_create_call_success(vapi_creds, monkeypatch):
         return FakeResponse(201, {"id": "call_1", "status": "queued", "cost": None})
 
     monkeypatch.setattr(httpx, "post", fake_post)
+    return captured
+
+
+def test_create_call_sends_agent_from_repo(vapi_creds, monkeypatch):
+    captured = _capture_post(monkeypatch)
     result = VapiVoiceProvider().create_outbound_call(_plan())
 
     assert result.provider_call_id == "call_1"
     assert result.status == CallAttemptStatus.queued.value
     assert result.accepted is True
     body = captured["json"]
+    assert "assistantId" not in body
     assert body["phoneNumberId"] == "pn_1"
-    assert body["assistantId"] == "asst_1"
     assert body["customer"]["number"] == "+14155550123"
-    assert body["assistantOverrides"]["firstMessage"].startswith("Hey, it's your sibling")
-    assert body["assistantOverrides"]["maxDurationSeconds"] == 60
-    assert body["assistantOverrides"]["variableValues"]["caller_label"] == "your sibling"
-    assert body["assistantOverrides"]["variableValues"]["tone"] == "warm"
-    assert body["assistantOverrides"]["backgroundSound"] == "off"
+    assistant = body["assistant"]
+    assert assistant["firstMessage"].startswith("Hey, it's your sibling")
+    assert assistant["maxDurationSeconds"] == 60
+    assert assistant["backgroundSound"] == "off"
+    system = assistant["model"]["messages"][0]
+    assert system["role"] == "system"
+    assert "your sibling" in system["content"]
+    assert "not customer service" in system["content"]
+    assert {"type": "endCall"} in assistant["model"]["tools"]
+    assert assistant["transcriber"]["language"] == "en"
+    assert assistant["metadata"]["request_id"] == "req-1"
+    assert "server" not in assistant
     assert captured["headers"]["Authorization"] == "Bearer vapi_key"
+
+
+def test_call_uses_sender_lines_own_vapi_number(vapi_creds, monkeypatch):
+    captured = _capture_post(monkeypatch)
+    plan = _plan()
+    plan.sender_vapi_phone_number_id = "pn_mom"
+    VapiVoiceProvider().create_outbound_call(plan)
+    assert captured["json"]["phoneNumberId"] == "pn_mom"
+
+
+def test_call_uses_sender_lines_twilio_number_inline(vapi_creds, monkeypatch):
+    monkeypatch.setattr(settings, "twilio_account_sid", "AC1")
+    monkeypatch.setattr(settings, "twilio_auth_token", "tok")
+    captured = _capture_post(monkeypatch)
+    plan = _plan()
+    plan.service_identity_value = "+15550100123"
+    VapiVoiceProvider().create_outbound_call(plan)
+    body = captured["json"]
+    assert "phoneNumberId" not in body
+    assert body["phoneNumber"]["twilioPhoneNumber"] == "+15550100123"
+    assert body["phoneNumber"]["twilioAccountSid"] == "AC1"
+
+
+def test_call_without_any_caller_number_is_rejected(vapi_creds, monkeypatch):
+    monkeypatch.setattr(settings, "vapi_phone_number_id", None)
+    _capture_post(monkeypatch)
+    with pytest.raises(ProviderRejected):
+        VapiVoiceProvider().create_outbound_call(_plan())
+
+
+def test_webhook_server_and_secret_sent_when_configured(vapi_creds, monkeypatch):
+    monkeypatch.setattr(settings, "public_base_url", "https://api.example.com/")
+    monkeypatch.setattr(settings, "vapi_webhook_secret", "s3cret")
+    captured = _capture_post(monkeypatch)
+    VapiVoiceProvider().create_outbound_call(_plan())
+    server = captured["json"]["assistant"]["server"]
+    assert server["url"] == "https://api.example.com/v1/webhooks/voice"
+    assert server["headers"]["X-Vapi-Secret"] == "s3cret"
 
 
 def test_create_call_handles_list_response(vapi_creds, monkeypatch):

@@ -8,7 +8,7 @@ version: 1
 locale: en
 supports_call: true
 supports_sms: true
-call_opening_line_template: "Hi {first_name}, it's {caller_persona_label}. Can you talk for a sec? It's {reason_label} — nothing scary, but I'd like you here."
+call_opening_line_template: "Hi, it's me. Have you got a sec? It's a family thing, nothing bad, but I'd like you here."
 call_system_prompt_template: "You are {caller_persona_label} calling about {reason_label}. Warm and a little insistent, keep it short, then end the call."
 call_followup_facts:
   - "Everyone is okay."
@@ -16,6 +16,6 @@ call_followup_facts:
 call_voice_profile_code: "warm_en"
 call_max_duration_seconds: 90
 call_supports_interruptions: true
-sms_body_template: "{caller_persona_label} here — it's {reason_label}. Can you call me when you get a sec?"
+sms_body_template: "Family thing, nothing bad. Can you call me when you get a sec?"
 sms_followup_body_template: null
 sms_sender_style: "warm"

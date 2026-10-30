@@ -14,6 +14,6 @@ call_followup_facts: null
 call_voice_profile_code: null
 call_max_duration_seconds: null
 call_supports_interruptions: false
-sms_body_template: "Hey {first_name}, mache nur {reason_label}. Schreib mir zurück, wenn du kannst, damit ich weiß, dass alles okay ist."
-sms_followup_body_template: "Habe noch nichts von dir gehört — alles in Ordnung?"
+sms_body_template: "Hey, wollte nur kurz hören, ob alles gut ist. Schreib mir, wenn du kannst."
+sms_followup_body_template: "Hab noch nichts von dir gehört, alles okay?"
 sms_sender_style: "warm"

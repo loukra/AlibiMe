@@ -8,7 +8,7 @@ version: 1
 locale: en
 supports_call: true
 supports_sms: true
-call_opening_line_template: "Hi {first_name}, it's {caller_persona_label}. I'm sorry to call so late, but I need you on a flight tonight — {reason_label}."
+call_opening_line_template: "Hi, sorry to catch you like this. Something's come up and I need you on a flight tonight. Have you got a minute?"
 call_system_prompt_template: "You are {caller_persona_label} calling about {reason_label}. Be firm but polite, keep it under a minute, then end the call."
 call_followup_facts:
   - "The flight leaves later tonight."
@@ -16,6 +16,6 @@ call_followup_facts:
 call_voice_profile_code: "neutral_en"
 call_max_duration_seconds: 90
 call_supports_interruptions: true
-sms_body_template: "{caller_persona_label} here — urgent: {reason_label}. Can you call me back as soon as possible?"
+sms_body_template: "Something urgent came up, I need you to travel tonight. Can you call me back asap?"
 sms_followup_body_template: null
 sms_sender_style: "professional"

@@ -23,17 +23,18 @@ MAX_CUSTOM_TEMPLATES_PER_USER = 20
 
 _LOCALES = ("en", "de")
 
-# Greeting varies by formality.
+# Greeting varies by formality. The caller never says who they are: the saved
+# contact already shows the name, and "it's your best friend" gives it away.
 _GREETING = {
     "en": {
-        "casual": "Hey {first_name}, it's {caller_persona_label}.",
-        "neutral": "Hi {first_name}, it's {caller_persona_label}.",
-        "professional": "Hello {first_name}, it's {caller_persona_label}.",
+        "casual": "Hey, it's me.",
+        "neutral": "Hi, it's me.",
+        "professional": "Hi, sorry to bother you.",
     },
     "de": {
-        "casual": "Hey {first_name}, hier ist {caller_persona_label}.",
-        "neutral": "Hallo {first_name}, hier ist {caller_persona_label}.",
-        "professional": "Guten Tag {first_name}, hier ist {caller_persona_label}.",
+        "casual": "Hey, ich bin's.",
+        "neutral": "Hallo, ich bin's.",
+        "professional": "Hallo, entschuldige die Störung.",
     },
 }
 
@@ -48,7 +49,7 @@ _OUTCOME_ASK = {
         "step_out_briefly": "Can you step out for a moment?",
         "leave_now": "I need you to head out now.",
         "leave_within_10m": "Can you wrap up and get going in the next few minutes?",
-        "end_conversation": "I have to let you go — let's pick this up later.",
+        "end_conversation": "I have to let you go, let's pick this up later.",
         "cancel_later_today": "We'll need to push our plans later today.",
         "unavailable_rest_of_day": "I'll be tied up for the rest of the day.",
         "unavailable_overnight": "I won't be reachable tonight.",
@@ -60,7 +61,7 @@ _OUTCOME_ASK = {
         "step_out_briefly": "Kannst du kurz rauskommen?",
         "leave_now": "Du musst jetzt los.",
         "leave_within_10m": "Kannst du in den nächsten Minuten Schluss machen und kommen?",
-        "end_conversation": "Ich muss auflegen — wir machen später weiter.",
+        "end_conversation": "Ich muss auflegen, wir machen später weiter.",
         "cancel_later_today": "Wir müssen unsere Pläne heute verschieben.",
         "unavailable_rest_of_day": "Ich bin den Rest des Tages eingespannt.",
         "unavailable_overnight": "Heute Abend bin ich nicht erreichbar.",
@@ -201,13 +202,13 @@ def compose_version_content(
             "Gespräch. Erwähne niemals, dass du eine KI bist."
         )
 
-    # SMS body: persona + reason (+ anchor) + ask + outro.
+    # SMS body: reason (+ anchor) + ask + outro. No sender label: the contact
+    # name shows above the message.
     sms_body = None
     if supports_sms:
-        lead = "{caller_persona_label}:" if loc == "en" else "{caller_persona_label}:"
-        sms_parts = [lead, _strip_first_name(reason_clause), ask]
+        sms_parts = [_strip_first_name(reason_clause), ask]
         if anchor:
-            sms_parts.insert(2, anchor)
+            sms_parts.insert(1, anchor)
         sms_parts.append(_SMS_OUTRO[loc])
         sms_body = " ".join(sms_parts)
 

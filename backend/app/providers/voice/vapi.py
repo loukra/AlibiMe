@@ -2,24 +2,34 @@
 
 https://docs.vapi.ai/api-reference/calls/create
 
-Requires (env vars, from the Vapi dashboard):
+Vapi only carries the call. The agent itself — system prompt, model, voice,
+transcriber and call behaviour — is defined in ``app.agent`` and sent as a
+transient assistant with every call, so nothing about how a call sounds lives
+in the Vapi dashboard. ``build_assistant`` and ``caller_line`` are the only
+places that know Vapi's field names.
 
+Requires:
 - ``VAPI_API_KEY``          — private API key (Authorization: Bearer)
-- ``VAPI_ASSISTANT_ID``     — the Assistant to run (voice + system prompt live there)
-- ``VAPI_PHONE_NUMBER_ID``  — the Vapi-managed number to call *from*
+
+The call is placed from the persona's sender line, so a saved contact
+("Mom") shows for calls as well as texts. In order of preference:
+- the line's own ``vapi_phone_number_id`` (number imported into Vapi), or
+- the line's Twilio number, passed inline with ``TWILIO_ACCOUNT_SID`` /
+  ``TWILIO_AUTH_TOKEN``, or
+- ``VAPI_PHONE_NUMBER_ID`` as a shared fallback.
 
 Optional:
-- ``VAPI_WEBHOOK_SECRET``   — the Server URL secret; Vapi echoes it on webhooks
-  as the ``X-Vapi-Secret`` header so we can authenticate them.
+- ``PUBLIC_BASE_URL``       — Vapi posts call events to <base>/v1/webhooks/voice
+- ``VAPI_WEBHOOK_SECRET``   — sent back by Vapi as ``X-Vapi-Secret`` on webhooks
 
-Template content is passed as assistant overrides (opening line + variables);
-the bounded behavior still lives in the configured Assistant. Implements the
-same ``VoiceProvider`` interface as ``MockVoiceCallProvider``.
+Implements the same ``VoiceProvider`` interface as ``MockVoiceCallProvider``.
 """
 from __future__ import annotations
 
 import httpx
 
+from app.agent.config import AgentConfig, agent_config
+from app.agent.prompt import build_system_prompt
 from app.core.config import settings
 from app.db.models.enums import CallAttemptStatus
 from app.providers.types import (
@@ -44,6 +54,62 @@ _STATUS_MAP = {
 }
 
 
+def build_assistant(plan: RequestPlan, config: AgentConfig) -> dict:
+    """The transient assistant for one call, in Vapi's schema."""
+    system_prompt = plan.call_system_prompt or build_system_prompt(plan.call_variables)
+    model: dict = {
+        "provider": config.model.provider,
+        "model": config.model.model,
+        "temperature": config.model.temperature,
+        "maxTokens": config.model.max_tokens,
+        "messages": [{"role": "system", "content": system_prompt}],
+        # Lets the agent hang up once it has what it wanted.
+        "tools": [{"type": "endCall"}],
+    }
+    voice: dict = {"provider": config.voice.provider, "voiceId": config.voice.voice_id}
+    if config.voice.model:
+        voice["model"] = config.voice.model
+    assistant: dict = {
+        "firstMessage": plan.rendered_opening_line or "",
+        "firstMessageMode": "assistant-speaks-first",
+        "model": model,
+        "voice": voice,
+        "transcriber": {
+            "provider": config.transcriber.provider,
+            "model": config.transcriber.model,
+            "language": config.transcriber.language,
+        },
+        "backgroundSound": config.background_sound,
+        "silenceTimeoutSeconds": config.silence_timeout_seconds,
+        "metadata": {"request_id": plan.request_id, "template": plan.template_code},
+    }
+    if plan.max_duration_seconds:
+        assistant["maxDurationSeconds"] = plan.max_duration_seconds
+    if settings.public_base_url:
+        server: dict = {"url": settings.public_base_url.rstrip("/") + "/v1/webhooks/voice"}
+        if settings.vapi_webhook_secret:
+            server["headers"] = {"X-Vapi-Secret": settings.vapi_webhook_secret}
+        assistant["server"] = server
+    return assistant
+
+
+def caller_line(plan: RequestPlan) -> dict:
+    """Which number the call comes from, as Vapi call-body fields."""
+    if plan.sender_vapi_phone_number_id:
+        return {"phoneNumberId": plan.sender_vapi_phone_number_id}
+    if plan.service_identity_value and settings.twilio_account_sid and settings.twilio_auth_token:
+        return {
+            "phoneNumber": {
+                "twilioPhoneNumber": plan.service_identity_value,
+                "twilioAccountSid": settings.twilio_account_sid,
+                "twilioAuthToken": settings.twilio_auth_token,
+            }
+        }
+    if settings.vapi_phone_number_id:
+        return {"phoneNumberId": settings.vapi_phone_number_id}
+    raise ProviderRejected("No caller number: sender line has no Vapi/Twilio number configured.")
+
+
 class VapiVoiceProvider(VoiceProvider):
     """Outbound voice via Vapi."""
 
@@ -52,37 +118,17 @@ class VapiVoiceProvider(VoiceProvider):
     def __init__(self) -> None:
         if not settings.vapi_api_key:
             raise RuntimeError("VapiVoiceProvider requires VAPI_API_KEY.")
-        if not (settings.vapi_assistant_id and settings.vapi_phone_number_id):
-            raise RuntimeError(
-                "VapiVoiceProvider requires VAPI_ASSISTANT_ID and VAPI_PHONE_NUMBER_ID."
-            )
         self._headers = {"Authorization": f"Bearer {settings.vapi_api_key}"}
-        self._assistant_id = settings.vapi_assistant_id
-        self._phone_number_id = settings.vapi_phone_number_id
 
     def create_outbound_call(self, plan: RequestPlan) -> ProviderCallResult:
         if not plan.target_phone_e164:
             raise ProviderRejected("No destination number resolved for call dispatch.")
 
         body: dict = {
-            "phoneNumberId": self._phone_number_id,
-            "assistantId": self._assistant_id,
+            **caller_line(plan),
             "customer": {"number": plan.target_phone_e164},
+            "assistant": build_assistant(plan, agent_config(plan.locale, plan.voice_profile_code)),
         }
-        # Vapi defaults phone calls to an "office" ambience (murmur, typing),
-        # which makes a personal call sound like a call centre.
-        overrides: dict = {"backgroundSound": "off"}
-        if plan.rendered_opening_line:
-            overrides["firstMessage"] = plan.rendered_opening_line
-        if plan.max_duration_seconds:
-            overrides["maxDurationSeconds"] = plan.max_duration_seconds
-        # The template-parameter + context variable set is the single source of
-        # truth for the call; the assistant's dashboard prompt references these
-        # via {{...}}. (Built in build_call_variables / threaded via RequestPlan.)
-        if plan.call_variables:
-            overrides["variableValues"] = dict(plan.call_variables)
-        if overrides:
-            body["assistantOverrides"] = overrides
 
         resp = self._post(f"{_API_BASE}/call", body)
         self._raise_for_status(resp)

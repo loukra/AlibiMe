@@ -36,9 +36,11 @@ def test_create_custom_template_composes_both_channels(client):
     body = resp.json()
     assert body["is_custom"] is True
     assert set(body["supported_channels"]) == {"call", "sms"}
-    # Wording is composed from approved skeletons (persona/reason filled in).
-    assert body["preview_opening_line"] and "manager" in body["preview_opening_line"]
-    assert body["preview_sms_body"]
+    # Wording is composed from approved skeletons. The caller never names their
+    # role: the saved contact shows who is calling.
+    assert body["preview_opening_line"]
+    assert "manager" not in body["preview_opening_line"]
+    assert body["preview_sms_body"] and "manager" not in body["preview_sms_body"]
     assert body["call_max_duration_seconds"] == 60
 
 

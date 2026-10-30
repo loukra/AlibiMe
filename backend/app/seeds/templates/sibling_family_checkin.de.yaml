@@ -8,7 +8,7 @@ version: 1
 locale: de
 supports_call: true
 supports_sms: true
-call_opening_line_template: "Hallo {first_name}, hier ist {caller_persona_label}. Hast du kurz Zeit? Es ist {reason_label} — nichts Schlimmes, aber ich hätte dich gern hier."
+call_opening_line_template: "Hi, ich bin's. Hast du kurz Zeit? Ist eine Familiensache, nichts Schlimmes, aber ich hätte dich gern hier."
 call_system_prompt_template: "Du bist {caller_persona_label} und rufst wegen {reason_label} an. Warm und etwas drängend, halte es kurz und beende dann das Gespräch."
 call_followup_facts:
   - "Allen geht es gut."
@@ -16,6 +16,6 @@ call_followup_facts:
 call_voice_profile_code: "warm_de"
 call_max_duration_seconds: 90
 call_supports_interruptions: true
-sms_body_template: "Hier ist {caller_persona_label} — es ist {reason_label}. Rufst du mich an, wenn du kurz Zeit hast?"
+sms_body_template: "Familiensache, nichts Schlimmes. Rufst du mich an, wenn du kurz Zeit hast?"
 sms_followup_body_template: null
 sms_sender_style: "warm"

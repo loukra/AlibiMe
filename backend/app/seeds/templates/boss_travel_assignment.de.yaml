@@ -8,7 +8,7 @@ version: 1
 locale: de
 supports_call: true
 supports_sms: true
-call_opening_line_template: "Hallo {first_name}, hier ist {caller_persona_label}. Tut mir leid, dass ich so spät anrufe, aber ich brauche dich heute Abend im Flieger — {reason_label}."
+call_opening_line_template: "Hallo, sorry, dass ich dich so überfalle. Es ist was reingekommen und ich brauch dich heute Abend im Flieger. Hast du kurz?"
 call_system_prompt_template: "Du bist {caller_persona_label} und rufst wegen {reason_label} an. Sei bestimmt, aber höflich, halte es unter einer Minute und beende dann das Gespräch."
 call_followup_facts:
   - "Der Flug geht heute Abend."
@@ -16,6 +16,6 @@ call_followup_facts:
 call_voice_profile_code: "neutral_de"
 call_max_duration_seconds: 90
 call_supports_interruptions: true
-sms_body_template: "Hier ist {caller_persona_label} — dringend: {reason_label}. Kannst du mich so schnell wie möglich zurückrufen?"
+sms_body_template: "Es ist was Dringendes reingekommen, ich brauch dich heute Abend auf Dienstreise. Rufst du mich gleich zurück?"
 sms_followup_body_template: null
 sms_sender_style: "professional"
