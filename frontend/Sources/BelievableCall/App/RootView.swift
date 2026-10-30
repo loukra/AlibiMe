@@ -79,6 +79,8 @@ struct MainTabView: View {
     @State private var profile: ProfileViewModel
     @State private var settings: SettingsViewModel
     @State private var selection: Tab = .home
+    /// Where Settings should scroll to when Home opens it.
+    @State private var settingsFocus: SettingsFocus?
     /// Set when a job is created, to drive the one-shot "fly to History" badge.
     @State private var flyingJob: (id: Int, channel: Channel)?
 
@@ -139,7 +141,10 @@ struct MainTabView: View {
     private var screens: some View {
         ZStack {
             HomeView(vm: home,
-                     onOpenSettings: { selection = .settings },
+                     onOpenSettings: { focus in
+                         settingsFocus = focus
+                         selection = .settings
+                     },
                      onOpenHistory: { selection = .history })
                 .opacity(selection == .home ? 1 : 0)
                 .allowsHitTesting(selection == .home)
@@ -152,7 +157,7 @@ struct MainTabView: View {
             ProfileView(vm: profile)
                 .opacity(selection == .profile ? 1 : 0)
                 .allowsHitTesting(selection == .profile)
-            SettingsView(vm: settings)
+            SettingsView(vm: settings, focus: $settingsFocus)
                 .opacity(selection == .settings ? 1 : 0)
                 .allowsHitTesting(selection == .settings)
         }

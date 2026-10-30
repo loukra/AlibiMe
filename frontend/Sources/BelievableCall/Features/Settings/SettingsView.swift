@@ -1,6 +1,14 @@
 #if canImport(SwiftUI)
 import SwiftUI
 
+/// A part of Settings another screen can open it at.
+public enum SettingsFocus: Hashable {
+    case number
+    case credits
+    /// The credits section with the Add Credits sheet already open.
+    case addCredits
+}
+
 /// Settings: verified-number snapshot, profile, credits, help/legal, sign out.
 public struct SettingsView: View {
     @Bindable var vm: SettingsViewModel
@@ -8,82 +16,101 @@ public struct SettingsView: View {
     /// sheet never renders before the view model exists).
     @State private var creditPackagesVM: CreditPackagesViewModel?
     @State private var confirmingDelete = false
+    /// Set from outside (Home's pills); scrolled to once, then cleared.
+    @Binding private var focus: SettingsFocus?
     private let locales = ["en", "de"]
 
-    public init(vm: SettingsViewModel) { self.vm = vm }
+    public init(vm: SettingsViewModel, focus: Binding<SettingsFocus?> = .constant(nil)) {
+        self.vm = vm
+        self._focus = focus
+    }
 
     public var body: some View {
         NavigationStack {
-            Form {
-                Section("Your number") {
-                    LabeledContent("Verified number", value: vm.maskedNumber ?? "—")
-                }
-                Section("Profile") {
-                    TextField("Display name", text: $vm.displayName)
-                    Picker("Language", selection: $vm.locale) {
-                        ForEach(locales, id: \.self) { code in
-                            Text(code == "de" ? "Deutsch" : "English").tag(code)
+            ScrollViewReader { proxy in
+                Form {
+                    Section("Your number") {
+                        LabeledContent("Verified number", value: vm.maskedNumber ?? "—")
+                    }
+                    .id(SettingsFocus.number)
+                    Section("Profile") {
+                        TextField("Display name", text: $vm.displayName)
+                        Picker("Language", selection: $vm.locale) {
+                            ForEach(locales, id: \.self) { code in
+                                Text(code == "de" ? "Deutsch" : "English").tag(code)
+                            }
+                        }
+                        LabeledContent("Timezone", value: vm.timezone)
+                        Button {
+                            Task { await vm.save() }
+                        } label: {
+                            HStack {
+                                Text("Save changes")
+                                if vm.isSaving { Spacer(); ProgressView() }
+                                else if vm.didSave { Spacer(); Image(systemName: "checkmark").foregroundStyle(Theme.success) }
+                            }
                         }
                     }
-                    LabeledContent("Timezone", value: vm.timezone)
-                    Button {
-                        Task { await vm.save() }
-                    } label: {
-                        HStack {
-                            Text("Save changes")
-                            if vm.isSaving { Spacer(); ProgressView() }
-                            else if vm.didSave { Spacer(); Image(systemName: "checkmark").foregroundStyle(Theme.success) }
+                    Section("Plan") {
+                        LabeledContent("Plan tier", value: vm.planLabel)
+                    }
+                    Section {
+                        Button {
+                            creditPackagesVM = vm.makeCreditPackagesViewModel()
+                        } label: {
+                            Label("Add Credits", systemImage: "plus.circle.fill")
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(Theme.accent)
+                        }
+                        if let success = vm.creditSuccessMessage {
+                            Label(success, systemImage: "checkmark.circle.fill")
+                                .font(.subheadline)
+                                .foregroundStyle(Theme.success)
+                        }
+                        LabeledContent("Credits available", value: "\(vm.creditsAvailable)")
+                    } footer: {
+                        Text("Credits are used each time you request a call or text.")
+                    }
+                    .id(SettingsFocus.credits)
+                    quickAlibiSection
+                    if let error = vm.errorMessage {
+                        Section { ErrorBanner(error) }
+                    }
+                    Section("About") {
+                        Link("Help & support", destination: URL(string: "https://believablecall.example/help")!)
+                        Link("Privacy & terms", destination: URL(string: "https://believablecall.example/legal")!)
+                        LabeledContent("Version", value: vm.appVersion)
+                    }
+                    Section {
+                        Button(role: .destructive) {
+                            Task { await vm.signOut() }
+                        } label: {
+                            Text("Sign out")
                         }
                     }
+                    Section {
+                        Button(role: .destructive) {
+                            confirmingDelete = true
+                        } label: {
+                            HStack {
+                                Text("Delete account")
+                                if vm.isDeleting { Spacer(); ProgressView() }
+                            }
+                        }
+                        .disabled(vm.isDeleting)
+                    } footer: {
+                        Text("Deletes your number, history, custom templates and any credits left.")
+                    }
                 }
-                Section("Plan") {
-                    LabeledContent("Plan tier", value: vm.planLabel)
-                }
-                Section {
-                    Button {
+                .onChange(of: focus) { _, target in
+                    guard let target else { return }
+                    withAnimation {
+                        proxy.scrollTo(target == .number ? SettingsFocus.number : .credits, anchor: .top)
+                    }
+                    if target == .addCredits {
                         creditPackagesVM = vm.makeCreditPackagesViewModel()
-                    } label: {
-                        Label("Add Credits", systemImage: "plus.circle.fill")
-                            .font(.body.weight(.semibold))
-                            .foregroundStyle(Theme.accent)
                     }
-                    if let success = vm.creditSuccessMessage {
-                        Label(success, systemImage: "checkmark.circle.fill")
-                            .font(.subheadline)
-                            .foregroundStyle(Theme.success)
-                    }
-                    LabeledContent("Credits available", value: "\(vm.creditsAvailable)")
-                } footer: {
-                    Text("Credits are used each time you request a call or text.")
-                }
-                quickAlibiSection
-                if let error = vm.errorMessage {
-                    Section { ErrorBanner(error) }
-                }
-                Section("About") {
-                    Link("Help & support", destination: URL(string: "https://believablecall.example/help")!)
-                    Link("Privacy & terms", destination: URL(string: "https://believablecall.example/legal")!)
-                    LabeledContent("Version", value: vm.appVersion)
-                }
-                Section {
-                    Button(role: .destructive) {
-                        Task { await vm.signOut() }
-                    } label: {
-                        Text("Sign out")
-                    }
-                }
-                Section {
-                    Button(role: .destructive) {
-                        confirmingDelete = true
-                    } label: {
-                        HStack {
-                            Text("Delete account")
-                            if vm.isDeleting { Spacer(); ProgressView() }
-                        }
-                    }
-                    .disabled(vm.isDeleting)
-                } footer: {
-                    Text("Deletes your number, history, custom templates and any credits left.")
+                    focus = nil
                 }
             }
             .bcClearScrollBackground()

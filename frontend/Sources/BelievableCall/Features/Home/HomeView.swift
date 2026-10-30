@@ -7,14 +7,14 @@ public struct HomeView: View {
     @Bindable var vm: HomeViewModel
     @State private var showTemplatePicker = false
     @State private var showSchedule = false
-    /// Invoked from the number and credits pills; the tab container routes this
-    /// to the Settings tab, where the number and the credits live.
-    var onOpenSettings: (() -> Void)?
+    /// Invoked from the number and credits pills; the tab container opens the
+    /// Settings tab at the part that was tapped.
+    var onOpenSettings: ((SettingsFocus) -> Void)?
     /// Invoked when the user taps the "next job" chip body — opens History.
     var onOpenHistory: (() -> Void)?
 
     public init(vm: HomeViewModel,
-                onOpenSettings: (() -> Void)? = nil,
+                onOpenSettings: ((SettingsFocus) -> Void)? = nil,
                 onOpenHistory: (() -> Void)? = nil) {
         self.vm = vm
         self.onOpenSettings = onOpenSettings
@@ -75,23 +75,25 @@ public struct HomeView: View {
         .padding(.bottom, Spacing.m)
     }
 
-    /// The verified number and the credits, as two small pills. Both open
-    /// Settings, where the number and the credits live.
+    /// The verified number and the credits, as two small pills. Each opens
+    /// Settings at its own section.
     private var header: some View {
         HStack(spacing: Spacing.s) {
             pill(systemImage: "checkmark.shield.fill", tint: Theme.success,
-                 text: vm.maskedNumber ?? "Not verified")
+                 text: vm.maskedNumber ?? "Not verified", opens: .number)
                 .accessibilityLabel("Your verified number, \(vm.maskedNumber ?? "not verified")")
             Spacer(minLength: 0)
             pill(systemImage: "creditcard.fill",
                  tint: vm.hasCredits ? Color.secondary : Theme.destructive,
-                 text: vm.creditsAvailable == 1 ? "1 credit" : "\(vm.creditsAvailable) credits")
+                 text: vm.creditsAvailable == 1 ? "1 credit" : "\(vm.creditsAvailable) credits",
+                 opens: .credits)
                 .accessibilityLabel("\(vm.creditsAvailable) credits available")
         }
     }
 
-    private func pill(systemImage: String, tint: Color, text: String) -> some View {
-        Button { onOpenSettings?() } label: {
+    private func pill(systemImage: String, tint: Color, text: String,
+                      opens focus: SettingsFocus) -> some View {
+        Button { onOpenSettings?(focus) } label: {
             HStack(spacing: Spacing.xs + 2) {
                 Image(systemName: systemImage).foregroundStyle(tint)
                 Text(text).foregroundStyle(.primary)
@@ -138,8 +140,8 @@ public struct HomeView: View {
 
     @ViewBuilder private var sendButton: some View {
         if !vm.hasCredits {
-            Button { onOpenSettings?() } label: {
-                Text("You’re out of credits. Add more in Settings.")
+            Button { onOpenSettings?(.addCredits) } label: {
+                Text("You’re out of credits. Tap to add more.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
@@ -179,12 +181,14 @@ public struct HomeView: View {
                         Text(template.displayName)
                             .font(.headline)
                             .foregroundStyle(.primary)
-                        if let preview = template.preview(for: vm.channel) ?? template.description {
-                            Text(preview)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                        }
+                            .lineLimit(1)
+                        // Always two lines tall, so switching between Call and
+                        // Text (whose previews differ in length) doesn't move
+                        // the controls below.
+                        Text(template.preview(for: vm.channel) ?? template.description ?? "")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2, reservesSpace: true)
                     } else {
                         Text("Choose a template")
                             .font(.headline)
