@@ -47,6 +47,10 @@ class Settings(BaseSettings):
     # are the expensive part (see docs/pricing.md).
     call_credit_cost: int = 4
     sms_credit_cost: int = 1
+    # Calls into another country bill at the destination's mobile rate per
+    # started minute (US line to a German mobile: $0.376/min), so keep them
+    # inside the first minute. 0 turns the cap off.
+    cross_border_call_max_seconds: int = 55
     # Max request-create calls per user per hour. 5 is the production default;
     # raise it in dev (env REQUEST_CREATE_MAX_PER_HOUR) for rapid testing.
     request_create_max_per_hour: int = 5

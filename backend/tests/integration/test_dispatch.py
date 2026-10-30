@@ -118,3 +118,26 @@ def test_scheduled_future_request_not_dispatched_early(client, db):
     finally:
         db2.close()
     assert outcomes == []
+
+
+class _CapturingVoice(MockVoiceCallProvider):
+    def create_outbound_call(self, plan):
+        self.plan = plan
+        return super().create_outbound_call(plan)
+
+
+def test_cross_border_call_is_capped_to_one_billed_minute(client, db):
+    # Default test phone is German, the seeded sender line is a US number.
+    a = signup(client)
+    _create_call(client, a["headers"])  # boss template allows 90 s
+    voice = _CapturingVoice()
+    _run_dispatch(voice_provider=voice)
+    assert voice.plan.max_duration_seconds == 55
+
+
+def test_same_country_call_keeps_template_length(client, db):
+    a = signup(client, phone="+14155550199")
+    _create_call(client, a["headers"])
+    voice = _CapturingVoice()
+    _run_dispatch(voice_provider=voice)
+    assert voice.plan.max_duration_seconds == 90

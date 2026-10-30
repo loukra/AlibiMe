@@ -19,11 +19,13 @@ from __future__ import annotations
 
 import uuid
 
+import phonenumbers
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.agent.prompt import PROMPT_VERSION, build_system_prompt
 from app.core.clock import utcnow
+from app.core.config import settings
 from app.core.errors import InsufficientCredits
 from app.core.logging import get_logger
 from app.db.models.attempts import CallAttempt, MessageAttempt
@@ -110,6 +112,18 @@ def _resolve_dispatch_identity(db: Session, request: Request) -> ServiceIdentity
     return _select_service_identity(db, request.channel)
 
 
+def _country_code(e164: str | None) -> int | None:
+    try:
+        return phonenumbers.parse(e164 or "").country_code
+    except phonenumbers.NumberParseException:
+        return None
+
+
+def _is_cross_border(sender_e164: str | None, target_e164: str | None) -> bool:
+    sender, target = _country_code(sender_e164), _country_code(target_e164)
+    return sender is not None and target is not None and sender != target
+
+
 def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None) -> RequestPlan:
     template = db.get(Template, request.template_id)
     version = db.get(TemplateVersion, request.template_version_id)
@@ -146,6 +160,9 @@ def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None)
         # snapshot it with its version so history shows what the agent was told.
         snapshot["call_system_prompt"] = build_system_prompt(call_variables)
         snapshot["agent_prompt_version"] = PROMPT_VERSION
+        cap = settings.cross_border_call_max_seconds
+        if cap and _is_cross_border(snapshot.get("service_identity_value"), target_e164):
+            snapshot["max_duration_seconds"] = min(snapshot.get("max_duration_seconds") or cap, cap)
     request.request_plan_snapshot_json = snapshot
 
     return RequestPlan(
