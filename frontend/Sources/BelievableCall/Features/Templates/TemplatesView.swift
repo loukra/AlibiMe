@@ -75,23 +75,11 @@ struct TemplateRow: View {
     let template: TemplateSummary
 
     var body: some View {
-        HStack(spacing: Spacing.m) {
-            TemplateBadge(category: template.category)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(template.displayName)
-                    .font(.body.weight(.semibold))
-                    .lineLimit(1)
-                // Always two lines tall, so every card has the same height.
-                Text(template.description ?? "")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2, reservesSpace: true)
-                ChannelGlyphs(channels: template.supportedChannels)
-                    .padding(.top, 2)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        ListCardRow(icon: template.category.systemImage,
+                    title: template.displayName,
+                    detail: template.description ?? "") {
+            ChannelGlyphs(channels: template.supportedChannels)
         }
-        .padding(.vertical, Spacing.xs)
         .accessibilityElement(children: .combine)
     }
 }

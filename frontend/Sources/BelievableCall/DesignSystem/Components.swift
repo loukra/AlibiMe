@@ -66,6 +66,55 @@ public struct IconBadge: View {
     }
 }
 
+/// The one layout every list card uses (Templates, History): badge, a one-line
+/// title with an optional trailing accessory, a detail that is always two lines
+/// tall and a one-line caption footer. The fixed line counts give every list
+/// card in the app the same height.
+struct ListCardRow<Trailing: View, Footer: View>: View {
+    let icon: String
+    let title: String
+    let detail: String
+    let trailing: Trailing
+    let footer: Footer
+
+    init(icon: String, title: String, detail: String,
+         @ViewBuilder trailing: () -> Trailing = { EmptyView() },
+         @ViewBuilder footer: () -> Footer) {
+        self.icon = icon
+        self.title = title
+        self.detail = detail
+        self.trailing = trailing()
+        self.footer = footer()
+    }
+
+    var body: some View {
+        HStack(spacing: Spacing.m) {
+            IconBadge(icon)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: Spacing.s) {
+                    Text(title)
+                        .font(.body.weight(.semibold))
+                        .lineLimit(1)
+                    Spacer(minLength: Spacing.s)
+                    trailing
+                }
+                .frame(height: 24)
+                Text(detail)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2, reservesSpace: true)
+                footer
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .padding(.top, 2)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.vertical, Spacing.xs)
+    }
+}
+
 extension View {
     /// Draws a List row as its own card on the screen gradient. Unlike a
     /// ScrollView of cards, swipe actions keep working.
@@ -255,10 +304,10 @@ public struct StatusBadge: View {
             Text(status.displayText(for: channel))
                 .lineLimit(1)
         }
-        .font(.subheadline.weight(.medium))
+        .font(.caption.weight(.semibold))
         .fixedSize()
         .padding(.horizontal, Spacing.s)
-        .padding(.vertical, Spacing.xs)
+        .padding(.vertical, 3)
         .foregroundStyle(tint)
         .background(tint.opacity(0.12))
         .clipShape(Capsule())

@@ -53,6 +53,7 @@ private extension TemplatePickerView {
     }
 }
 
+/// The same card as a row on the Templates tab, plus a check on the chosen one.
 struct TemplateCard: View {
     let template: TemplateSummary
     let isSelected: Bool
@@ -61,35 +62,15 @@ struct TemplateCard: View {
     var body: some View {
         Button(action: onSelect) {
             Card {
-                HStack(alignment: .top, spacing: Spacing.m) {
-                    TemplateBadge(category: template.category)
-                    VStack(alignment: .leading, spacing: Spacing.s) {
-                        HStack(alignment: .firstTextBaseline) {
-                            Text(template.displayName)
-                                .font(.headline)
-                                .foregroundStyle(.primary)
-                            Spacer()
-                            if isSelected {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Theme.accent)
-                            }
-                        }
-                        if let description = template.description {
-                            Text(description)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        // One template, both channel previews — so a dual-channel
-                        // template reveals how each channel behaves.
-                        VStack(alignment: .leading, spacing: Spacing.xs) {
-                            if template.supports(.call), let line = template.previewOpeningLine {
-                                channelPreview(.call, text: line)
-                            }
-                            if template.supports(.text), let body = template.previewSMSBody {
-                                channelPreview(.text, text: body)
-                            }
-                        }
+                ListCardRow(icon: template.category.systemImage,
+                            title: template.displayName,
+                            detail: template.description ?? "") {
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(Theme.accent)
                     }
+                } footer: {
+                    ChannelGlyphs(channels: template.supportedChannels)
                 }
             }
             .overlay(
@@ -100,24 +81,6 @@ struct TemplateCard: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
-    }
-
-    /// A labelled, per-channel preview line (e.g. CALL “…”, TEXT “…”).
-    @ViewBuilder
-    private func channelPreview(_ channel: Channel, text: String) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: Spacing.s) {
-            Image(systemName: channel.outlineSymbol)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(width: 18)
-            Text("“\(text)”")
-                .font(.footnote.italic())
-                .foregroundStyle(.secondary)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(channel.title) preview: \(text)")
     }
 }
 

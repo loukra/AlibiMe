@@ -92,17 +92,14 @@ struct PendingRow: View {
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        HStack(spacing: Spacing.m) {
-            IconBadge(item.channel.outlineSymbol)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(item.templateLabel).font(.subheadline.weight(.medium)).lineLimit(1)
-                Text(item.executeAt, format: .dateTime.month().day().hour().minute())
-                    .font(.caption).foregroundStyle(.secondary)
-            }
-            Spacer()
+        ListCardRow(icon: item.channel.outlineSymbol,
+                    title: item.templateLabel,
+                    detail: item.preview ?? item.fallbackDetail(upcoming: true)) {
             Text(countdown)
                 .font(.subheadline.weight(.semibold).monospacedDigit())
                 .foregroundStyle(Theme.accent)
+        } footer: {
+            Text(item.executeAt, format: .dateTime.month().day().hour().minute())
         }
         .onReceive(timer) { now = $0 }
         .accessibilityElement(children: .combine)
@@ -118,33 +115,33 @@ struct HistoryRow: View {
     let item: HistoryEntry
 
     var body: some View {
-        HStack(spacing: Spacing.m) {
-            IconBadge(item.channel.outlineSymbol)
-            VStack(alignment: .leading, spacing: Spacing.xs) {
-                Text(item.templateLabel)
-                    .font(.subheadline.weight(.medium))
-                    .lineLimit(1)
+        ListCardRow(icon: item.channel.outlineSymbol,
+                    title: item.templateLabel,
+                    detail: item.preview ?? item.fallbackDetail(upcoming: false)) {
+            StatusBadge(status: item.status, channel: item.channel)
+        } footer: {
+            HStack(spacing: 4) {
                 Text(item.requestedAt, format: .dateTime.month().day().hour().minute())
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                if let preview = item.preview {
-                    Text(preview)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-            }
-            Spacer()
-            VStack(alignment: .trailing, spacing: Spacing.xs) {
-                StatusBadge(status: item.status, channel: item.channel)
                 if let duration = item.durationSeconds {
-                    Text("\(duration)s")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    Text("· \(duration)s")
                 }
             }
         }
         .accessibilityElement(children: .combine)
+    }
+}
+
+extension HistoryEntry {
+    /// Fills the card's detail lines when there is no message preview, so the
+    /// card never shows an empty gap.
+    func fallbackDetail(upcoming: Bool) -> String {
+        let time = (upcoming ? executeAt : requestedAt).formatted(date: .omitted, time: .shortened)
+        switch (channel, upcoming) {
+        case (.call, true): return "Your phone rings at \(time)."
+        case (.text, true): return "The text arrives at \(time)."
+        case (.call, false): return "Call at \(time)."
+        case (.text, false): return "Text at \(time)."
+        }
     }
 }
 

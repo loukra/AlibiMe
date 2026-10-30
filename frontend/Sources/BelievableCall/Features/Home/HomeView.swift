@@ -181,6 +181,7 @@ public struct HomeView: View {
     @ViewBuilder private var selectedTemplateCard: some View {
         Card(minHeight: cardHeight) {
             HStack(spacing: Spacing.m) {
+                IconBadge(vm.selectedTemplate?.category.systemImage ?? "square.stack.3d.up")
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     if let template = vm.selectedTemplate {
                         Text(template.displayName)

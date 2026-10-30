@@ -135,9 +135,8 @@ public struct NextJobChip: View {
         HStack(spacing: Spacing.m) {
             Button(action: onOpen) {
                 HStack(spacing: Spacing.s) {
-                    Image(systemName: leadingIcon)
-                        .foregroundStyle(request == nil ? Color.secondary : Theme.accent)
-                        .frame(width: 22)
+                    IconBadge(leadingIcon)
+                        .opacity(request == nil ? 0.5 : 1)
                     VStack(alignment: .leading, spacing: 0) {
                         Text(captionText)
                             .font(.caption).foregroundStyle(.secondary)
