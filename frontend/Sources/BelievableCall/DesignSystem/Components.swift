@@ -196,8 +196,10 @@ public struct StatusBadge: View {
         HStack(spacing: Spacing.xs) {
             Image(systemName: icon)
             Text(status.displayText(for: channel))
+                .lineLimit(1)
         }
         .font(.subheadline.weight(.medium))
+        .fixedSize()
         .padding(.horizontal, Spacing.s)
         .padding(.vertical, Spacing.xs)
         .foregroundStyle(tint)

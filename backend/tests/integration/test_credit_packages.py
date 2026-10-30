@@ -43,7 +43,7 @@ def test_list_shows_the_paid_packs_with_products_and_costs(client):
     assert first["credits"] == 12
     assert first["fulfillment_mode"] == "app_store_iap"
     assert first["store_product_id"] == "com.believablecall.app.credits12"
-    assert first["price_label"] == "2.99 EUR"
+    assert first["price_label"] == "€2.99"
     assert body["credit_costs"] == {"call": 1, "sms": 1}  # test env: one each
 
 

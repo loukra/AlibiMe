@@ -167,7 +167,20 @@ public struct NextJobChip: View {
     private var mainText: String {
         guard let request else { return "Nothing scheduled" }
         let remaining = request.secondsRemaining(now: now)
-        return String(format: "%02d:%02d", remaining / 60, remaining % 60)
+        // Due or already handed to the provider: say what's happening instead
+        // of a countdown frozen at 00:00.
+        if remaining == 0 || request.status != .scheduled {
+            return request.channel == .call ? "Calling you…" : "Texting you…"
+        }
+        return Self.countdown(remaining)
+    }
+
+    /// "04:59", or "1:59:59" once it's an hour or more away.
+    static func countdown(_ seconds: Int) -> String {
+        if seconds >= 3600 {
+            return String(format: "%d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60)
+        }
+        return String(format: "%02d:%02d", seconds / 60, seconds % 60)
     }
 }
 #endif

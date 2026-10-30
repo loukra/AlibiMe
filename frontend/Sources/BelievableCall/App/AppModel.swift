@@ -33,6 +33,7 @@ public final class AppModel {
             env.tokenHolder.update(stored.token)
             phase = .authenticated
             redeemUnfinishedPurchasesInBackground()
+            syncTimezoneInBackground()
         } else {
             phase = .unauthenticated
         }
@@ -46,6 +47,7 @@ public final class AppModel {
         phase = .authenticated
         registerDeviceInBackground()
         redeemUnfinishedPurchasesInBackground()
+        syncTimezoneInBackground()
     }
 
     public func signOut() {
@@ -70,6 +72,17 @@ public final class AppModel {
         let devices = env.devices
         let deviceID = env.prefs.deviceID
         Task { try? await devices.register(deviceID: deviceID, pushToken: nil, appVersion: nil, osVersion: nil) }
+    }
+
+    /// The agent tells the time of day from the profile's timezone ("it's
+    /// Friday 23:10 where they are"), so keep it in step with the device.
+    private func syncTimezoneInBackground() {
+        let profile = env.profile
+        let current = TimeZone.current.identifier
+        Task {
+            guard let me = try? await profile.me(), me.timezone != current else { return }
+            _ = try? await profile.update(locale: nil, timezone: current, displayName: nil)
+        }
     }
 
     /// Purchases StoreKit delivered that never reached the backend (app killed

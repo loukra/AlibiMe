@@ -122,15 +122,15 @@ public enum Fixtures {
 
     public static let creditPackages: [CreditPackage] = [
         CreditPackage(code: "credits_12", displayName: "12 Credits", credits: 12,
-                      fulfillmentMode: "app_store_iap", priceLabel: "2.99 EUR",
+                      fulfillmentMode: "app_store_iap", priceLabel: "€2.99",
                       badgeText: nil, sortOrder: 10,
                       storeProductID: "com.believablecall.app.credits12"),
         CreditPackage(code: "credits_40", displayName: "40 Credits", credits: 40,
-                      fulfillmentMode: "app_store_iap", priceLabel: "7.99 EUR",
+                      fulfillmentMode: "app_store_iap", priceLabel: "€7.99",
                       badgeText: "Popular", sortOrder: 20,
                       storeProductID: "com.believablecall.app.credits40"),
         CreditPackage(code: "credits_100", displayName: "100 Credits", credits: 100,
-                      fulfillmentMode: "app_store_iap", priceLabel: "17.99 EUR",
+                      fulfillmentMode: "app_store_iap", priceLabel: "€17.99",
                       badgeText: "Best value", sortOrder: 30,
                       storeProductID: "com.believablecall.app.credits100"),
     ]

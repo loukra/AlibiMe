@@ -13,7 +13,7 @@ final class CreditPackagesViewModelTests: XCTestCase {
         XCTAssertEqual(vm.phase, .ready)
         XCTAssertEqual(vm.packages.count, 3)
         XCTAssertEqual(vm.selectedCode, "credits_12")
-        XCTAssertEqual(vm.primaryButtonTitle, "Buy 12 Credits for 2.99 EUR")
+        XCTAssertEqual(vm.primaryButtonTitle, "Buy 12 Credits for €2.99")
         XCTAssertEqual(vm.costsNote, "A call uses 4 credits, a text 1.")
         XCTAssertTrue(vm.canSubmit)
     }
@@ -24,7 +24,7 @@ final class CreditPackagesViewModelTests: XCTestCase {
         await vm.load()
         vm.select("credits_40")
         XCTAssertEqual(vm.primaryButtonTitle, "Buy 40 Credits for 7,99 €")
-        XCTAssertEqual(vm.price(for: vm.packages[0]), "2.99 EUR")  // store doesn't know it
+        XCTAssertEqual(vm.price(for: vm.packages[0]), "€2.99")  // store doesn't know it
     }
 
     func testPurchaseIsRedeemedThenFinished() async {

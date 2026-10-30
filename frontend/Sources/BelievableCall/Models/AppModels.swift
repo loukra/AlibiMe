@@ -399,14 +399,14 @@ public enum RequestStatus: String, Sendable {
 
     public var isTerminal: Bool { !isLive }
 
-    /// Calm, neutral status copy for status/history surfaces.
+    /// Calm, neutral status copy for status/history surfaces. Short enough for
+    /// a one-line badge; the channel icon next to it says call or text.
     public func displayText(for channel: Channel) -> String {
-        let noun = channel == .call ? "Call" : "Text"
         switch self {
-        case .scheduled: return "\(noun) scheduled"
-        case .dispatching: return "\(noun) starting"
-        case .providerAccepted: return channel == .call ? "Call ringing" : "Text queued"
-        case .active: return "Call in progress"
+        case .scheduled: return "Scheduled"
+        case .dispatching: return "Starting"
+        case .providerAccepted: return channel == .call ? "Calling" : "Sending"
+        case .active: return "On the call"
         case .completed: return "Completed"
         case .noAnswer: return "No answer"
         case .canceled: return "Canceled"
