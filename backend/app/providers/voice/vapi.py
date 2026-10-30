@@ -69,7 +69,9 @@ class VapiVoiceProvider(VoiceProvider):
             "assistantId": self._assistant_id,
             "customer": {"number": plan.target_phone_e164},
         }
-        overrides: dict = {}
+        # Vapi defaults phone calls to an "office" ambience (murmur, typing),
+        # which makes a personal call sound like a call centre.
+        overrides: dict = {"backgroundSound": "off"}
         if plan.rendered_opening_line:
             overrides["firstMessage"] = plan.rendered_opening_line
         if plan.max_duration_seconds:

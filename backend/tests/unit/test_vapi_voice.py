@@ -86,6 +86,7 @@ def test_create_call_success(vapi_creds, monkeypatch):
     assert body["assistantOverrides"]["maxDurationSeconds"] == 60
     assert body["assistantOverrides"]["variableValues"]["caller_label"] == "your sibling"
     assert body["assistantOverrides"]["variableValues"]["tone"] == "warm"
+    assert body["assistantOverrides"]["backgroundSound"] == "off"
     assert captured["headers"]["Authorization"] == "Bearer vapi_key"
 
 
