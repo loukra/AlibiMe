@@ -37,7 +37,19 @@ final class SaveContactTests: XCTestCase {
         XCTAssertEqual(vm.pendingSenderPrompt?.bindingID, "b1")
     }
 
-    func testCallSuccessDoesNotOfferPrompt() async {
+    func testCallSuccessOffersContactPrompt() async {
+        let callReq = RequestSummary(id: "r1", channel: .call, status: .scheduled,
+                                     scheduledKind: nil, executeAt: Date(), requestedAt: nil,
+                                     cancelable: true, lastErrorCode: nil,
+                                     senderIdentity: Fixtures.senderIdentity(bindingID: "b2"))
+        let vm = makeVM(request: MockRequestService(created: callReq))
+        await vm.load()
+        vm.selectChannel(.call)
+        await vm.send()
+        XCTAssertEqual(vm.pendingSenderPrompt?.bindingID, "b2")
+    }
+
+    func testCallWithoutSenderDoesNotOfferPrompt() async {
         let callReq = RequestSummary(id: "r1", channel: .call, status: .scheduled,
                                      scheduledKind: nil, executeAt: Date(), requestedAt: nil,
                                      cancelable: true, lastErrorCode: nil, senderIdentity: nil)

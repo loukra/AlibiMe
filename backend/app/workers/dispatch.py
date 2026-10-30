@@ -98,7 +98,7 @@ def _select_service_identity(db: Session, channel: str) -> ServiceIdentity | Non
 def _resolve_dispatch_identity(db: Session, request: Request) -> ServiceIdentity | None:
     """Prefer the line the request was bound to at create time so the sender
     number stays consistent with what the user was shown; fall back to a pool
-    pick if the binding's line is gone or no binding exists (e.g. calls)."""
+    pick if the binding's line is gone or no binding exists."""
     from app.db.models.user_sender_binding import UserSenderBinding
 
     if request.sender_binding_id is not None:

@@ -30,10 +30,10 @@ public final class HomeViewModel {
     private let contactLinks: ContactLinkStoring
     public var onSessionExpired: (() -> Void)?
 
-    // MARK: Save Contact flow (post-SMS-success, fully optional)
+    // MARK: Save Contact flow (after a call or text is set up, fully optional)
 
     /// The soft "Save this sender as a contact?" prompt. Non-blocking; set after
-    /// a successful SMS send when the binding hasn't been acted on before.
+    /// a successful send when the binding hasn't been acted on before.
     public var pendingSenderPrompt: SenderIdentity?
     /// When set, the view presents the prefilled iOS new-contact sheet.
     public var contactSheetSender: SenderIdentity?
@@ -238,7 +238,6 @@ public final class HomeViewModel {
     /// Decide whether to show the post-success contact prompt. Continuity comes
     /// from the backend binding regardless, so this is purely a convenience.
     func maybeOfferContactPrompt(for request: RequestSummary) {
-        guard request.channel == .text else { return }
         guard let sender = request.senderIdentity,
               sender.contactPromptRecommended,
               sender.canSaveContact,

@@ -9,7 +9,8 @@ so the mirror must reflect the real numbers.
 This is a manual/admin reconciliation (run it after changing Twilio numbers); it
 is intentionally *not* on the request path:
 
-    python -m app.admin.sync_sender_lines      # or: make sync-senders
+    python -m app.admin.sync_sender_lines          # or: make sync-senders
+    python -m app.admin.sync_sender_lines --vapi   # also link the lines in Vapi
 
 Behavior:
   - upsert each Twilio number into ``service_identities`` (provider ``twilio``),
@@ -20,6 +21,10 @@ Behavior:
     mock seed) by clearing their SMS capability — existing mock bindings then
     reallocate to a real number. Voice capability is left intact so local mock
     voice still works.
+
+With ``--vapi`` each voice-capable line is also registered in Vapi (imported
+from Twilio if Vapi doesn't know it yet) and its Vapi phone-number id stored on
+the line, so calls go out from the same number as that persona's texts.
 
 The Twilio fetch (I/O) and the DB upsert (pure) are separated so the upsert is
 unit-testable without network access.
@@ -42,6 +47,7 @@ logger = get_logger("admin.sync_sender_lines")
 
 _API_BASE = "https://api.twilio.com/2010-04-01"
 _MESSAGING_API = "https://messaging.twilio.com/v1"
+_VAPI_API = "https://api.vapi.ai"
 
 TWILIO_PROVIDER = "twilio"
 
@@ -184,7 +190,64 @@ def sync_sender_lines(
     }
 
 
+def _vapi_headers() -> dict[str, str]:
+    if not settings.vapi_api_key:
+        raise RuntimeError("Vapi API key required: set VAPI_API_KEY.")
+    return {"Authorization": f"Bearer {settings.vapi_api_key}"}
+
+
+def fetch_vapi_numbers() -> dict[str, str]:
+    """Map E.164 number -> Vapi phone-number id for every number Vapi knows."""
+    resp = httpx.get(f"{_VAPI_API}/phone-number", headers=_vapi_headers(), timeout=15.0)
+    resp.raise_for_status()
+    return {item["number"]: item["id"] for item in resp.json() if item.get("number")}
+
+
+def import_into_vapi(e164: str) -> str:
+    """Register a Twilio number in Vapi and return its Vapi id."""
+    resp = httpx.post(
+        f"{_VAPI_API}/phone-number",
+        headers=_vapi_headers(),
+        json={
+            "provider": "twilio",
+            "number": e164,
+            "twilioAccountSid": settings.twilio_account_sid,
+            "twilioAuthToken": settings.twilio_auth_token,
+        },
+        timeout=15.0,
+    )
+    resp.raise_for_status()
+    return resp.json()["id"]
+
+
+def link_vapi_numbers(db: Session, vapi_numbers: dict[str, str], import_number=None) -> dict:
+    """Store each active voice line's Vapi id. Lines Vapi doesn't know yet are
+    imported through ``import_number`` when given, otherwise left unlinked."""
+    lines = db.execute(
+        select(ServiceIdentity).where(
+            ServiceIdentity.provider == TWILIO_PROVIDER,
+            ServiceIdentity.status == ServiceIdentityStatus.active.value,
+            ServiceIdentity.capability_outbound_voice.is_(True),
+        )
+    ).scalars().all()
+    linked = imported = missing = 0
+    for line in lines:
+        vapi_id = vapi_numbers.get(line.identity_value)
+        if vapi_id is None and import_number is not None:
+            vapi_id = import_number(line.identity_value)
+            imported += 1
+        if vapi_id is None:
+            missing += 1
+            continue
+        line.vapi_phone_number_id = vapi_id
+        linked += 1
+    db.commit()
+    return {"linked": linked, "imported": imported, "missing": missing}
+
+
 def main() -> None:  # pragma: no cover - thin I/O wrapper
+    import sys
+
     configure_logging()
     numbers = fetch_twilio_numbers()
     db = SessionLocal()
@@ -192,6 +255,8 @@ def main() -> None:  # pragma: no cover - thin I/O wrapper
         result = sync_sender_lines(
             db, numbers, messaging_service_sid=settings.twilio_messaging_service_sid
         )
+        if "--vapi" in sys.argv:
+            result["vapi"] = link_vapi_numbers(db, fetch_vapi_numbers(), import_into_vapi)
     finally:
         db.close()
     logger.info("sender_lines_synced", extra={"provider": "admin"})

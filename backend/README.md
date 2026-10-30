@@ -257,30 +257,32 @@ Notes:
 ### Vapi (real voice calls)
 
 `VapiVoiceProvider` (`app/providers/voice/vapi.py`) places outbound calls via
-Vapi against a pre-configured Assistant and Vapi phone number.
+Vapi. The agent itself is not configured in Vapi: prompt, model, voice and
+transcriber live in `app/agent` and go along with every call as a transient
+assistant, so changes to the agent are code changes with tests.
 
 1. Create a Vapi account: https://dashboard.vapi.ai
 2. **API Keys** → copy a private key → `VAPI_API_KEY`.
-3. **Assistants** → create one (voice + system prompt; this is where the bounded
-   call behavior lives) → its id → `VAPI_ASSISTANT_ID`.
-4. **Phone Numbers** → import/buy a number to call *from* → its id →
-   `VAPI_PHONE_NUMBER_ID`.
-5. In `.env`, set:
+3. Set up Twilio first (above), then link its numbers in Vapi:
+   `make sync-senders-vapi`. This imports every voice-capable Twilio line into
+   Vapi and stores the Vapi id on the line, so a persona calls from the same
+   number it texts from and the contact the user saved shows up.
+   `VAPI_PHONE_NUMBER_ID` is only a fallback.
+4. In `.env`, set:
    ```
    VOICE_PROVIDER=vapi
    VAPI_API_KEY=...
-   VAPI_ASSISTANT_ID=...
-   VAPI_PHONE_NUMBER_ID=...
+   PUBLIC_BASE_URL=https://<public-host>
+   VAPI_WEBHOOK_SECRET=<random>
    ```
-6. Restart the API and the **worker** (`make worker` dispatches call requests).
+5. Restart the API and the **worker** (`make worker` dispatches call requests).
 
-The template's opening line + variables are passed as `assistantOverrides`;
-`max_duration_seconds` caps call length.
+`max_duration_seconds` caps call length. Background sound is off, so the call
+doesn't sound like an office.
 
 Call status (ringing → in progress → **Completed**):
-- Vapi posts events to a **Server URL** you configure (Assistant or account
-  level). Point it at `<public-host>/v1/webhooks/voice` (use `ngrok http 8000`
-  locally), and set a **Server URL Secret** → `VAPI_WEBHOOK_SECRET`.
+- Each call tells Vapi to post events to `<PUBLIC_BASE_URL>/v1/webhooks/voice`
+  (use `ngrok http 8000` locally) with `VAPI_WEBHOOK_SECRET` as header.
 - Vapi echoes that secret as the `X-Vapi-Secret` header; the webhook rejects any
   request whose secret doesn't match (403) when `VOICE_PROVIDER=vapi` and the
   secret is set. Mock/local modes skip the check so `simulate` keeps working.

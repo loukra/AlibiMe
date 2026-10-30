@@ -190,8 +190,8 @@ public final class MockTemplateService: TemplateServicing, @unchecked Sendable {
             reasonCode: draft.reason, senderPersonaKey: draft.persona, senderDisplayName: draft.persona,
             supportsContactSave: true, isCustom: true, supportedChannels: draft.channels,
             callMaxDurationSeconds: draft.channels.contains(.call) ? draft.callMaxSeconds : nil,
-            previewOpeningLine: draft.channels.contains(.call) ? "Hi, it's your \(draft.persona)…" : nil,
-            previewSMSBody: draft.channels.contains(.text) ? "Your \(draft.persona) here…" : nil
+            previewOpeningLine: draft.channels.contains(.call) ? "Hey, it's me. Got a minute?" : nil,
+            previewSMSBody: draft.channels.contains(.text) ? "Call me when you can." : nil
         )
         templates.append(created)
         return created

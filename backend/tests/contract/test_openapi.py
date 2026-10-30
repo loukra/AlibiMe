@@ -38,8 +38,11 @@ def test_create_request_response_shape(client):
         "request_id", "channel", "status", "execute_at", "credits_available",
         "cancelable", "sender_identity",
     }
-    # A call request resolves no SMS sender binding in this pass.
-    assert body["sender_identity"] is None
+    # Calls carry a fixed sender number too, for the saved contact.
+    assert set(body["sender_identity"].keys()) == {
+        "sender_binding_id", "sender_persona_key", "sender_display_name",
+        "sender_phone_e164", "contact_prompt_recommended",
+    }
 
 
 def test_error_envelope_shape(client):

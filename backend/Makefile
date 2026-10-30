@@ -3,7 +3,7 @@ PY := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 
 .PHONY: venv install env test api api-lan worker seed migrate revision fmt clean cli demo \
-        bootstrap setup start sync-senders
+        bootstrap setup start sync-senders sync-senders-vapi
 
 venv:
 	python3.11 -m venv $(VENV)
@@ -52,6 +52,10 @@ seed: env
 # adding/removing/rotating Twilio numbers (requires Twilio creds in .env).
 sync-senders: env
 	$(PY) -m app.admin.sync_sender_lines
+
+# Same, then import the voice-capable lines into Vapi and store their ids.
+sync-senders-vapi: env
+	$(PY) -m app.admin.sync_sender_lines --vapi
 
 # CLI: pass args via `make cli args="templates"` or run the script directly.
 cli:

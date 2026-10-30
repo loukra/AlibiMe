@@ -1,7 +1,7 @@
 #if canImport(SwiftUI)
 import SwiftUI
 
-// The optional Save Contact flow, attached to the SMS success surface. None of
+// The optional Save Contact flow, offered after a call or text is set up. None of
 // this is on the critical send path: sender continuity comes from the backend
 // binding whether or not a contact is ever saved.
 
@@ -66,7 +66,7 @@ private struct SaveContactFlowModifier: ViewModifier {
             // dismissal — which clears `pendingSenderPrompt` — can't race the
             // Save action and turn a "Save" into a no-op.
             .alert(
-                "Save this sender as a contact?",
+                "Save this number as a contact?",
                 isPresented: Binding(
                     get: { vm.pendingSenderPrompt != nil },
                     set: { if !$0 { vm.pendingSenderPrompt = nil } }
@@ -76,7 +76,7 @@ private struct SaveContactFlowModifier: ViewModifier {
                 Button("Save Contact") { Task { await vm.beginSaveContact(for: sender) } }
                 Button("Not now", role: .cancel) { vm.markPromptSkipped(for: sender) }
             } message: { sender in
-                Text("Future texts from \(sender.displayName ?? "this sender") can come from the same sender. You can save this contact now or skip it.")
+                Text("Calls and texts from \(sender.displayName ?? "this sender") always come from this number. Save it and your phone shows the name instead.")
             }
             // 2. Prefilled contact sheet (presented only after permission).
             .sheet(item: $vm.contactSheetSender) { sender in

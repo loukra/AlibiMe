@@ -152,26 +152,24 @@ def create_request(
         raise InsufficientCredits()
 
     # Resolve (or allocate) a stable sender binding so the same persona keeps the
-    # same sender number across sends, and snapshot it onto the request. SMS-only
-    # in this pass; the binding system is channel-agnostic for later voice reuse.
+    # same number across sends and channels, and snapshot it onto the request.
     sender_binding_id = None
     sender_persona_key = None
     sender_display_name_snapshot = None
     sender_phone_e164_snapshot = None
-    if channel == Channel.sms.value:
-        resolved = sender_identity.resolve_or_allocate_binding(
-            db,
-            user_id,
-            sender_persona_key=template.sender_persona_key,
-            channel=channel,
-            template_id=template.id,
-        )
-        if resolved is not None:
-            binding, line = resolved
-            sender_binding_id = binding.id
-            sender_persona_key = template.sender_persona_key
-            sender_display_name_snapshot = template.sender_display_name
-            sender_phone_e164_snapshot = line.identity_value
+    resolved = sender_identity.resolve_or_allocate_binding(
+        db,
+        user_id,
+        sender_persona_key=template.sender_persona_key,
+        channel=channel,
+        template_id=template.id,
+    )
+    if resolved is not None:
+        binding, line = resolved
+        sender_binding_id = binding.id
+        sender_persona_key = template.sender_persona_key
+        sender_display_name_snapshot = template.sender_display_name
+        sender_phone_e164_snapshot = line.identity_value
 
     request = Request(
         user_id=user_id,
@@ -212,7 +210,7 @@ def create_request(
 
 def sender_identity_payload(db: Session, request: Request) -> dict | None:
     """Sender metadata for API responses; ``None`` when no binding was resolved
-    (e.g. call requests, or an empty sender pool)."""
+    (an empty sender pool)."""
     if request.sender_binding_id is None:
         return None
     template = db.get(Template, request.template_id)

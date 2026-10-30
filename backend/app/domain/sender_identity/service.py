@@ -10,8 +10,9 @@ Source-of-truth split:
   - this backend owns how those lines are assigned to users and personas
     (``user_sender_bindings``).
 
-This module is provider-agnostic on purpose so ``call`` bindings can later reuse
-the same machinery for Vapi.
+Calls and texts from one persona share a line wherever it can do both, so the
+contact the user saved ("Mom") shows up for either. Bindings stay one row per
+channel; a new channel's binding reuses the line of the persona's other binding.
 """
 from __future__ import annotations
 
@@ -32,13 +33,19 @@ def _line_supports(line: ServiceIdentity, channel: str) -> bool:
     return line.capability_outbound_sms
 
 
-def select_sender_line(db: Session, channel: str) -> ServiceIdentity | None:
+def select_sender_line(
+    db: Session,
+    channel: str,
+    *,
+    user_id: uuid.UUID | None = None,
+    sender_persona_key: str | None = None,
+) -> ServiceIdentity | None:
     """Pick an active sender line capable of the channel.
 
-    Deterministic by ``created_at`` so a single-number pool always resolves to
-    the same line (multiple personas may therefore share one number — that is an
-    accepted product outcome, not a bug). A richer allocator (least-recently
-    assigned / round-robin) can slot in here once the pool has several numbers.
+    Preference, in order: a line no other persona of this user is bound to (so
+    "Mom" and "Boss" don't show up as the same contact), a line that can both
+    call and text, then the oldest line. With a one-number pool every persona
+    shares that number, which is an accepted outcome, not a bug.
     """
     stmt = select(ServiceIdentity).where(
         ServiceIdentity.status == ServiceIdentityStatus.active.value
@@ -47,7 +54,58 @@ def select_sender_line(db: Session, channel: str) -> ServiceIdentity | None:
         stmt = stmt.where(ServiceIdentity.capability_outbound_voice.is_(True))
     else:
         stmt = stmt.where(ServiceIdentity.capability_outbound_sms.is_(True))
-    return db.execute(stmt.order_by(ServiceIdentity.created_at)).scalars().first()
+    lines = db.execute(stmt.order_by(ServiceIdentity.created_at)).scalars().all()
+    if not lines:
+        return None
+
+    taken: set[uuid.UUID] = set()
+    if user_id is not None:
+        taken = set(
+            db.execute(
+                select(UserSenderBinding.sender_line_id).where(
+                    UserSenderBinding.user_id == user_id,
+                    UserSenderBinding.sender_persona_key != sender_persona_key,
+                )
+            ).scalars().all()
+        )
+
+    def rank(indexed):
+        i, line = indexed
+        both = line.capability_outbound_voice and line.capability_outbound_sms
+        return (line.id in taken, not both, i)
+
+    return min(enumerate(lines), key=rank)[1]
+
+
+def _persona_line(
+    db: Session, user_id: uuid.UUID, sender_persona_key: str, channel: str
+) -> ServiceIdentity | None:
+    """The line this persona already uses on another channel, if it can serve
+    this channel too."""
+    others = db.execute(
+        select(UserSenderBinding).where(
+            UserSenderBinding.user_id == user_id,
+            UserSenderBinding.sender_persona_key == sender_persona_key,
+            UserSenderBinding.channel != channel,
+        )
+    ).scalars().all()
+    for other in others:
+        line = db.get(ServiceIdentity, other.sender_line_id)
+        if (
+            line is not None
+            and line.status == ServiceIdentityStatus.active.value
+            and _line_supports(line, channel)
+        ):
+            return line
+    return None
+
+
+def _allocate_line(
+    db: Session, user_id: uuid.UUID, sender_persona_key: str, channel: str
+) -> ServiceIdentity | None:
+    return _persona_line(db, user_id, sender_persona_key, channel) or select_sender_line(
+        db, channel, user_id=user_id, sender_persona_key=sender_persona_key
+    )
 
 
 def resolve_or_allocate_binding(
@@ -59,6 +117,9 @@ def resolve_or_allocate_binding(
     template_id: uuid.UUID | None,
 ) -> tuple[UserSenderBinding, ServiceIdentity] | None:
     """Return the stable (binding, line) for this user+persona+channel.
+
+    A first binding on a channel takes the line the persona already uses on the
+    other channel when that line can serve it.
 
     Reuses an existing active binding when its line is still usable. If the line
     was disabled/removed, the binding is marked orphaned and re-pointed at a
@@ -86,7 +147,7 @@ def resolve_or_allocate_binding(
             binding.last_used_at = now
             return binding, line
         # Bound line vanished/disabled: reallocate without mutating past history.
-        replacement = select_sender_line(db, channel)
+        replacement = _allocate_line(db, user_id, sender_persona_key, channel)
         if replacement is None:
             binding.status = SenderBindingStatus.orphaned.value
             return None
@@ -95,7 +156,7 @@ def resolve_or_allocate_binding(
         binding.last_used_at = now
         return binding, replacement
 
-    line = select_sender_line(db, channel)
+    line = _allocate_line(db, user_id, sender_persona_key, channel)
     if line is None:
         return None
     binding = UserSenderBinding(

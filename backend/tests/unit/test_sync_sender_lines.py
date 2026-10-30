@@ -1,7 +1,7 @@
 """Unit tests for the Twilio sender-line sync (DB upsert logic, no network)."""
 from sqlalchemy import select
 
-from app.admin.sync_sender_lines import TwilioNumber, sync_sender_lines
+from app.admin.sync_sender_lines import TwilioNumber, link_vapi_numbers, sync_sender_lines
 from app.db.models.enums import ServiceIdentityStatus
 from app.db.models.service_identity import ServiceIdentity
 
@@ -76,3 +76,37 @@ def test_sync_adopts_existing_number_row(db):
     assert len(rows) == 1
     assert rows[0].provider == "twilio"
     assert rows[0].external_identity_id == "PN9"
+
+
+def test_link_vapi_numbers_stores_known_ids_and_imports_the_rest(db):
+    sync_sender_lines(
+        db,
+        [
+            _twilio(sid="PN1", e164="+14155550111", voice=True),
+            _twilio(sid="PN2", e164="+14155550222", voice=True),
+            _twilio(sid="PN3", e164="+14155550333", voice=False),  # sms only
+        ],
+        messaging_service_sid="MG_test",
+    )
+    imported = []
+
+    def fake_import(e164):
+        imported.append(e164)
+        return "vapi_new"
+
+    result = link_vapi_numbers(db, {"+14155550111": "vapi_1"}, fake_import)
+    assert result == {"linked": 2, "imported": 1, "missing": 0}
+    assert imported == ["+14155550222"]
+
+    by_sid = {
+        r.external_identity_id: r.vapi_phone_number_id
+        for r in db.execute(
+            select(ServiceIdentity).where(ServiceIdentity.provider == "twilio")
+        ).scalars()
+    }
+    assert by_sid == {"PN1": "vapi_1", "PN2": "vapi_new", "PN3": None}
+
+
+def test_link_vapi_numbers_without_import_leaves_unknown_lines(db):
+    sync_sender_lines(db, [_twilio(voice=True)], messaging_service_sid="MG_test")
+    assert link_vapi_numbers(db, {}) == {"linked": 0, "imported": 0, "missing": 1}

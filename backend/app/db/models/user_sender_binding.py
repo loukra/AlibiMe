@@ -17,8 +17,8 @@ class UserSenderBinding(Base):
 
     This is the core object that makes future messages from the same persona
     come from the same number. It is provider-agnostic: the bound sender line
-    (``service_identities``) carries the Twilio/Vapi specifics, so a ``call``
-    binding can later point at a voice-capable line under the same persona.
+    (``service_identities``) carries the Twilio/Vapi specifics. A persona's call
+    and sms bindings point at the same line whenever it can do both.
     """
 
     __tablename__ = "user_sender_bindings"

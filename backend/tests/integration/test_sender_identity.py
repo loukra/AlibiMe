@@ -103,16 +103,74 @@ def test_history_exposes_sender_snapshot(client):
     assert item["sender_phone_e164"]
 
 
-def test_call_request_has_no_sender_identity(client):
-    """SMS-only in this pass: call requests resolve no binding."""
-    a = signup(client)
-    tid = get_template_id(client, a["headers"], "boss_travel_assignment")
-    resp = client.post(
+def _create_call(client, headers, template, crid):
+    tid = get_template_id(client, headers, template)
+    return client.post(
         "/v1/requests",
-        headers=a["headers"],
-        json={"client_request_id": "c1", "template_id": tid, "channel": "call", "delay_seconds": 0},
-    ).json()
-    assert resp["sender_identity"] is None
+        headers=headers,
+        json={"client_request_id": crid, "template_id": tid, "channel": "call", "delay_seconds": 0},
+    )
+
+
+def _add_line(db, value, *, voice=True, sms=True):
+    line = ServiceIdentity(
+        provider="mock",
+        identity_value=value,
+        capability_outbound_voice=voice,
+        capability_outbound_sms=sms,
+        status=ServiceIdentityStatus.active.value,
+    )
+    db.add(line)
+    db.commit()
+    return line
+
+
+def test_call_request_returns_sender_identity(client):
+    """Calls get a fixed sender number too, so a saved contact shows for them."""
+    a = signup(client)
+    resp = _create_call(client, a["headers"], "boss_travel_assignment", "c1").json()
+    sender = resp["sender_identity"]
+    assert sender is not None
+    assert sender["sender_persona_key"] == "boss"
+    assert sender["sender_phone_e164"]
+    assert sender["contact_prompt_recommended"] is True
+
+
+def test_call_and_text_from_one_persona_share_the_number(client, db):
+    a = signup(client)
+    _add_line(db, "+10000000201")
+    _add_line(db, "+10000000202")
+    text = _create_sms(client, a["headers"], "best_friend_need_you_outside", "c1").json()
+    _cancel(client, a["headers"], text["request_id"])
+    call = _create_call(client, a["headers"], "best_friend_need_you_outside", "c2").json()
+    assert (
+        call["sender_identity"]["sender_phone_e164"]
+        == text["sender_identity"]["sender_phone_e164"]
+    )
+
+
+def test_personas_get_distinct_numbers_when_the_pool_allows(client, db):
+    a = signup(client)
+    _add_line(db, "+10000000301")
+    boss = _create_call(client, a["headers"], "boss_travel_assignment", "c1").json()
+    _cancel(client, a["headers"], boss["request_id"])
+    sibling = _create_call(client, a["headers"], "sibling_family_checkin", "c2").json()
+    assert (
+        boss["sender_identity"]["sender_phone_e164"]
+        != sibling["sender_identity"]["sender_phone_e164"]
+    )
+
+
+def test_allocation_prefers_lines_that_call_and_text(client, db):
+    # Retire the seed line so only the two new lines compete.
+    for line in db.execute(select(ServiceIdentity)).scalars().all():
+        line.status = ServiceIdentityStatus.disabled.value
+    db.commit()
+    _add_line(db, "+10000000401", sms=False)  # older, voice only
+    _add_line(db, "+10000000402")
+    a = signup(client)
+    call = _create_call(client, a["headers"], "boss_travel_assignment", "c1").json()
+    assert call["sender_identity"]["sender_phone_e164"] == "+10000000402"
 
 
 def test_orphaned_line_reallocates_on_next_send(client, db):

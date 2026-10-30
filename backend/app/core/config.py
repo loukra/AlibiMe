@@ -57,7 +57,6 @@ class Settings(BaseSettings):
     twilio_sms_from_number: str | None = None
     twilio_status_callback_url: str | None = None
     vapi_api_key: str | None = None
-    vapi_assistant_id: str | None = None  # unused since the agent config moved into app/agent
     # Fallback caller line when a sender line has neither its own Vapi number
     # nor Twilio credentials to place the call from.
     vapi_phone_number_id: str | None = None

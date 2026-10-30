@@ -15,7 +15,6 @@ def _enable_vapi(monkeypatch):
     monkeypatch.setattr(settings, "vapi_webhook_secret", SECRET)
     # Needed only when a request passes verification and builds the provider.
     monkeypatch.setattr(settings, "vapi_api_key", "vapi_key")
-    monkeypatch.setattr(settings, "vapi_assistant_id", "asst_1")
     monkeypatch.setattr(settings, "vapi_phone_number_id", "pn_1")
 
 
