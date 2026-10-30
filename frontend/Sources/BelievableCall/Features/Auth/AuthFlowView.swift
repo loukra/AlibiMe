@@ -45,7 +45,7 @@ struct WelcomeView: View {
                     .accessibilityHidden(true)
                 Text("AlibiMe")
                     .font(.largeTitle.bold())
-                Text("A believable call or text to your own phone, right on cue — your way out of an awkward or unsafe moment.")
+                Text("Get a call or text when you need a reason to leave.")
                     .font(.body)
                     .foregroundStyle(.secondary)
             }

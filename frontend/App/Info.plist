@@ -11,6 +11,6 @@
 	<!-- Requested only in-context, when the user chooses to save a sender as a
 	     contact. The app never asks for Contacts access at launch. -->
 	<key>NSContactsUsageDescription</key>
-	<string>Save a sender as a contact, like "Mom", so your alibi rings or arrives as someone you know. This is optional — alibis work whether or not you save a contact.</string>
+	<string>Lets you save the sender as a contact, for example as "Mom". This is optional.</string>
 </dict>
 </plist>
