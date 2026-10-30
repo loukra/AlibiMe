@@ -103,6 +103,12 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
     public let supportsContactSave: Bool
     /// True for a user's own custom template; false for built-in/system ones.
     public let isCustom: Bool
+    /// A built-in the user changed: shown in the original's place, with Reset.
+    public let isEdited: Bool
+    /// For an edited built-in: the original's id, so a selection follows it.
+    public let originalId: String?
+    /// What the editor opens with when this template is tapped.
+    public let choices: CustomTemplateDraft?
     public let supportedChannels: Set<Channel>
     public let callMaxDurationSeconds: Int?
     public let previewOpeningLine: String?
@@ -119,6 +125,9 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
                 senderDisplayName: String = "",
                 supportsContactSave: Bool = true,
                 isCustom: Bool = false,
+                isEdited: Bool = false,
+                originalId: String? = nil,
+                choices: CustomTemplateDraft? = nil,
                 supportedChannels: Set<Channel>,
                 callMaxDurationSeconds: Int?,
                 previewOpeningLine: String?,
@@ -134,6 +143,9 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
         self.senderDisplayName = senderDisplayName
         self.supportsContactSave = supportsContactSave
         self.isCustom = isCustom
+        self.isEdited = isEdited
+        self.originalId = originalId
+        self.choices = choices
         self.supportedChannels = supportedChannels
         self.callMaxDurationSeconds = callMaxDurationSeconds
         self.previewOpeningLine = previewOpeningLine
@@ -142,6 +154,12 @@ public struct TemplateSummary: Equatable, Identifiable, Sendable {
 
     public func supports(_ channel: Channel) -> Bool {
         supportedChannels.contains(channel)
+    }
+
+    /// Whether this is the same template as `id`, counting a built-in and the
+    /// user's edited copy of it as one.
+    public func isSameTemplate(as other: TemplateSummary) -> Bool {
+        id == other.id || originalId == other.id || other.originalId == id
     }
 
     /// Preview line appropriate for the chosen channel, if any.

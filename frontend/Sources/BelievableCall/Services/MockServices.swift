@@ -5,6 +5,18 @@ import Foundation
 // the real backend.
 
 public enum Fixtures {
+    /// What the backend sends as a built-in's editor choices.
+    static func choices(name: String, channels: Set<Channel>) -> CustomTemplateDraft {
+        var draft = CustomTemplateDraft()
+        draft.displayName = name
+        draft.category = "work"
+        draft.persona = "manager"
+        draft.reason = "work_urgent_task"
+        draft.urgency = "high"
+        draft.channels = channels
+        return draft
+    }
+
     public static func template(
         id: String = "tpl-boss-urgent",
         code: String = "coworker_urgent_work_issue",
@@ -17,6 +29,7 @@ public enum Fixtures {
             description: "Your boss calls about an urgent work issue.",
             category: category, callerPersona: "boss", reasonCode: "urgent_work_issue",
             senderPersonaKey: "boss", senderDisplayName: "Boss", supportsContactSave: true,
+            choices: choices(name: name, channels: channels),
             supportedChannels: channels, callMaxDurationSeconds: 60,
             previewOpeningLine: "Hi, sorry to call — there's an urgent issue I need you on.",
             previewSMSBody: "Need you on an urgent work issue — can you call back?"
@@ -190,7 +203,7 @@ public final class MockTemplateService: TemplateServicing, @unchecked Sendable {
             displayName: draft.displayName, description: draft.description.isEmpty ? nil : draft.description,
             category: TemplateCategory(wireValue: draft.category), callerPersona: draft.persona,
             reasonCode: draft.reason, senderPersonaKey: draft.persona, senderDisplayName: draft.persona,
-            supportsContactSave: true, isCustom: true, supportedChannels: draft.channels,
+            supportsContactSave: true, isCustom: true, choices: draft, supportedChannels: draft.channels,
             callMaxDurationSeconds: draft.channels.contains(.call) ? draft.callMaxSeconds : nil,
             previewOpeningLine: draft.channels.contains(.call) ? "Hey, it's me. Got a minute?" : nil,
             previewSMSBody: draft.channels.contains(.text) ? "Call me when you can." : nil
@@ -199,9 +212,44 @@ public final class MockTemplateService: TemplateServicing, @unchecked Sendable {
         return created
     }
 
+    public private(set) var updated: [(id: String, draft: CustomTemplateDraft)] = []
+
+    public func update(id: String, _ draft: CustomTemplateDraft) async throws -> TemplateSummary {
+        if let createError { throw createError }
+        updated.append((id, draft))
+        guard let index = templates.firstIndex(where: { $0.id == id }) else {
+            throw APIError.api(code: "not_found", message: "Template not found.", retryable: false, requestID: nil)
+        }
+        let old = templates[index]
+        let saved = TemplateSummary(
+            id: old.isCustom || old.isEdited ? old.id : "edited-\(old.id)", code: old.code,
+            displayName: draft.displayName,
+            description: draft.description.isEmpty ? nil : draft.description,
+            category: old.isCustom ? TemplateCategory(wireValue: draft.category) : old.category,
+            callerPersona: draft.persona, reasonCode: draft.reason,
+            isCustom: old.isCustom, isEdited: !old.isCustom,
+            originalId: old.isCustom ? nil : (old.originalId ?? old.id), choices: draft,
+            supportedChannels: draft.channels,
+            callMaxDurationSeconds: draft.channels.contains(.call) ? draft.callMaxSeconds : nil,
+            previewOpeningLine: draft.channels.contains(.call) ? "Hey, it's me. Got a minute?" : nil,
+            previewSMSBody: draft.channels.contains(.text) ? "Call me when you can." : nil
+        )
+        if !old.isCustom && !old.isEdited { originals[saved.id] = old }
+        templates[index] = saved
+        return saved
+    }
+
+    /// Built-ins replaced by an edited copy, so a reset can bring them back.
+    private var originals: [String: TemplateSummary] = [:]
+
     public func delete(id: String) async throws {
         deletedIDs.append(id)
-        templates.removeAll { $0.id == id }
+        if let original = originals.removeValue(forKey: id),
+           let index = templates.firstIndex(where: { $0.id == id }) {
+            templates[index] = original
+        } else {
+            templates.removeAll { $0.id == id }
+        }
     }
 }
 

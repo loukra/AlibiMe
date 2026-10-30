@@ -3,7 +3,8 @@ import SwiftUI
 
 /// The Templates library page: the user's own templates first, then the
 /// built-in ones by category, each as its own card (like the picker on Home).
-/// ＋ creates a new one; own templates are deleted with a swipe.
+/// Tapping a card edits it (a built-in one can be reset later); ＋ creates a
+/// new one; own templates are also deleted with a swipe.
 public struct TemplatesView: View {
     @Bindable var vm: TemplatesViewModel
     /// Non-nil while the editor sheet is open. `.sheet(item:)` hands the view
@@ -28,7 +29,7 @@ public struct TemplatesView: View {
             }
             if !vm.customTemplates.isEmpty {
                 Section {
-                    ForEach(vm.customTemplates) { TemplateRow(template: $0).bcCardRow() }
+                    ForEach(vm.customTemplates) { row($0) }
                         .onDelete { offsets in
                             let items = offsets.map { vm.customTemplates[$0] }
                             Task { for item in items { await vm.delete(item) } }
@@ -37,7 +38,7 @@ public struct TemplatesView: View {
             }
             ForEach(vm.systemTemplatesByCategory, id: \.category) { group in
                 Section {
-                    ForEach(group.templates) { TemplateRow(template: $0).bcCardRow() }
+                    ForEach(group.templates) { row($0) }
                 } header: { SectionHeader(group.category.title) }
             }
         }
@@ -62,12 +63,23 @@ public struct TemplatesView: View {
             CustomTemplateEditorView(
                 vm: editor,
                 onClose: { editorVM = nil },
-                onCreated: { _ in
+                onFinished: {
                     editorVM = nil
-                    Task { await vm.load() }
+                    Task { await vm.editorFinished() }
                 }
             )
         }
+    }
+
+    private func row(_ template: TemplateSummary) -> some View {
+        Button {
+            editorVM = vm.makeEditorViewModel(editing: template)
+        } label: {
+            TemplateRow(template: template)
+        }
+        .buttonStyle(.plain)
+        .bcCardRow()
+        .accessibilityHint("Edit")
     }
 }
 
@@ -78,9 +90,23 @@ struct TemplateRow: View {
         ListCardRow(icon: template.category.systemImage,
                     title: template.displayName,
                     detail: template.description ?? "") {
+            if template.isEdited { EditedTag() }
+        } footer: {
             ChannelGlyphs(channels: template.supportedChannels)
         }
         .accessibilityElement(children: .combine)
+    }
+}
+
+/// Marks a built-in template the user changed (it can be reset in the editor).
+struct EditedTag: View {
+    var body: some View {
+        Text("Edited")
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, Spacing.s)
+            .padding(.vertical, 3)
+            .foregroundStyle(Theme.accent)
+            .background(Theme.accent.opacity(0.12), in: Capsule())
     }
 }
 

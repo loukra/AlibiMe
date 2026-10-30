@@ -94,7 +94,7 @@ final class ExtendedCustomTemplateTests: XCTestCase {
         let vm = CustomTemplateEditorViewModel(service: MockTemplateService())
         await vm.load()
         XCTAssertEqual(vm.phase, .ready)
-        XCTAssertFalse(vm.draft.persona.isEmpty)
+        XCTAssertFalse(vm.options?.personas.isEmpty ?? true)
         // Rich defaults are valid coded values.
         XCTAssertEqual(vm.draft.outcome, "step_out_briefly")
         XCTAssertEqual(vm.draft.continuityScope, "one_off")
@@ -104,6 +104,7 @@ final class ExtendedCustomTemplateTests: XCTestCase {
         let service = MockTemplateService()
         let vm = CustomTemplateEditorViewModel(service: service)
         await vm.load()
+        vm.walkThroughSteps()
         vm.draft.displayName = "Leave the date"
         vm.draft.outcome = "leave_now"
         vm.draft.contextModules = ["home"]

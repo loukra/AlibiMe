@@ -35,6 +35,27 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertEqual(vm.selectedTemplate?.id, "tpl-safety")
     }
 
+    func testSelectionFollowsTheEditedCopyAndBackAfterReset() async throws {
+        let service = MockTemplateService()
+        let vm = HomeViewModel(templateService: service, requestService: MockRequestService(),
+                               profileService: MockProfileService(profile: Fixtures.profile()),
+                               prefs: InMemoryPreferences(), contacts: MockContactsService(),
+                               contactLinks: InMemoryContactLinkStore())
+        await vm.load()
+        let original = try XCTUnwrap(vm.templates.first { $0.id == "tpl-boss-travel" })
+        vm.selectTemplate(original)
+
+        var draft = try XCTUnwrap(original.choices)
+        draft.displayName = "My boss"
+        let copy = try await service.update(id: original.id, draft)
+        await vm.refresh()
+        XCTAssertEqual(vm.selectedTemplate?.id, copy.id)
+
+        try await service.delete(id: copy.id)
+        await vm.refresh()
+        XCTAssertEqual(vm.selectedTemplate?.id, original.id)
+    }
+
     func testChannelFilteringForTextOnlyTemplate() async {
         // tpl-roommate supports only .text in fixtures.
         let prefs = InMemoryPreferences()

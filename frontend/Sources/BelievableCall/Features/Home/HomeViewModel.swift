@@ -116,7 +116,7 @@ public final class HomeViewModel {
     /// On foreground/resume (and each time the Home tab becomes visible), refresh
     /// the active request, profile, and the template catalog — so templates
     /// created on the Templates tab appear here too. The current selection is
-    /// preserved if it still exists.
+    /// preserved if it still exists, or moves to its edited copy or original.
     public func refresh() async {
         if let updated = try? await profileService.me() {
             profile = updated
@@ -125,8 +125,11 @@ public final class HomeViewModel {
         }
         if let latest = try? await templateService.list() {
             templates = latest
-            if let current = selectedTemplate, latest.contains(where: { $0.id == current.id }) {
-                selectedTemplate = latest.first { $0.id == current.id }
+            // Editing or resetting the selected built-in keeps it selected.
+            if let current = selectedTemplate,
+               let match = latest.first(where: { $0.id == current.id })
+                ?? latest.first(where: { $0.isSameTemplate(as: current) }) {
+                selectTemplate(match)
             } else {
                 restoreSelection()
             }

@@ -4,8 +4,39 @@ import Foundation
 // into product-language models.
 
 extension TemplateCategory {
+    /// Built-ins use the short names; own templates use the editor's catalog.
     init(wireValue: String) {
-        self = TemplateCategory(rawValue: wireValue) ?? .social
+        switch wireValue {
+        case "family_care": self = .family
+        case "home_logistics", "travel_transition": self = .logistics
+        case "safety_discomfort", "personal_boundaries": self = .safety
+        default: self = TemplateCategory(rawValue: wireValue) ?? .social
+        }
+    }
+}
+
+extension CustomTemplateDraft {
+    init(dto: TemplateChoicesDTO, callSecondsDefault: Int = 60) {
+        self.init()
+        displayName = dto.display_name
+        description = dto.description ?? ""
+        category = dto.category
+        persona = dto.persona
+        reason = dto.reason
+        channels = Set(dto.channels.compactMap { Channel(wireValue: $0) })
+        urgency = dto.urgency
+        outcome = dto.outcome
+        setting = dto.setting
+        tone = dto.tone
+        detailProfile = dto.detail_profile
+        discretionLevel = dto.discretion_level
+        formality = dto.formality
+        expectedResponse = dto.expected_response
+        followupBehavior = dto.followup_behavior
+        continuityScope = dto.continuity_scope
+        contextModules = Set(dto.context_modules ?? [])
+        voiceStyle = dto.voice_style
+        callMaxSeconds = dto.call_max_seconds ?? callSecondsDefault
     }
 }
 
@@ -24,6 +55,9 @@ extension TemplateSummary {
             senderDisplayName: dto.sender_display_name,
             supportsContactSave: dto.supports_contact_save,
             isCustom: dto.is_custom ?? false,
+            isEdited: dto.is_edited ?? false,
+            originalId: dto.original_id,
+            choices: dto.choices.map { CustomTemplateDraft(dto: $0) },
             supportedChannels: Set(channels),
             callMaxDurationSeconds: dto.call_max_duration_seconds,
             previewOpeningLine: dto.preview_opening_line,

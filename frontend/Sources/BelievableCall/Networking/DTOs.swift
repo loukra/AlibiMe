@@ -102,10 +102,36 @@ struct TemplateOutDTO: Decodable {
     let sender_display_name: String
     let supports_contact_save: Bool
     let is_custom: Bool?
+    var is_edited: Bool? = nil
+    var original_id: String? = nil
+    var choices: TemplateChoicesDTO? = nil
     let supported_channels: [String]
     let call_max_duration_seconds: Int?
     let preview_opening_line: String?
     let preview_sms_body: String?
+}
+
+/// The editor's starting choices; the same fields as the create/update body.
+struct TemplateChoicesDTO: Decodable {
+    let display_name: String
+    let description: String?
+    let category: String
+    let persona: String
+    let reason: String
+    let channels: [String]
+    let urgency: String
+    let outcome: String
+    let setting: String
+    let tone: String
+    let detail_profile: String
+    let discretion_level: String
+    let formality: String
+    let expected_response: String
+    let followup_behavior: String
+    let continuity_scope: String
+    let context_modules: [String]?
+    let voice_style: String
+    let call_max_seconds: Int?
 }
 
 struct TemplateListResponseDTO: Decodable {

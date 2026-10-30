@@ -39,7 +39,11 @@ public protocol TemplateServicing: Sendable {
     func options() async throws -> TemplateOptions
     /// Create a user-owned custom template from structured choices.
     func createCustom(_ draft: CustomTemplateDraft) async throws -> TemplateSummary
-    /// Delete one of the user's own custom templates.
+    /// Save the editor's choices for an existing template. A built-in one is
+    /// stored as the user's edited copy, which then replaces it in the list.
+    func update(id: String, _ draft: CustomTemplateDraft) async throws -> TemplateSummary
+    /// Delete one of the user's own custom templates, or reset an edited
+    /// built-in (by the edited copy's id) to its original.
     func delete(id: String) async throws
 }
 
@@ -162,7 +166,21 @@ public struct LiveTemplateService: TemplateServicing {
     }
 
     public func createCustom(_ draft: CustomTemplateDraft) async throws -> TemplateSummary {
-        let body = try BCCoding.encoder.encode(
+        let dto = try await client.send(
+            Endpoint(.POST, "v1/templates", body: try Self.body(draft)), as: TemplateOutDTO.self
+        )
+        return TemplateSummary(dto: dto)
+    }
+
+    public func update(id: String, _ draft: CustomTemplateDraft) async throws -> TemplateSummary {
+        let dto = try await client.send(
+            Endpoint(.PUT, "v1/templates/\(id)", body: try Self.body(draft)), as: TemplateOutDTO.self
+        )
+        return TemplateSummary(dto: dto)
+    }
+
+    private static func body(_ draft: CustomTemplateDraft) throws -> Data {
+        try BCCoding.encoder.encode(
             CreateCustomTemplateBodyDTO(
                 display_name: draft.displayName,
                 description: draft.description.isEmpty ? nil : draft.description,
@@ -185,10 +203,6 @@ public struct LiveTemplateService: TemplateServicing {
                 call_max_seconds: draft.callMaxSeconds
             )
         )
-        let dto = try await client.send(
-            Endpoint(.POST, "v1/templates", body: body), as: TemplateOutDTO.self
-        )
-        return TemplateSummary(dto: dto)
     }
 
     public func delete(id: String) async throws {
