@@ -2,3 +2,4 @@
 *.db
 # Local CLI/TUI saved session
 .bc_app_session.json
+evals/reports/

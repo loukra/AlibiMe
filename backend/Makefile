@@ -3,7 +3,7 @@ PY := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 
 .PHONY: venv install env test api api-lan worker seed migrate revision fmt clean cli demo \
-        bootstrap setup start sync-senders sync-senders-vapi
+        bootstrap setup start sync-senders sync-senders-vapi eval
 
 venv:
 	python3.11 -m venv $(VENV)
@@ -56,6 +56,11 @@ sync-senders: env
 # Same, then import the voice-capable lines into Vapi and store their ids.
 sync-senders-vapi: env
 	$(PY) -m app.admin.sync_sender_lines --vapi
+
+# Voice-agent evals. Offline by default; EVAL_LLM_PROVIDER=openai (or anthropic)
+# talks to the real model, args="--judge" adds the LLM judge.
+eval:
+	$(PY) -m evals.run $(args)
 
 # CLI: pass args via `make cli args="templates"` or run the script directly.
 cli:
