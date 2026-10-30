@@ -42,7 +42,19 @@ final class BackendIntegrationTests: XCTestCase {
         let session = try await env.auth.confirm(verificationID: start.verificationID,
                                                  code: mockOTP, deviceID: env.prefs.deviceID)
         env.tokenHolder.update(session.token)
+        try await topUp(env)
         return session
+    }
+
+    /// Buys a pack with a mock App Store transaction (a local or test backend
+    /// accepts those). The test numbers are a small fictional range and free
+    /// credits come once per number, so a number used in an earlier run would
+    /// otherwise have none left.
+    private func topUp(_ env: AppEnvironment) async throws {
+        let catalog = try await env.creditPackages.catalog()
+        let product = try XCTUnwrap(catalog.packages.compactMap(\.storeProductID).first,
+                                    "No App Store pack in the catalog.")
+        _ = try await env.creditPackages.redeem(signedTransaction: "mock:\(product):\(UUID().uuidString)")
     }
 
     /// Cancels any pre-existing active request so a test can create a fresh one.
@@ -129,22 +141,28 @@ final class BackendIntegrationTests: XCTestCase {
         _ = try? await env.requests.cancel(id: created.id)
     }
 
-    func testActiveRequestBlocksSecond() async throws {
+    func testQueueRefusesAJobBeyondTheCap() async throws {
+        // The backend queues up to three jobs at once (MAX_PENDING_REQUESTS);
+        // the fourth is refused with active_request_exists.
         let env = makeEnvironment()
         try await authenticate(env, phone: freshPhoneNumber())
         try await clearActiveRequest(env)
         let templates = try await env.templates.list()
         let template = try XCTUnwrap(templates.first { $0.supports(.call) })
-
-        let first = try await env.requests.create(
+        // A new draft each time: a draft carries its own client_request_id,
+        // and the backend answers a repeat with the same job.
+        func draft() -> RequestDraft {
             RequestDraft(templateID: template.id, channel: .call, timing: .in5Minutes)
-        )
-        defer { Task { _ = try? await env.requests.cancel(id: first.id) } }
+        }
+
+        var queued: [String] = []
+        defer { for id in queued { Task { _ = try? await env.requests.cancel(id: id) } } }
+        for _ in 0..<3 {
+            queued.append(try await env.requests.create(draft()).id)
+        }
 
         do {
-            _ = try await env.requests.create(
-                RequestDraft(templateID: template.id, channel: .call, timing: .in5Minutes)
-            )
+            _ = try await env.requests.create(draft())
             XCTFail("expected active_request_exists")
         } catch let error as APIError {
             XCTAssertEqual(error.backendCode, "active_request_exists")

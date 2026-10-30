@@ -93,8 +93,14 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
 ```
 
 The integration suite drives the full login → templates → create → get → cancel
-→ history flow, plus the active-request and schedule-window invariants, through
+→ history flow, plus the queue cap and schedule-window invariants, through
 the app's own networking layer.
+
+Each test signs in with one of the hundred fictional numbers +1 415 555-0100 to
+-0199 and then buys a pack with a mock App Store transaction, since free credits
+come only once per number. Running the suite many times within a few minutes
+reuses numbers and hits the backend's rate limits (`rate_limited`); a fresh
+throwaway database or a short pause clears that.
 
 ## Running the app on a device / simulator
 
