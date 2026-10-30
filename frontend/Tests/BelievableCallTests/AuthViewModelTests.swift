@@ -18,11 +18,49 @@ final class AuthViewModelTests: XCTestCase {
         XCTAssertTrue(vm.canSubmitPhone)
     }
 
+    func testGermanyIsTheDefaultCountry() {
+        let vm = AuthViewModel(auth: MockAuthService())
+        XCTAssertEqual(vm.country.dialCode, "49")
+        XCTAssertEqual(vm.country.flag, "🇩🇪")
+        vm.phoneNumber = "0151 23456789"
+        XCTAssertEqual(vm.fullNumber, "+4915123456789")
+        vm.country = PhoneCountry.all.first { $0.regionCode == "AT" }!
+        XCTAssertEqual(vm.fullNumber, "+4315123456789")
+    }
+
+    func testAPastedInternationalNumberPicksItsCountry() {
+        let vm = AuthViewModel(auth: MockAuthService())
+        vm.phoneNumber = "+44 7700 900123"
+        vm.phoneNumberChanged()
+        XCTAssertEqual(vm.country.regionCode, "GB")
+        XCTAssertEqual(vm.phoneNumber, "7700900123")
+        XCTAssertEqual(vm.fullNumber, "+447700900123")
+
+        vm.phoneNumber = "00352 621 123 456"
+        vm.phoneNumberChanged()
+        XCTAssertEqual(vm.country.regionCode, "LU", "the longer +352 wins over shorter codes")
+
+        vm.phoneNumber = "+1 415 555 0123"
+        vm.phoneNumberChanged()
+        XCTAssertEqual(vm.country.regionCode, "US")
+    }
+
+    func testAPlusAloneLeavesTheMenuAlone() {
+        let vm = AuthViewModel(auth: MockAuthService())
+        vm.phoneNumber = "+4"
+        vm.phoneNumberChanged()
+        XCTAssertEqual(vm.country.regionCode, "DE")
+        XCTAssertEqual(vm.phoneNumber, "+4")
+    }
+
     func testNormalizationStripsFormatting() {
-        XCTAssertEqual(AuthViewModel.normalizedPhone("+1 (415) 555-0123"), "+14155550123")
-        XCTAssertEqual(AuthViewModel.normalizedPhone("4155550123"), "4155550123")
-        XCTAssertNil(AuthViewModel.normalizedPhone("12"))
-        XCTAssertNil(AuthViewModel.normalizedPhone("not a number"))
+        XCTAssertEqual(AuthViewModel.normalizedPhone("+1 (415) 555-0123", dialCode: "49"), "+14155550123")
+        XCTAssertEqual(AuthViewModel.normalizedPhone("0151 2345 6789", dialCode: "49"), "+4915123456789")
+        XCTAssertEqual(AuthViewModel.normalizedPhone("151 23456789", dialCode: "49"), "+4915123456789")
+        XCTAssertEqual(AuthViewModel.normalizedPhone("0044 7700 900123", dialCode: "49"), "+447700900123")
+        XCTAssertEqual(AuthViewModel.normalizedPhone("4155550123", dialCode: "1"), "+14155550123")
+        XCTAssertNil(AuthViewModel.normalizedPhone("12", dialCode: "49"))
+        XCTAssertNil(AuthViewModel.normalizedPhone("not a number", dialCode: "49"))
     }
 
     func testRequestCodeSuccessTransitionsToOTP() async {

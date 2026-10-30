@@ -79,9 +79,30 @@ struct PhoneEntryView: View {
                     .foregroundStyle(.secondary)
             }
             Card {
-                TextField("+1 555 123 4567", text: $vm.phoneNumber)
-                    .font(.title3)
-                    .bcPhoneKeyboard()
+                HStack(spacing: Spacing.m) {
+                    Menu {
+                        Picker("Country", selection: $vm.country) {
+                            ForEach(PhoneCountry.all) { country in
+                                Text("\(country.flag) \(country.name) +\(country.dialCode)").tag(country)
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: Spacing.xs) {
+                            Text("\(vm.country.flag) +\(vm.country.dialCode)")
+                                .monospacedDigit()
+                            Image(systemName: "chevron.down")
+                                .font(.caption.weight(.semibold))
+                        }
+                        .font(.title3)
+                    }
+                    .tint(.primary)
+                    .accessibilityLabel("Country code +\(vm.country.dialCode), \(vm.country.name)")
+                    Divider().frame(height: 28)
+                    TextField("151 23456789", text: $vm.phoneNumber)
+                        .font(.title3)
+                        .bcPhoneKeyboard()
+                        .onChange(of: vm.phoneNumber) { vm.phoneNumberChanged() }
+                }
             }
             if let error = vm.errorMessage {
                 ErrorBanner(error)
@@ -107,7 +128,7 @@ struct OTPView: View {
             VStack(alignment: .leading, spacing: Spacing.s) {
                 Text("Enter the code")
                     .font(.title2.bold())
-                Text("We sent a 6-digit code to \(vm.phoneNumber).")
+                Text("We sent a 6-digit code to \(vm.fullNumber ?? vm.phoneNumber).")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Button("Use a different number") { vm.editPhoneNumber() }

@@ -15,6 +15,9 @@ public final class AuthViewModel {
     }
 
     public private(set) var step: Step = .welcome
+    /// The country whose dial code goes in front of `phoneNumber`.
+    public var country: PhoneCountry = .default
+    /// What the user typed: the national number, or a full one starting with +.
     public var phoneNumber: String = ""
     public var code: String = ""
     public var locale: String = "en"
@@ -51,7 +54,28 @@ public final class AuthViewModel {
     }
 
     public var canSubmitPhone: Bool {
-        !isLoading && AuthViewModel.normalizedPhone(phoneNumber) != nil
+        !isLoading && fullNumber != nil
+    }
+
+    /// A number typed or pasted with + (or 00) picks its country in the menu
+    /// and keeps only the rest in the field, so the menu never contradicts it.
+    public func phoneNumberChanged() {
+        let trimmed = phoneNumber.trimmingCharacters(in: .whitespaces)
+        guard trimmed.hasPrefix("+") || trimmed.hasPrefix("00") else { return }
+        var digits = trimmed.filter(\.isNumber)
+        if trimmed.hasPrefix("00") { digits.removeFirst(2) }
+        // Longest dial code first (+352 before +35…); the list order breaks ties (+1 is US).
+        let match = PhoneCountry.all
+            .filter { digits.hasPrefix($0.dialCode) }
+            .max { $0.dialCode.count < $1.dialCode.count }
+        guard let match, digits.count > match.dialCode.count + 4 else { return }
+        country = match
+        phoneNumber = String(digits.dropFirst(match.dialCode.count))
+    }
+
+    /// The number in international form, as the code is sent to it.
+    public var fullNumber: String? {
+        AuthViewModel.normalizedPhone(phoneNumber, dialCode: country.dialCode)
     }
 
     public var canSubmitCode: Bool {
@@ -59,18 +83,24 @@ public final class AuthViewModel {
     }
 
     /// Strips formatting (spaces, parens, dashes) into a light E.164 candidate.
+    /// A number starting with + is taken as is; otherwise a leading 0 (the
+    /// trunk prefix, as in 0151…) is dropped and the dial code goes in front.
     /// The backend is authoritative for true validation.
-    static func normalizedPhone(_ raw: String) -> String? {
+    static func normalizedPhone(_ raw: String, dialCode: String) -> String? {
         let trimmed = raw.trimmingCharacters(in: .whitespaces)
-        let hasPlus = trimmed.hasPrefix("+")
-        let digits = trimmed.filter(\.isNumber)
-        guard digits.count >= 6 else { return nil }
-        return hasPlus ? "+\(digits)" : digits
+        var digits = trimmed.filter(\.isNumber)
+        if trimmed.hasPrefix("+") || trimmed.hasPrefix("00") {
+            if trimmed.hasPrefix("00") { digits.removeFirst(2) }
+            return digits.count >= 6 ? "+\(digits)" : nil
+        }
+        while digits.hasPrefix("0") { digits.removeFirst() }
+        guard digits.count >= 5 else { return nil }
+        return "+\(dialCode)\(digits)"
     }
 
     public func requestCode() async {
-        guard let normalized = AuthViewModel.normalizedPhone(phoneNumber) else {
-            errorMessage = "Enter your phone number including country code."
+        guard let normalized = fullNumber else {
+            errorMessage = "Enter your phone number."
             return
         }
         isLoading = true
@@ -126,4 +156,44 @@ public final class AuthViewModel {
     }
 
     private func startResendCountdown() { resendCountdown = 30 }
+}
+
+/// A country in the login's dial-code menu. Germany comes first and is the
+/// default; a number typed with + overrides the menu.
+public struct PhoneCountry: Identifiable, Hashable, Sendable {
+    public let regionCode: String
+    public let name: String
+    public let dialCode: String
+    public var id: String { regionCode }
+
+    /// The region's flag, built from its two letters.
+    public var flag: String {
+        regionCode.unicodeScalars
+            .compactMap { UnicodeScalar(127397 + $0.value) }
+            .map(String.init)
+            .joined()
+    }
+
+    public static let `default` = PhoneCountry(regionCode: "DE", name: "Germany", dialCode: "49")
+
+    public static let all: [PhoneCountry] = [
+        .default,
+        PhoneCountry(regionCode: "AT", name: "Austria", dialCode: "43"),
+        PhoneCountry(regionCode: "CH", name: "Switzerland", dialCode: "41"),
+        PhoneCountry(regionCode: "NL", name: "Netherlands", dialCode: "31"),
+        PhoneCountry(regionCode: "BE", name: "Belgium", dialCode: "32"),
+        PhoneCountry(regionCode: "LU", name: "Luxembourg", dialCode: "352"),
+        PhoneCountry(regionCode: "FR", name: "France", dialCode: "33"),
+        PhoneCountry(regionCode: "DK", name: "Denmark", dialCode: "45"),
+        PhoneCountry(regionCode: "PL", name: "Poland", dialCode: "48"),
+        PhoneCountry(regionCode: "CZ", name: "Czechia", dialCode: "420"),
+        PhoneCountry(regionCode: "IT", name: "Italy", dialCode: "39"),
+        PhoneCountry(regionCode: "ES", name: "Spain", dialCode: "34"),
+        PhoneCountry(regionCode: "GB", name: "United Kingdom", dialCode: "44"),
+        PhoneCountry(regionCode: "IE", name: "Ireland", dialCode: "353"),
+        PhoneCountry(regionCode: "SE", name: "Sweden", dialCode: "46"),
+        PhoneCountry(regionCode: "NO", name: "Norway", dialCode: "47"),
+        PhoneCountry(regionCode: "US", name: "United States", dialCode: "1"),
+        PhoneCountry(regionCode: "CA", name: "Canada", dialCode: "1"),
+    ]
 }
