@@ -26,6 +26,11 @@ class Template(Base):
     owner_user_id: Mapped[uuid.UUID | None] = uuid_fk(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True
     )
+    # A user's edited copy of a built-in template points at the original. The
+    # catalog then shows the copy in its place; deleting the copy is "Reset".
+    overrides_template_id: Mapped[uuid.UUID | None] = uuid_fk(
+        ForeignKey("templates.id", ondelete="CASCADE"), nullable=True, index=True
+    )
     # Sender identity, keyed by persona (not by template id) so different
     # templates from the same persona reuse one sender binding. Defaults derive
     # from caller_persona/display_name at seed time.

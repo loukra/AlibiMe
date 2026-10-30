@@ -36,6 +36,13 @@ def get_template_options(
     return compose.options(ctx.user.locale)
 
 
+def _parse_id(template_id: str) -> uuid.UUID:
+    try:
+        return uuid.UUID(template_id)
+    except (ValueError, TypeError):
+        raise ValidationFailed("Invalid template id.")
+
+
 @router.post("", response_model=TemplateOut, status_code=201)
 def create_custom_template(
     body: CreateCustomTemplateBody,
@@ -43,28 +50,21 @@ def create_custom_template(
     db: Session = Depends(get_db),
 ) -> TemplateOut:
     item = templates_service.create_custom_template(
-        db,
-        ctx.user.id,
-        display_name=body.display_name,
-        description=body.description,
-        category=body.category,
-        persona=body.persona,
-        reason=body.reason,
-        channels=body.channels,
-        urgency=body.urgency,
-        outcome=body.outcome,
-        setting=body.setting,
-        tone=body.tone,
-        detail_profile=body.detail_profile,
-        discretion_level=body.discretion_level,
-        formality=body.formality,
-        expected_response=body.expected_response,
-        followup_behavior=body.followup_behavior,
-        continuity_scope=body.continuity_scope,
-        context_modules=body.context_modules,
-        voice_style=body.voice_style,
-        call_max_seconds=body.call_max_seconds,
-        locale=ctx.user.locale,
+        db, ctx.user.id, locale=ctx.user.locale, **body.model_dump()
+    )
+    return TemplateOut(**item)
+
+
+@router.put("/{template_id}", response_model=TemplateOut)
+def update_template(
+    template_id: str,
+    body: CreateCustomTemplateBody,
+    ctx: CurrentContext = Depends(get_current_context),
+    db: Session = Depends(get_db),
+) -> TemplateOut:
+    """Edit an own template, or a built-in one (stored as the user's edited copy)."""
+    item = templates_service.update_template(
+        db, ctx.user.id, _parse_id(template_id), locale=ctx.user.locale, **body.model_dump()
     )
     return TemplateOut(**item)
 
@@ -75,8 +75,5 @@ def delete_custom_template(
     ctx: CurrentContext = Depends(get_current_context),
     db: Session = Depends(get_db),
 ) -> None:
-    try:
-        tid = uuid.UUID(template_id)
-    except (ValueError, TypeError):
-        raise ValidationFailed("Invalid template id.")
-    templates_service.delete_custom_template(db, ctx.user.id, tid)
+    """Delete an own template, or reset an edited built-in to its original."""
+    templates_service.delete_custom_template(db, ctx.user.id, _parse_id(template_id))

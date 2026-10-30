@@ -137,7 +137,12 @@ def create_request(
         )
 
     template = db.get(Template, template_id)
-    if template is None or not template.active:
+    # Another user's own template is as unknown as a missing one.
+    if (
+        template is None
+        or not template.active
+        or template.owner_user_id not in (None, user_id)
+    ):
         raise NotFound("Template not found.")
     version = templates.resolve_version(db, template.id, user_locale)
     templates.assert_channel_supported(version, channel)

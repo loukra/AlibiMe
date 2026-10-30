@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import NotFound, TemplateChannelNotSupported, ValidationFailed
 from app.db.models.enums import Channel
+from app.db.models.request import Request
 from app.db.models.template import Template, TemplateVersion
 from app.domain.profile import context as profile_context
 from app.domain.templates import catalogs, compose, rendering
@@ -67,7 +68,11 @@ def _catalog_item(db: Session, tmpl: Template, locale: str) -> dict | None:
         "sender_persona_key": tmpl.sender_persona_key,
         "sender_display_name": tmpl.sender_display_name,
         "supports_contact_save": tmpl.supports_contact_save,
-        "is_custom": tmpl.owner_user_id is not None,
+        # An edited built-in is still listed as built-in, marked as edited.
+        "is_custom": tmpl.owner_user_id is not None and tmpl.overrides_template_id is None,
+        "is_edited": tmpl.overrides_template_id is not None,
+        "original_id": str(tmpl.overrides_template_id) if tmpl.overrides_template_id else None,
+        "choices": _choices(tmpl, version),
         "supported_channels": supported_channels(version),
         "call_max_duration_seconds": version.call_max_duration_seconds
         if version.supports_call
@@ -84,7 +89,8 @@ def _catalog_item(db: Session, tmpl: Template, locale: str) -> dict | None:
 def list_catalog(db: Session, locale: str, user_id: uuid.UUID) -> list[dict]:
     """System templates plus the requesting user's own custom templates.
 
-    Custom (user-owned) templates sort after system ones.
+    Custom (user-owned) templates sort after system ones. A built-in the user
+    edited is replaced by their edited copy.
     """
     templates = db.execute(
         select(Template)
@@ -94,8 +100,11 @@ def list_catalog(db: Session, locale: str, user_id: uuid.UUID) -> list[dict]:
         )
         .order_by(Template.owner_user_id.isnot(None), Template.code)
     ).scalars().all()
+    edited = {t.overrides_template_id for t in templates if t.overrides_template_id}
     catalog = []
     for tmpl in templates:
+        if tmpl.id in edited:
+            continue
         item = _catalog_item(db, tmpl, locale)
         if item is not None:
             catalog.append(item)
@@ -107,9 +116,108 @@ def _require(code: str, allowed: list[str], field: str) -> None:
         raise ValidationFailed(f"Unknown {field}.")
 
 
-def create_custom_template(
-    db: Session,
-    user_id: uuid.UUID,
+# The editor's defaults, the same as the create body's.
+_DEFAULT_CHOICES = {
+    "urgency": "medium",
+    "outcome": "step_out_briefly",
+    "setting": "casual_hangout",
+    "tone": "casual",
+    "detail_profile": "minimal",
+    "discretion_level": "normal",
+    "formality": "neutral",
+    "expected_response": "no_reply_needed",
+    "followup_behavior": "one_touch_only",
+    "continuity_scope": "one_off",
+}
+
+# Built-in templates are hand-written and use their own codes. Editing one starts
+# from the closest choices in the editor's catalog.
+_BUILTIN_CATEGORY = {
+    "work": "work",
+    "family": "family_care",
+    "social": "social_exit",
+    "logistics": "home_logistics",
+    "safety": "safety_discomfort",
+}
+_BUILTIN_CHOICES = {
+    "boss_travel_assignment": {
+        "persona": "manager", "reason": "work_travel_assignment", "urgency": "high",
+        "tone": "professional", "formality": "professional", "setting": "work_meeting",
+        "outcome": "leave_within_10m", "expected_response": "say_call_back",
+    },
+    "coworker_urgent_work_issue": {
+        "persona": "coworker", "reason": "work_client_issue", "urgency": "high",
+        "tone": "rushed", "setting": "work_meeting", "expected_response": "say_call_back",
+    },
+    "sibling_family_checkin": {
+        "persona": "sibling", "reason": "family_checkin", "tone": "warm",
+        "formality": "casual", "expected_response": "say_call_back",
+    },
+    "best_friend_need_you_outside": {
+        "persona": "best_friend", "reason": "social_friend_outside", "formality": "casual",
+        "expected_response": "step_out_and_answer",
+    },
+    "roommate_issue_at_home": {
+        "persona": "roommate", "reason": "home_problem", "urgency": "high",
+        "tone": "concerned", "formality": "casual", "outcome": "leave_within_10m",
+        "expected_response": "say_on_my_way",
+    },
+    "safety_checkin": {
+        "persona": "trusted_friend", "reason": "safety_step_out_now", "tone": "calm",
+        "discretion_level": "public_safe", "expected_response": "quick_acknowledgement",
+    },
+}
+
+
+def _choices(tmpl: Template, version: TemplateVersion) -> dict:
+    """What the editor opens with: the template's stored choices, or for an
+    untouched built-in the closest catalog equivalent."""
+    channels = supported_channels(version)
+    voice = (version.call_voice_profile_code or "neutral").split("_")[0]
+    common = {
+        "display_name": tmpl.display_name,
+        "description": tmpl.description,
+        "channels": channels,
+        "voice_style": voice if voice in compose.VOICE_STYLES else "neutral",
+        "call_max_seconds": version.call_max_duration_seconds if version.supports_call else None,
+    }
+    if tmpl.owner_user_id is None:
+        mapped = _BUILTIN_CHOICES.get(tmpl.code, {})
+        return {
+            **_DEFAULT_CHOICES,
+            "category": _BUILTIN_CATEGORY.get(tmpl.category, catalogs.CATEGORIES[0]),
+            "persona": mapped.get("persona", catalogs.PERSONAS[0]),
+            "reason": mapped.get("reason", catalogs.REASONS[0]),
+            "context_modules": [],
+            **{k: v for k, v in mapped.items() if k in _DEFAULT_CHOICES},
+            **common,
+        }
+    stored = {
+        "urgency": tmpl.urgency_code,
+        "outcome": tmpl.outcome_code,
+        "setting": tmpl.setting_code,
+        "tone": tmpl.tone_code,
+        "detail_profile": tmpl.detail_profile_code,
+        "discretion_level": tmpl.discretion_level_code,
+        "formality": tmpl.formality_code,
+        "expected_response": tmpl.expected_response_code,
+        "followup_behavior": tmpl.followup_behavior_code,
+        "continuity_scope": tmpl.continuity_scope_code,
+    }
+    category = tmpl.category
+    if tmpl.overrides_template_id is not None:
+        category = _BUILTIN_CATEGORY.get(category, category)
+    return {
+        **{k: stored[k] or _DEFAULT_CHOICES[k] for k in _DEFAULT_CHOICES},
+        "category": category,
+        "persona": tmpl.caller_persona,
+        "reason": tmpl.reason_code,
+        "context_modules": list(tmpl.context_modules_json or []),
+        **common,
+    }
+
+
+def _validated(
     *,
     display_name: str,
     description: str | None,
@@ -130,11 +238,8 @@ def create_custom_template(
     context_modules: list[str] | None = None,
     voice_style: str = "neutral",
     call_max_seconds: int | None = None,
-    locale: str = _DEFAULT_LOCALE,
 ) -> dict:
-    """Validate structured choices and compose a user-owned template (+ versions)
-    from approved building blocks. No free-form user text reaches the content;
-    the user's optional context profile only adds safe, generic anchors."""
+    """Check every structured choice against the catalogs; returns them cleaned."""
     name = (display_name or "").strip()
     if not (1 <= len(name) <= 120):
         raise ValidationFailed("Template name must be 1–120 characters.")
@@ -155,86 +260,192 @@ def create_custom_template(
     _require(continuity_scope, catalogs.CONTINUITY_SCOPES, "continuity scope")
     if voice_style not in compose.VOICE_STYLES:
         raise ValidationFailed("Unknown voice style.")
-    modules = [m for m in (context_modules or []) if m in catalogs.CONTEXT_MODULES]
     selected = [c for c in channels if c in (Channel.call.value, Channel.sms.value)]
     if not selected:
         raise ValidationFailed("Select at least one channel.")
-    seconds = compose.clamp_call_seconds(call_max_seconds)
+    return {
+        "name": name,
+        "description": description.strip() if description else None,
+        "category": category,
+        "persona": persona,
+        "reason": reason,
+        "channels": selected,
+        "urgency": urgency,
+        "outcome": outcome,
+        "setting": setting,
+        "tone": tone,
+        "detail_profile": detail_profile,
+        "discretion_level": discretion_level,
+        "formality": formality,
+        "expected_response": expected_response,
+        "followup_behavior": followup_behavior,
+        "continuity_scope": continuity_scope,
+        "modules": [m for m in (context_modules or []) if m in catalogs.CONTEXT_MODULES],
+        "voice_style": voice_style,
+        "seconds": compose.clamp_call_seconds(call_max_seconds),
+    }
 
-    existing = db.execute(
-        select(func.count()).select_from(Template).where(Template.owner_user_id == user_id)
-    ).scalar_one()
-    if existing >= compose.MAX_CUSTOM_TEMPLATES_PER_USER:
-        raise ValidationFailed("You've reached the maximum number of custom templates.")
 
+def _apply(tmpl: Template, c: dict) -> None:
+    tmpl.caller_persona = c["persona"]
+    tmpl.reason_code = c["reason"]
+    tmpl.display_name = c["name"]
+    tmpl.description = c["description"]
+    tmpl.sender_persona_key = c["persona"]
+    tmpl.sender_display_name = rendering._label(rendering.PERSONA_LABELS, "en", c["persona"])
+    tmpl.urgency_code = c["urgency"]
+    tmpl.outcome_code = c["outcome"]
+    tmpl.setting_code = c["setting"]
+    tmpl.tone_code = c["tone"]
+    tmpl.detail_profile_code = c["detail_profile"]
+    tmpl.discretion_level_code = c["discretion_level"]
+    tmpl.formality_code = c["formality"]
+    tmpl.expected_response_code = c["expected_response"]
+    tmpl.followup_behavior_code = c["followup_behavior"]
+    tmpl.continuity_scope_code = c["continuity_scope"]
+    tmpl.context_modules_json = c["modules"] or None
+
+
+def _write_versions(db: Session, tmpl: Template, c: dict, user_id: uuid.UUID) -> None:
+    """Compose fresh wording as the next version. Older versions stay (past
+    requests point at them) but are no longer active."""
+    latest = 0
+    for old in tmpl.versions:
+        old.active = False
+        latest = max(latest, old.version)
     # Optional context profile → a plain dict of present fields (composer
     # tolerates emptiness and falls back to generic wording).
-    context = profile_context.context_dict(db, user_id) if modules else {}
-
-    tmpl = Template(
-        code=f"custom_{uuid.uuid4().hex[:12]}",
-        category=category,
-        caller_persona=persona,
-        reason_code=reason,
-        display_name=name,
-        description=(description.strip() if description else None),
-        owner_user_id=user_id,
-        sender_persona_key=persona,
-        sender_display_name=rendering._label(rendering.PERSONA_LABELS, "en", persona),
-        supports_contact_save=True,
-        active=True,
-        urgency_code=urgency,
-        outcome_code=outcome,
-        setting_code=setting,
-        tone_code=tone,
-        detail_profile_code=detail_profile,
-        discretion_level_code=discretion_level,
-        formality_code=formality,
-        expected_response_code=expected_response,
-        followup_behavior_code=followup_behavior,
-        continuity_scope_code=continuity_scope,
-        context_modules_json=modules or None,
-    )
-    db.add(tmpl)
-    db.flush()
-
+    context = profile_context.context_dict(db, user_id) if c["modules"] else {}
     for loc in ("en", "de"):
         content = compose.compose_version_content(
             locale=loc,
-            channels=selected,
-            persona=persona,
-            reason=reason,
-            urgency=urgency,
-            outcome=outcome,
-            setting=setting,
-            tone=tone,
-            detail_profile=detail_profile,
-            discretion_level=discretion_level,
-            formality=formality,
-            expected_response=expected_response,
-            followup_behavior=followup_behavior,
-            continuity_scope=continuity_scope,
-            context_modules=modules,
-            voice_style=voice_style,
-            call_max_seconds=seconds,
-            category=category,
+            channels=c["channels"],
+            persona=c["persona"],
+            reason=c["reason"],
+            urgency=c["urgency"],
+            outcome=c["outcome"],
+            setting=c["setting"],
+            tone=c["tone"],
+            detail_profile=c["detail_profile"],
+            discretion_level=c["discretion_level"],
+            formality=c["formality"],
+            expected_response=c["expected_response"],
+            followup_behavior=c["followup_behavior"],
+            continuity_scope=c["continuity_scope"],
+            context_modules=c["modules"],
+            voice_style=c["voice_style"],
+            call_max_seconds=c["seconds"],
+            category=c["category"],
             context=context,
         )
-        db.add(TemplateVersion(template_id=tmpl.id, version=1, active=True, **content))
+        db.add(TemplateVersion(template_id=tmpl.id, version=latest + 1, active=True, **content))
 
+
+def _new_user_template(
+    db: Session, user_id: uuid.UUID, c: dict, *, overrides: Template | None = None
+) -> Template:
+    tmpl = Template(
+        code=f"custom_{uuid.uuid4().hex[:12]}",
+        # An edited built-in stays in the original's section.
+        category=overrides.category if overrides else c["category"],
+        owner_user_id=user_id,
+        overrides_template_id=overrides.id if overrides else None,
+        supports_contact_save=True,
+        active=True,
+    )
+    _apply(tmpl, c)
+    db.add(tmpl)
+    db.flush()
+    _write_versions(db, tmpl, c, user_id)
+    return tmpl
+
+
+def _item_or_fail(db: Session, tmpl: Template, locale: str) -> dict:
     db.commit()
     item = _catalog_item(db, tmpl, locale)
     if item is None:
-        raise NotFound("Template not found after creation.")
+        raise NotFound("Template not found after saving.")
     return item
 
 
-def delete_custom_template(db: Session, user_id: uuid.UUID, template_id: uuid.UUID) -> None:
+def create_custom_template(
+    db: Session, user_id: uuid.UUID, *, locale: str = _DEFAULT_LOCALE, **fields
+) -> dict:
+    """Validate structured choices and compose a user-owned template (+ versions)
+    from approved building blocks. No free-form user text reaches the content;
+    the user's optional context profile only adds safe, generic anchors."""
+    c = _validated(**fields)
+    existing = db.execute(
+        select(func.count())
+        .select_from(Template)
+        .where(
+            Template.owner_user_id == user_id,
+            Template.active.is_(True),
+            Template.overrides_template_id.is_(None),
+        )
+    ).scalar_one()
+    if existing >= compose.MAX_CUSTOM_TEMPLATES_PER_USER:
+        raise ValidationFailed("You've reached the maximum number of custom templates.")
+    return _item_or_fail(db, _new_user_template(db, user_id, c), locale)
+
+
+def _edited_copy(db: Session, user_id: uuid.UUID, original_id: uuid.UUID) -> Template | None:
+    return db.execute(
+        select(Template).where(
+            Template.owner_user_id == user_id,
+            Template.overrides_template_id == original_id,
+            Template.active.is_(True),
+        )
+    ).scalars().first()
+
+
+def update_template(
+    db: Session,
+    user_id: uuid.UUID,
+    template_id: uuid.UUID,
+    *,
+    locale: str = _DEFAULT_LOCALE,
+    **fields,
+) -> dict:
+    """Save the editor's choices. An own template is rewritten in place; a
+    built-in one gets (or updates) the user's edited copy, the original stays."""
     tmpl = db.get(Template, template_id)
-    if tmpl is None or tmpl.owner_user_id != user_id:
+    if tmpl is None or not tmpl.active or tmpl.owner_user_id not in (None, user_id):
+        raise NotFound("Template not found.")
+    if tmpl.owner_user_id is None:
+        original, target = tmpl, _edited_copy(db, user_id, tmpl.id)
+    elif tmpl.overrides_template_id is not None:
+        original, target = db.get(Template, tmpl.overrides_template_id), tmpl
+    else:
+        original, target = None, tmpl
+    if original is not None:
+        # The section is the original's; the editor's category only shapes wording.
+        fields["category"] = _BUILTIN_CATEGORY.get(original.category, fields.get("category"))
+    c = _validated(**fields)
+    if target is None:
+        return _item_or_fail(db, _new_user_template(db, user_id, c, overrides=original), locale)
+    _apply(target, c)
+    if original is None:
+        target.category = c["category"]
+    _write_versions(db, target, c, user_id)
+    return _item_or_fail(db, target, locale)
+
+
+def delete_custom_template(db: Session, user_id: uuid.UUID, template_id: uuid.UUID) -> None:
+    """Delete an own template, or reset an edited built-in to its original."""
+    tmpl = db.get(Template, template_id)
+    if tmpl is None or not tmpl.active or tmpl.owner_user_id != user_id:
         # Don't reveal whether a system/other-user template exists.
         raise NotFound("Custom template not found.")
-    db.delete(tmpl)
+    used = db.execute(
+        select(func.count()).select_from(Request).where(Request.template_id == tmpl.id)
+    ).scalar_one()
+    if used:
+        # Past requests still point at it: hide it instead.
+        tmpl.active = False
+        tmpl.overrides_template_id = None
+    else:
+        db.delete(tmpl)
     db.commit()
 
 
