@@ -55,7 +55,6 @@ final class SettingsViewModelTests: XCTestCase {
         XCTAssertEqual(vm.displayName, "Alex")
         XCTAssertEqual(vm.maskedNumber, "+14******123")
         XCTAssertEqual(vm.creditsAvailable, 3)
-        XCTAssertEqual(vm.planLabel, "Free")
     }
 
     func testSaveUpdatesProfileAndFlagsSuccess() async {
@@ -66,6 +65,22 @@ final class SettingsViewModelTests: XCTestCase {
         await vm.save()
         XCTAssertTrue(vm.didSave)
         XCTAssertEqual(vm.profile?.displayName, "Jordan")
+    }
+
+    func testSavesOnlyWhatChanged() async {
+        let profileService = MockProfileService()
+        let vm = SettingsViewModel(profileService: profileService, auth: MockAuthService(), creditPackages: MockCreditPackagesService())
+        await vm.load()
+        XCTAssertFalse(vm.hasChanges)
+        await vm.saveIfChanged()
+        XCTAssertFalse(vm.didSave, "nothing changed, nothing sent")
+
+        vm.locale = "de"
+        XCTAssertTrue(vm.hasChanges)
+        await vm.saveIfChanged()
+        XCTAssertTrue(vm.didSave)
+        XCTAssertEqual(vm.profile?.locale, "de")
+        XCTAssertFalse(vm.hasChanges)
     }
 
     func testSignOutInvokesCallback() async {

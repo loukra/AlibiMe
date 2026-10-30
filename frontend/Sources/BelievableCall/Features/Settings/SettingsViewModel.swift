@@ -65,7 +65,6 @@ public final class SettingsViewModel {
 
     public var maskedNumber: String? { profile?.phone.maskedNumber }
     public var creditsAvailable: Int { profile?.entitlements.creditsAvailable ?? 0 }
-    public var planLabel: String { profile?.entitlements.planLabel ?? "—" }
     public var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }
@@ -131,21 +130,44 @@ public final class SettingsViewModel {
         timezone = profile.timezone
     }
 
+    /// Whether the name or language differ from what the server has.
+    public var hasChanges: Bool {
+        guard let profile else { return false }
+        return trimmedName != (profile.displayName ?? "") || locale != profile.locale
+    }
+
+    private var trimmedName: String { displayName.trimmingCharacters(in: .whitespaces) }
+
+    /// Settings save as they change: the language right away, the name when
+    /// the field is left or submitted.
+    public func saveIfChanged() async {
+        guard hasChanges, !isSaving else { return }
+        await save()
+    }
+
     public func save() async {
         isSaving = true
         errorMessage = nil
         didSave = false
-        defer { isSaving = false }
+        let sentName = trimmedName
+        let sentLocale = locale
         do {
-            let trimmedName = displayName.trimmingCharacters(in: .whitespaces)
             let updated = try await profileService.update(
-                locale: locale,
+                locale: sentLocale,
                 timezone: timezone,
-                displayName: trimmedName.isEmpty ? nil : trimmedName
+                displayName: sentName.isEmpty ? nil : sentName
             )
-            apply(updated)
+            // Keep what the user changed while this save was on its way.
+            if trimmedName == sentName && locale == sentLocale {
+                apply(updated)
+            } else {
+                profile = updated
+            }
             didSave = true
+            isSaving = false
+            if hasChanges { await save() }
         } catch {
+            isSaving = false
             handle(error)
         }
     }

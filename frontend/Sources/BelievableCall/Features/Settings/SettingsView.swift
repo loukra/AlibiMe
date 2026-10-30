@@ -9,13 +9,16 @@ public enum SettingsFocus: Hashable {
     case addCredits
 }
 
-/// Settings: verified-number snapshot, profile, credits, help/legal, sign out.
+/// Settings: the account (number, name, language), credits, the Action
+/// Button, help and legal, then sign out and delete. Changes save as they are
+/// made; there is no Save button.
 public struct SettingsView: View {
     @Bindable var vm: SettingsViewModel
     /// Non-nil while the Add Credits sheet is open (`.sheet(item:)`, so the
     /// sheet never renders before the view model exists).
     @State private var creditPackagesVM: CreditPackagesViewModel?
     @State private var confirmingDelete = false
+    @FocusState private var editingName: Bool
     /// Set from outside (Home's pills); scrolled to once, then cleared.
     @Binding private var focus: SettingsFocus?
     private let locales = ["en", "de"]
@@ -29,66 +32,22 @@ public struct SettingsView: View {
         NavigationStack {
             ScrollViewReader { proxy in
                 Form {
-                    Section("Your number") {
-                        LabeledContent("Verified number", value: vm.maskedNumber ?? "—")
-                    }
-                    .id(SettingsFocus.number)
-                    Section("Profile") {
-                        TextField("Display name", text: $vm.displayName)
-                        Picker("Language", selection: $vm.locale) {
-                            ForEach(locales, id: \.self) { code in
-                                Text(code == "de" ? "Deutsch" : "English").tag(code)
-                            }
-                        }
-                        LabeledContent("Timezone", value: vm.timezone)
-                        Button {
-                            Task { await vm.save() }
-                        } label: {
-                            HStack {
-                                Text("Save changes")
-                                if vm.isSaving { Spacer(); ProgressView() }
-                                else if vm.didSave { Spacer(); Image(systemName: "checkmark").foregroundStyle(Theme.success) }
-                            }
-                        }
-                    }
-                    Section("Plan") {
-                        LabeledContent("Plan tier", value: vm.planLabel)
-                    }
-                    Section {
-                        Button {
-                            creditPackagesVM = vm.makeCreditPackagesViewModel()
-                        } label: {
-                            Label("Add Credits", systemImage: "plus.circle.fill")
-                                .font(.body.weight(.semibold))
-                                .foregroundStyle(Theme.accent)
-                        }
-                        if let success = vm.creditSuccessMessage {
-                            Label(success, systemImage: "checkmark.circle.fill")
-                                .font(.subheadline)
-                                .foregroundStyle(Theme.success)
-                        }
-                        LabeledContent("Credits available", value: "\(vm.creditsAvailable)")
-                    } footer: {
-                        Text("Credits are used each time you request a call or text.")
-                    }
-                    .id(SettingsFocus.credits)
+                    accountSection
+                    creditsSection
                     quickAlibiSection
                     if let error = vm.errorMessage {
                         Section { ErrorBanner(error) }
                     }
-                    Section("About") {
+                    Section {
                         Link("Help & support", destination: URL(string: "https://believablecall.example/help")!)
                         Link("Privacy & terms", destination: URL(string: "https://believablecall.example/legal")!)
                         LabeledContent("Version", value: vm.appVersion)
+                    } header: {
+                        SectionHeader("About")
                     }
                     Section {
-                        Button(role: .destructive) {
-                            Task { await vm.signOut() }
-                        } label: {
-                            Text("Sign out")
-                        }
-                    }
-                    Section {
+                        Button("Sign out") { Task { await vm.signOut() } }
+                            .foregroundStyle(Theme.accent)
                         Button(role: .destructive) {
                             confirmingDelete = true
                         } label: {
@@ -99,7 +58,7 @@ public struct SettingsView: View {
                         }
                         .disabled(vm.isDeleting)
                     } footer: {
-                        Text("Deletes your number, history, custom templates and any credits left.")
+                        Text("Deleting removes your number, history, own templates and any credits left.")
                     }
                 }
                 .onChange(of: focus) { _, target in
@@ -140,9 +99,71 @@ public struct SettingsView: View {
 }
 
 private extension SettingsView {
+    var accountSection: some View {
+        Section {
+            LabeledContent("Number", value: vm.maskedNumber ?? "—")
+                .id(SettingsFocus.number)
+            TextField("Your name (optional)", text: $vm.displayName)
+                .focused($editingName)
+                .submitLabel(.done)
+                .onSubmit { Task { await vm.saveIfChanged() } }
+                .onChange(of: editingName) { _, editing in
+                    if !editing { Task { await vm.saveIfChanged() } }
+                }
+            Picker("Language", selection: $vm.locale) {
+                ForEach(locales, id: \.self) { code in
+                    Text(code == "de" ? "Deutsch" : "English").tag(code)
+                }
+            }
+            .onChange(of: vm.locale) { Task { await vm.saveIfChanged() } }
+            LabeledContent("Timezone", value: vm.timezone)
+        } header: {
+            HStack {
+                SectionHeader("Account")
+                Spacer()
+                if vm.isSaving {
+                    ProgressView().controlSize(.mini)
+                } else if vm.didSave {
+                    Label("Saved", systemImage: "checkmark")
+                        .labelStyle(.titleAndIcon)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Theme.success)
+                }
+            }
+        } footer: {
+            Text("Calls and texts come to this number. The language is the one they are in.")
+        }
+    }
+
+    var creditsSection: some View {
+        Section {
+            LabeledContent("Credits available", value: "\(vm.creditsAvailable)")
+            if let success = vm.creditSuccessMessage {
+                Label(success, systemImage: "checkmark.circle.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.success)
+            }
+            Button {
+                creditPackagesVM = vm.makeCreditPackagesViewModel()
+            } label: {
+                Label("Add Credits", systemImage: "plus.circle.fill")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(Theme.accent)
+            }
+        } header: {
+            SectionHeader("Credits")
+        } footer: {
+            Text("One credit for each call or text.")
+        }
+        .id(SettingsFocus.credits)
+    }
+
     var quickAlibiSection: some View {
         Section {
-            Picker("Alibi", selection: Binding(
+            Text("Press the Action Button and AlibiMe calls or texts you, without opening the app. Choose what it sends.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Picker("Template", selection: Binding(
                 get: { vm.quickAlibi?.templateID ?? "" },
                 set: { vm.setQuickAlibi(templateID: $0.isEmpty ? nil : $0) }
             )) {
@@ -172,9 +193,9 @@ private extension SettingsView {
                 }
             }
         } header: {
-            Text("Action Button")
+            SectionHeader("Action Button")
         } footer: {
-            Text("In the iPhone Settings under Action Button, choose Shortcut and pick AlibiMe's \"Get Me Out\". Siri and the Shortcuts app can run it too.")
+            Text("To set it up: iPhone Settings › Action Button › Shortcut › AlibiMe › Get Me Out. Siri and the Shortcuts app can run it too.")
         }
     }
 }
