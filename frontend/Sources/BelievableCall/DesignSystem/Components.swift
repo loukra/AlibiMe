@@ -164,12 +164,12 @@ public struct PrimaryButton: View {
             .padding(.vertical, Spacing.m)
             .foregroundStyle(.white)
             .bcGlassTint(
-                role == .destructive ? Theme.destructive : Theme.accent,
+                role == .destructive ? Theme.destructive : Theme.accentFill,
                 in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous),
                 interactive: true
             )
             .shadow(
-                color: (role == .destructive ? Theme.destructive : Theme.accent).opacity(0.22),
+                color: (role == .destructive ? Theme.destructive : Theme.accentFill).opacity(0.22),
                 radius: 12, x: 0, y: 6
             )
         }
@@ -204,7 +204,7 @@ public struct SelectablePill: View {
             .frame(maxWidth: .infinity)
             .foregroundStyle(isSelected ? Color.white : Color.primary)
             .background(
-                isSelected ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Material.ultraThin),
+                isSelected ? AnyShapeStyle(Theme.accentFill) : AnyShapeStyle(Material.ultraThin),
                 in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
             )
             .overlay(
@@ -261,7 +261,7 @@ public struct SegmentedSelector: View {
                         .background {
                             if isSelected {
                                 Color.clear
-                                    .bcGlassTintCapsule(Theme.accent)
+                                    .bcGlassTintCapsule(Theme.accentFill)
                                     .matchedGeometryEffect(id: "segmentedSelection", in: ns)
                             }
                         }

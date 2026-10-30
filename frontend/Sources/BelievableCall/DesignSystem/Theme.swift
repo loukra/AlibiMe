@@ -17,6 +17,10 @@ public enum Theme {
     // Accent is the brand indigo (#6366F1); dark mode lightens it (#818CF8) so it
     // stays legible on dark surfaces while keeping white text readable on buttons.
     public static let accent = dynamic(light: (0.388, 0.400, 0.945), dark: (0.506, 0.549, 0.973))
+    /// Filled surfaces with white text (buttons, selected pills): the brand
+    /// indigo in both modes. The lighter dark-mode `accent` is for text and
+    /// icons; under white text it would be too pale to read.
+    public static let accentFill = Color(red: 0.388, green: 0.400, blue: 0.945)
     public static let success = dynamic(light: (0.13, 0.55, 0.33), dark: (0.30, 0.78, 0.50))
     public static let warning = dynamic(light: (0.80, 0.55, 0.05), dark: (0.98, 0.74, 0.25))
     public static let destructive = dynamic(light: (0.80, 0.18, 0.16), dark: (1.0, 0.42, 0.38))

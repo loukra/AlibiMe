@@ -30,8 +30,10 @@ public struct ProfileView: View {
                 ForEach(ProfileTopic.allCases) { topic in
                     let rows = answered.filter { $0.topic == topic }
                     if !rows.isEmpty {
-                        Section(topic.title) {
+                        Section {
                             ForEach(rows) { answeredRow($0) }
+                        } header: {
+                            SectionHeader(topic.title)
                         }
                     }
                 }
@@ -131,7 +133,7 @@ struct AddProfileAnswerSheet: View {
                                 }
                             }
                         } header: {
-                            Text(topic.title)
+                            SectionHeader(topic.title)
                         } footer: {
                             Text(topic.footer)
                         }

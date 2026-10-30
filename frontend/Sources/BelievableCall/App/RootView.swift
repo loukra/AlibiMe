@@ -191,7 +191,7 @@ struct FlyingJobBadge: View {
             .font(.headline)
             .foregroundStyle(.white)
             .padding(12)
-            .background(Theme.accent, in: Circle())
+            .background(Theme.accentFill, in: Circle())
             .overlay(Circle().strokeBorder(Theme.glassBorder, lineWidth: 1))
             .shadow(color: Theme.cardShadow, radius: 10, x: 0, y: 6)
             .scaleEffect(arrived ? 0.3 : 1)
