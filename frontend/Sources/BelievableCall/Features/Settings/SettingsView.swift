@@ -4,7 +4,8 @@ import SwiftUI
 /// Settings: verified-number snapshot, profile, credits, help/legal, sign out.
 public struct SettingsView: View {
     @Bindable var vm: SettingsViewModel
-    @State private var showAddCredits = false
+    /// Non-nil while the Add Credits sheet is open (`.sheet(item:)`, so the
+    /// sheet never renders before the view model exists).
     @State private var creditPackagesVM: CreditPackagesViewModel?
     private let locales = ["en", "de"]
 
@@ -40,7 +41,6 @@ public struct SettingsView: View {
                 Section {
                     Button {
                         creditPackagesVM = vm.makeCreditPackagesViewModel()
-                        showAddCredits = true
                     } label: {
                         Label("Add Credits", systemImage: "plus.circle.fill")
                             .font(.body.weight(.semibold))
@@ -76,18 +76,16 @@ public struct SettingsView: View {
             .bcScreenBackground()
             .navigationTitle("Settings")
             .task { await vm.load() }
-            .sheet(isPresented: $showAddCredits) {
-                if let packagesVM = creditPackagesVM {
-                    AddCreditsSheet(
-                        vm: packagesVM,
-                        onClose: { showAddCredits = false },
-                        onAcquired: { result in
-                            showAddCredits = false
-                            Task { await vm.didAcquireCredits(result) }
-                        }
-                    )
-                    .bcSheetDetents()
-                }
+            .sheet(item: $creditPackagesVM) { packagesVM in
+                AddCreditsSheet(
+                    vm: packagesVM,
+                    onClose: { creditPackagesVM = nil },
+                    onAcquired: { result in
+                        creditPackagesVM = nil
+                        Task { await vm.didAcquireCredits(result) }
+                    }
+                )
+                .bcSheetDetents()
             }
         }
     }

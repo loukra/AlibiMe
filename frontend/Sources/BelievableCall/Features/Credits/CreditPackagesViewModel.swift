@@ -6,7 +6,7 @@ import Observation
 /// remains the source of truth for the resulting balance.
 @MainActor
 @Observable
-public final class CreditPackagesViewModel {
+public final class CreditPackagesViewModel: Identifiable {
     /// Explicit sheet state machine (mirrors the feature spec).
     public enum Phase: Equatable {
         case idle
