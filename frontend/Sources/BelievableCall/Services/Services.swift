@@ -314,7 +314,8 @@ public struct LiveCreditPackagesService: CreditPackagesServicing {
             as: CreditPackagesResponseDTO.self
         )
         return CreditCatalog(packages: dto.packages.map(CreditPackage.init(dto:)),
-                             costs: dto.credit_costs.map { CreditCosts(call: $0.call, text: $0.sms) })
+                             costs: dto.credit_costs.map { CreditCosts(call: $0.call, text: $0.sms) },
+                             firstPurchaseBonus: dto.first_purchase_bonus ?? 0)
     }
 
     public func redeem(signedTransaction: String) async throws -> CreditAcquisition {

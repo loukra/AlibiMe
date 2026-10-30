@@ -34,6 +34,12 @@ public struct AddCreditsSheet: View {
                     Text("Choose a package")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                    if let bonus = vm.bonusNote {
+                        Label(bonus, systemImage: "gift.fill")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.success)
+                            .padding(.top, Spacing.xs)
+                    }
                 }
                 Spacer()
                 Button { onClose() } label: {

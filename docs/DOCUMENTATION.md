@@ -316,8 +316,9 @@ Credits are an **append-only ledger**, never a mutable balance —
 (`entitlements.py:40`) gives new users the configured free credits once per
 phone number (`FreeAllowanceClaim` keeps the hash after an account is deleted).
 
-A call costs `CALL_CREDIT_COST` (4) and a text `SMS_CREDIT_COST` (1); the
-reasoning is in `docs/pricing.md`.
+A call costs `CALL_CREDIT_COST` (2) and a text `SMS_CREDIT_COST` (1), and a
+phone number's first App Store purchase gets `FIRST_PURCHASE_BONUS_CREDITS` (3)
+extra (`FirstPurchaseBonusClaim`); the reasoning is in `docs/pricing.md`.
 
 Credit packs are consumable App Store products
 (`domain/billing/credit_packages.py`). The app buys with StoreKit 2 and posts
@@ -691,7 +692,7 @@ make start       # migrate + seed + uvicorn on :8000  (http://localhost:8000/doc
 make worker      # scheduler + dispatch + reconciliation loop
 ```
 
-Mock OTP code is always `123456`; new numbers get 4 free credits (one call). Switch to real
+Mock OTP code is always `123456`; new numbers get 3 free credits (one text, one call). Switch to real
 providers by setting `OTP_PROVIDER` / `VOICE_PROVIDER` / `MESSAGE_PROVIDER` and
 the matching credentials (see `backend/README.md`).
 

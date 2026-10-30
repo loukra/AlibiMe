@@ -121,18 +121,18 @@ public enum Fixtures {
     ]
 
     public static let creditPackages: [CreditPackage] = [
-        CreditPackage(code: "credits_12", displayName: "12 Credits", credits: 12,
-                      fulfillmentMode: "app_store_iap", priceLabel: "€2.99",
+        CreditPackage(code: "credits_10", displayName: "10 Credits", credits: 10,
+                      fulfillmentMode: "app_store_iap", priceLabel: "€4.99",
                       badgeText: nil, sortOrder: 10,
-                      storeProductID: "com.believablecall.app.credits12"),
-        CreditPackage(code: "credits_40", displayName: "40 Credits", credits: 40,
-                      fulfillmentMode: "app_store_iap", priceLabel: "€7.99",
+                      storeProductID: "com.believablecall.app.credits10"),
+        CreditPackage(code: "credits_25", displayName: "25 Credits", credits: 25,
+                      fulfillmentMode: "app_store_iap", priceLabel: "€9.99",
                       badgeText: "Popular", sortOrder: 20,
-                      storeProductID: "com.believablecall.app.credits40"),
-        CreditPackage(code: "credits_100", displayName: "100 Credits", credits: 100,
-                      fulfillmentMode: "app_store_iap", priceLabel: "€17.99",
+                      storeProductID: "com.believablecall.app.credits25"),
+        CreditPackage(code: "credits_60", displayName: "60 Credits", credits: 60,
+                      fulfillmentMode: "app_store_iap", priceLabel: "€19.99",
                       badgeText: "Best value", sortOrder: 30,
-                      storeProductID: "com.believablecall.app.credits100"),
+                      storeProductID: "com.believablecall.app.credits60"),
     ]
 }
 
@@ -311,7 +311,8 @@ public final class MockCreditPackagesService: CreditPackagesServicing, @unchecke
     public var packages: [CreditPackage]
     public var listError: Error?
     public var acquireError: Error?
-    public var costs: CreditCosts? = CreditCosts(call: 4, text: 1)
+    public var costs: CreditCosts? = CreditCosts(call: 2, text: 1)
+    public var firstPurchaseBonus = 3
     public private(set) var redeemed: [String] = []
     /// Running balance the mock reports after each grant, so view models can
     /// assert the post-grant value.
@@ -325,7 +326,7 @@ public final class MockCreditPackagesService: CreditPackagesServicing, @unchecke
 
     public func catalog() async throws -> CreditCatalog {
         if let listError { throw listError }
-        return CreditCatalog(packages: packages, costs: costs)
+        return CreditCatalog(packages: packages, costs: costs, firstPurchaseBonus: firstPurchaseBonus)
     }
 
     public func redeem(signedTransaction: String) async throws -> CreditAcquisition {
@@ -333,9 +334,11 @@ public final class MockCreditPackagesService: CreditPackagesServicing, @unchecke
         redeemed.append(signedTransaction)
         let product = signedTransaction.split(separator: ":").dropFirst().first.map(String.init)
         let pack = packages.first { $0.storeProductID == product }
-        balance += pack?.credits ?? 0
+        let granted = (pack?.credits ?? 0) + firstPurchaseBonus
+        firstPurchaseBonus = 0
+        balance += granted
         return CreditAcquisition(claimID: "claim-\(signedTransaction)", status: "granted",
-                                 grantedCredits: pack?.credits ?? 0, creditsAvailable: balance,
+                                 grantedCredits: granted, creditsAvailable: balance,
                                  planCode: pack?.code ?? "")
     }
 

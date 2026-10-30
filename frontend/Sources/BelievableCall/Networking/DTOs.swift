@@ -310,6 +310,7 @@ struct CreditCostsDTO: Decodable {
 struct CreditPackagesResponseDTO: Decodable {
     let packages: [CreditPackageDTO]
     let credit_costs: CreditCostsDTO?
+    let first_purchase_bonus: Int?
 }
 
 struct RedeemRequestDTO: Encodable {

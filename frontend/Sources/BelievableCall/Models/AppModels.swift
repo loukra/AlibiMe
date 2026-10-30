@@ -599,9 +599,12 @@ public struct CreditCosts: Equatable, Sendable {
 public struct CreditCatalog: Equatable, Sendable {
     public let packages: [CreditPackage]
     public let costs: CreditCosts?
-    public init(packages: [CreditPackage], costs: CreditCosts?) {
+    /// Extra credits on the next App Store purchase; 0 once used.
+    public let firstPurchaseBonus: Int
+    public init(packages: [CreditPackage], costs: CreditCosts?, firstPurchaseBonus: Int = 0) {
         self.packages = packages
         self.costs = costs
+        self.firstPurchaseBonus = firstPurchaseBonus
     }
 }
 

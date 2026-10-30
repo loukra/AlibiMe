@@ -19,7 +19,9 @@ from sqlalchemy.orm import Session
 
 from app.core.clock import utcnow
 from app.core.errors import AppError, NotFound, ValidationFailed
+from app.core.config import settings
 from app.db.models.credit_package_claim import CreditPackageClaim
+from app.db.models.free_allowance_claim import FirstPurchaseBonusClaim
 from app.db.models.enums import (
     CreditPackageClaimStatus,
     CreditReferenceType,
@@ -75,10 +77,29 @@ def list_active_packages(db: Session) -> list[Plan]:
     return [p for p in plans if is_credit_package(p)]
 
 
+def _phone_hash(db: Session, user_id: uuid.UUID) -> str | None:
+    from app.domain.users.service import get_primary_phone
+
+    phone = get_primary_phone(db, user_id)
+    return phone.phone_hash if phone else None
+
+
+def first_purchase_bonus(db: Session, user_id: uuid.UUID) -> int:
+    """Bonus credits this user's next store purchase would get (0 once used)."""
+    bonus = settings.first_purchase_bonus_credits
+    if bonus <= 0:
+        return 0
+    phone_hash = _phone_hash(db, user_id)
+    if phone_hash is None or db.get(FirstPurchaseBonusClaim, phone_hash) is not None:
+        return 0
+    return bonus
+
+
 def _claim_result(db: Session, claim: CreditPackageClaim, user_id: uuid.UUID) -> dict:
     return {
         "claim_id": str(claim.id),
         "status": claim.status,
+        # Includes a first-purchase bonus, so refunds take that back too.
         "granted_credits": claim.credits_granted,
         "credits_available": credits.current_balance(db, user_id),
         "plan_code": claim.plan_code,
@@ -206,6 +227,18 @@ def redeem_store_transaction(
         reference_id=claim.id,
         notes=f"App Store {tx.product_id} ({tx.transaction_id})",
     )
+    bonus = first_purchase_bonus(db, user_id)
+    if bonus:
+        db.add(FirstPurchaseBonusClaim(phone_hash=_phone_hash(db, user_id)))
+        credits.grant(
+            db,
+            user_id,
+            bonus,
+            reference_type=CreditReferenceType.purchase,
+            reference_id=claim.id,
+            notes="first purchase bonus",
+        )
+        claim.credits_granted += bonus
     db.commit()
     return _claim_result(db, claim, user_id)
 

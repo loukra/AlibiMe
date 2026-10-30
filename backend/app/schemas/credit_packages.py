@@ -25,6 +25,8 @@ class CreditCosts(BaseModel):
 class CreditPackagesResponse(BaseModel):
     packages: list[CreditPackageOut]
     credit_costs: CreditCosts
+    # Extra credits on this user's next App Store purchase; 0 once used.
+    first_purchase_bonus: int = 0
 
 
 class RedeemBody(BaseModel):

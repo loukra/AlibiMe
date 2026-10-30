@@ -33,43 +33,73 @@ The German mobile surcharge is the one number that matters. Calling German users
 from a US number costs about nine times as much per minute as calling them from
 an EEA number.
 
+## The model
+
+- A call (about a minute at most) costs 2 credits, a text 1.
+- A new phone number gets 3 free credits: one text and one call. The text
+  offers to save the number as a contact, say as "Mom", and the call then shows
+  up as Mom. That is the moment that sells the app, so the free test covers it.
+- The first purchase gets 3 bonus credits on top.
+- Both the free credits and the bonus are once per phone number (kept as a
+  hash), so deleting the account and signing up again doesn't repeat them.
+- Packs: 10 credits for €4.99, 25 for €9.99, 60 for €19.99.
+
 ## What a pack brings in
 
 Apple keeps 15% in the Small Business Program (30% without it), and in Germany
 the price includes 19% VAT. Per credit, after both:
 
-| Pack | Price | Net per credit |
+| Pack | Price | Calls | Net per credit |
+|---|---|---|---|
+| 10 credits | €4.99 | 5 | €0.36 |
+| 25 credits | €9.99 | 12 | €0.29 |
+| 60 credits | €19.99 | 30 | €0.24 |
+
+A credit has to bring in half a call. That is about €0.22 for a German mobile
+called from a US number, €0.07 from an EEA number, and €0.05 in the US. Every
+pack covers even the worst case.
+
+## Paying for the free users
+
+Most people who install the app will only use their free credits, so buyers
+have to pay for them. What one free user costs (login code, one text, one call
+of 55 seconds):
+
+| User | Cost |
+|---|---|
+| German number, called from a US line | about €0.68 |
+| German number, called from an EEA line | about €0.38 |
+| US number | about €0.17 |
+
+What a buyer leaves after their first 10-credit pack, if every credit goes into
+a full call and after the bonus: about €0.76 from a US line to Germany, about
+€2.70 from an EEA line, about €3.20 in the US.
+
+The share of users who have to buy for the free credits to pay off is the cost
+of a free user divided by what a buyer leaves:
+
+| | One pack per buyer | Buyer also takes a 25 pack later |
 |---|---|---|
-| 12 credits | €2.99 | €0.18 |
-| 40 credits | €7.99 | €0.14 |
-| 100 credits | €17.99 | €0.13 |
+| Germany, US line | about 90% | about 27% |
+| Germany, EEA line | about 14% | about 5% |
+| US | about 5% | about 2% |
 
-## The proposal
-
-- A text costs 1 credit, a call 4 credits.
-- A new phone number gets 4 free credits, enough for one real call. The grant is
-  tied to the number (as a hash), so deleting the account and signing up again
-  doesn't give it twice.
-- Packs as above: 12, 40 and 100 credits.
-
-With these numbers a call brings in €0.51 to €0.71 and a text €0.13 to €0.18.
-US calls and texts have a comfortable margin. German texts are thin (about
-€0.10 cost). German calls from a US number would lose money past the first
-minute, which is why cross-border calls are capped at 55 seconds. The free
-starter call costs about €0.45 per German sign-up, plus
-Twilio Verify for the login code.
+Freemium apps commonly convert a few percent of users, so the German case only
+works with an EEA line. Texts and calls shorter than a minute make all of this
+cheaper; these are worst cases on list prices with an estimated exchange rate.
 
 ## What to do before launch
 
 1. **Verify** whether an EEA Twilio number (not German, which needs proof of
-   address) can call German users. That single change makes German calls
-   profitable at these prices.
+   address) can call German users. Without it, free calls to German users cost
+   more than buyers bring in.
 2. Calls into another country are already capped at 55 seconds so they bill as
    one minute (`CROSS_BORDER_CALL_MAX_SECONDS`, the templates allow up to 90).
-   With an EEA line for German users the cap no longer applies to them.
 3. Enrol in the App Store Small Business Program before the first sale.
 4. Create the three consumable products in App Store Connect with the ids in
    `backend/app/seeds/seed.py` and the prices above.
 5. After the first real calls, compare `estimated_cost_minor` on the call and
-   message attempts with the Vapi and Twilio invoices and adjust the credit
-   costs (`CALL_CREDIT_COST`, `SMS_CREDIT_COST`), which need no app update.
+   message attempts with the Vapi and Twilio invoices. Credit costs, free
+   credits and the bonus are settings (`CALL_CREDIT_COST`, `SMS_CREDIT_COST`,
+   `FREE_TEST_CREDITS`, `FIRST_PURCHASE_BONUS_CREDITS`) and need no app update;
+   prices change in App Store Connect.

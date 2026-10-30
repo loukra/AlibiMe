@@ -1,48 +1,63 @@
 {
-  "identifier" : "6E4C2A11-3B0F-4C55-9E57-2B8D2A0C7A01",
-  "nonRenewingSubscriptions" : [ ],
-  "products" : [
+  "identifier": "6E4C2A11-3B0F-4C55-9E57-2B8D2A0C7A01",
+  "nonRenewingSubscriptions": [],
+  "products": [
     {
-      "displayPrice" : "2.99",
-      "familyShareable" : false,
-      "internalID" : "6740000001",
-      "localizations" : [
-        { "description" : "12 credits: three calls or twelve texts.", "displayName" : "12 Credits", "locale" : "en_US" }
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "6740000001",
+      "localizations": [
+        {
+          "description": "10 credits: five calls or ten texts.",
+          "displayName": "10 Credits",
+          "locale": "en_US"
+        }
       ],
-      "productID" : "com.believablecall.app.credits12",
-      "referenceName" : "12 Credits",
-      "type" : "Consumable"
+      "productID": "com.believablecall.app.credits10",
+      "referenceName": "10 Credits",
+      "type": "Consumable"
     },
     {
-      "displayPrice" : "7.99",
-      "familyShareable" : false,
-      "internalID" : "6740000002",
-      "localizations" : [
-        { "description" : "40 credits: ten calls or forty texts.", "displayName" : "40 Credits", "locale" : "en_US" }
+      "displayPrice": "9.99",
+      "familyShareable": false,
+      "internalID": "6740000002",
+      "localizations": [
+        {
+          "description": "25 credits: twelve calls or twenty-five texts.",
+          "displayName": "25 Credits",
+          "locale": "en_US"
+        }
       ],
-      "productID" : "com.believablecall.app.credits40",
-      "referenceName" : "40 Credits",
-      "type" : "Consumable"
+      "productID": "com.believablecall.app.credits25",
+      "referenceName": "25 Credits",
+      "type": "Consumable"
     },
     {
-      "displayPrice" : "17.99",
-      "familyShareable" : false,
-      "internalID" : "6740000003",
-      "localizations" : [
-        { "description" : "100 credits: twenty-five calls or a hundred texts.", "displayName" : "100 Credits", "locale" : "en_US" }
+      "displayPrice": "19.99",
+      "familyShareable": false,
+      "internalID": "6740000003",
+      "localizations": [
+        {
+          "description": "60 credits: thirty calls or sixty texts.",
+          "displayName": "60 Credits",
+          "locale": "en_US"
+        }
       ],
-      "productID" : "com.believablecall.app.credits100",
-      "referenceName" : "100 Credits",
-      "type" : "Consumable"
+      "productID": "com.believablecall.app.credits60",
+      "referenceName": "60 Credits",
+      "type": "Consumable"
     }
   ],
-  "settings" : {
-    "_applicationInternalID" : "6740000000",
-    "_developerTeamID" : "",
-    "_locale" : "en_US",
-    "_storefront" : "DEU",
-    "_storeKitErrors" : [ ]
+  "settings": {
+    "_applicationInternalID": "6740000000",
+    "_developerTeamID": "",
+    "_locale": "en_US",
+    "_storefront": "DEU",
+    "_storeKitErrors": []
   },
-  "subscriptionGroups" : [ ],
-  "version" : { "major" : 4, "minor" : 0 }
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
 }

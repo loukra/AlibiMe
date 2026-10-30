@@ -6,7 +6,7 @@ from app.db.models.credit_ledger import CreditLedger
 from app.db.models.credit_package_claim import CreditPackageClaim
 from app.db.models.device import Device
 from app.db.models.entitlement import Entitlement
-from app.db.models.free_allowance_claim import FreeAllowanceClaim
+from app.db.models.free_allowance_claim import FirstPurchaseBonusClaim, FreeAllowanceClaim
 from app.db.models.otp_verification import OtpVerification
 from app.db.models.phone import PhoneNumber
 from app.db.models.plan import Plan
@@ -30,6 +30,7 @@ __all__ = [
     "CreditPackageClaim",
     "Device",
     "Entitlement",
+    "FirstPurchaseBonusClaim",
     "FreeAllowanceClaim",
     "OtpVerification",
     "PhoneNumber",

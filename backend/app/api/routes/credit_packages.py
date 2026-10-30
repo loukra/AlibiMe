@@ -40,6 +40,7 @@ def list_packages(
             for p in packages
         ],
         credit_costs=CreditCosts(call=settings.call_credit_cost, sms=settings.sms_credit_cost),
+        first_purchase_bonus=credit_packages.first_purchase_bonus(db, ctx.user.id),
     )
 
 

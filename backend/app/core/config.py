@@ -41,12 +41,14 @@ class Settings(BaseSettings):
 
     # Feature flags
     feature_free_test_request: bool = True
-    # Enough for one call, so a new user can try the real thing once.
-    free_test_credits: int = 4
-    # What a request costs. A call costs more because calls to non-US mobiles
-    # are the expensive part (see docs/pricing.md).
-    call_credit_cost: int = 4
+    # One text and one call: the text offers to save the number as a contact,
+    # the call then shows that name. Once per phone number.
+    free_test_credits: int = 3
+    # What a request costs; a call costs more than a text (see docs/pricing.md).
+    call_credit_cost: int = 2
     sms_credit_cost: int = 1
+    # Extra credits on a phone number's first App Store purchase.
+    first_purchase_bonus_credits: int = 3
     # Calls into another country bill at the destination's mobile rate per
     # started minute (US line to a German mobile: $0.376/min), so keep them
     # inside the first minute. 0 turns the cap off.

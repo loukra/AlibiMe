@@ -61,8 +61,9 @@ Each persona calls and texts from the same number, so once the user saves it as
 a contact, both show up under that name. The Action Button (or Siri, or a
 Shortcut) can send a preset alibi without opening the app. Credits are bought
 as App Store in-app purchases, and the backend checks Apple's signed
-transaction before granting them. New numbers get enough free credits for one
-call, and accounts can be deleted from Settings. How the prices were worked out
+transaction before granting them. New numbers get free credits for one text and
+one call, the first purchase comes with a bonus, and accounts can be deleted
+from Settings. How the prices were worked out
 is in [`docs/pricing.md`](docs/pricing.md).
 
 ```mermaid

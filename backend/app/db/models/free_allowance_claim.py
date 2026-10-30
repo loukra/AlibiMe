@@ -20,3 +20,13 @@ class FreeAllowanceClaim(Base):
 
     phone_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
     claimed_at: Mapped[datetime] = mapped_column(default=utcnow, nullable=False)
+
+
+class FirstPurchaseBonusClaim(Base):
+    """Phone numbers (as HMAC hash) that already got the first-purchase bonus,
+    kept across account deletion like ``FreeAllowanceClaim``."""
+
+    __tablename__ = "first_purchase_bonus_claims"
+
+    phone_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    claimed_at: Mapped[datetime] = mapped_column(default=utcnow, nullable=False)

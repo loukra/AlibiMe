@@ -24,6 +24,7 @@ public final class CreditPackagesViewModel: Identifiable {
     public private(set) var errorMessage: String?
     public private(set) var lastGranted: CreditAcquisition?
     public private(set) var costs: CreditCosts?
+    public private(set) var firstPurchaseBonus = 0
     /// Localized App Store prices by product id, once StoreKit has them.
     public private(set) var storePrices: [String: String] = [:]
     /// Set while a purchase waits for approval (Ask to Buy).
@@ -51,6 +52,12 @@ public final class CreditPackagesViewModel: Identifiable {
     public var costsNote: String? {
         guard let costs else { return nil }
         return "A call uses \(costs.call) credits, a text \(costs.text)."
+    }
+
+    /// "+3 bonus credits on your first purchase", while it still applies.
+    public var bonusNote: String? {
+        guard firstPurchaseBonus > 0, packages.contains(where: \.isStorePurchase) else { return nil }
+        return "+\(firstPurchaseBonus) bonus credits on your first purchase"
     }
 
     public var selectedPackage: CreditPackage? {
@@ -84,6 +91,7 @@ public final class CreditPackagesViewModel: Identifiable {
             let list = catalog.packages
             packages = list
             costs = catalog.costs
+            firstPurchaseBonus = catalog.firstPurchaseBonus
             let productIDs = list.compactMap(\.storeProductID)
             if !productIDs.isEmpty {
                 storePrices = await purchases.prices(for: productIDs)

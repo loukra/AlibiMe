@@ -24,6 +24,8 @@ os.environ["FREE_TEST_CREDITS"] = "3"
 os.environ["CALL_CREDIT_COST"] = "1"
 os.environ["SMS_CREDIT_COST"] = "1"
 os.environ["STORE_VERIFIER"] = "mock"
+# Purchases grant exactly the pack; the first-purchase bonus has its own tests.
+os.environ["FIRST_PURCHASE_BONUS_CREDITS"] = "0"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

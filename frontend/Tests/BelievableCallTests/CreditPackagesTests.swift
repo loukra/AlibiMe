@@ -12,19 +12,19 @@ final class CreditPackagesViewModelTests: XCTestCase {
         await vm.load()
         XCTAssertEqual(vm.phase, .ready)
         XCTAssertEqual(vm.packages.count, 3)
-        XCTAssertEqual(vm.selectedCode, "credits_12")
-        XCTAssertEqual(vm.primaryButtonTitle, "Buy 12 Credits for €2.99")
-        XCTAssertEqual(vm.costsNote, "A call uses 4 credits, a text 1.")
+        XCTAssertEqual(vm.selectedCode, "credits_10")
+        XCTAssertEqual(vm.primaryButtonTitle, "Buy 10 Credits for €4.99")
+        XCTAssertEqual(vm.costsNote, "A call uses 2 credits, a text 1.")
         XCTAssertTrue(vm.canSubmit)
     }
 
     func testStorePriceReplacesBackendLabel() async {
-        let purchases = MockPurchaseService(storePrices: ["com.believablecall.app.credits40": "7,99 €"])
+        let purchases = MockPurchaseService(storePrices: ["com.believablecall.app.credits25": "9,99 €"])
         let vm = CreditPackagesViewModel(service: MockCreditPackagesService(), purchases: purchases)
         await vm.load()
-        vm.select("credits_40")
-        XCTAssertEqual(vm.primaryButtonTitle, "Buy 40 Credits for 7,99 €")
-        XCTAssertEqual(vm.price(for: vm.packages[0]), "€2.99")  // store doesn't know it
+        vm.select("credits_25")
+        XCTAssertEqual(vm.primaryButtonTitle, "Buy 25 Credits for 9,99 €")
+        XCTAssertEqual(vm.price(for: vm.packages[0]), "€4.99")  // store doesn't know it
     }
 
     func testPurchaseIsRedeemedThenFinished() async {
@@ -32,14 +32,15 @@ final class CreditPackagesViewModelTests: XCTestCase {
         let purchases = MockPurchaseService()
         let vm = CreditPackagesViewModel(service: service, purchases: purchases)
         await vm.load()
-        vm.select("credits_40")
+        XCTAssertEqual(vm.bonusNote, "+3 bonus credits on your first purchase")
+        vm.select("credits_25")
         let ok = await vm.acquire()
         XCTAssertTrue(ok)
         XCTAssertEqual(vm.phase, .success)
-        XCTAssertEqual(vm.lastGranted?.grantedCredits, 40)
-        XCTAssertEqual(vm.lastGranted?.creditsAvailable, 43)
+        XCTAssertEqual(vm.lastGranted?.grantedCredits, 28)  // 25 + first-purchase bonus
+        XCTAssertEqual(vm.lastGranted?.creditsAvailable, 31)
         XCTAssertEqual(service.redeemed.count, 1)
-        XCTAssertTrue(service.redeemed[0].hasPrefix("mock:com.believablecall.app.credits40:"))
+        XCTAssertTrue(service.redeemed[0].hasPrefix("mock:com.believablecall.app.credits25:"))
         XCTAssertEqual(purchases.finished.count, 1)
         XCTAssertTrue(service.acquiredCodes.isEmpty)  // never the free path
     }
@@ -81,6 +82,7 @@ final class CreditPackagesViewModelTests: XCTestCase {
         let service = MockCreditPackagesService(packages: [devPack], balance: 3)
         let vm = CreditPackagesViewModel(service: service)
         await vm.load()
+        XCTAssertNil(vm.bonusNote)  // free dev packs carry no store bonus
         XCTAssertEqual(vm.primaryButtonTitle, "Add 5 Credits")
         let ok = await vm.acquire()
         XCTAssertTrue(ok)
@@ -102,14 +104,14 @@ final class CreditPackagesViewModelTests: XCTestCase {
         let service = MockCreditPackagesService()
         let vm = CreditPackagesViewModel(service: service)
         await vm.load()
-        vm.select("credits_40")
+        vm.select("credits_25")
         service.acquireError = APIError.api(code: "rate_limited", message: "slow down",
                                             retryable: true, requestID: nil)
         let ok = await vm.acquire()
         XCTAssertFalse(ok)
         XCTAssertEqual(vm.phase, .failure)
         XCTAssertFalse(vm.packages.isEmpty)
-        XCTAssertEqual(vm.selectedCode, "credits_40")
+        XCTAssertEqual(vm.selectedCode, "credits_25")
         XCTAssertNotNil(vm.errorMessage)
     }
 
