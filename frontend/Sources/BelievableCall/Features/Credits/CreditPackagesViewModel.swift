@@ -137,7 +137,7 @@ public final class CreditPackagesViewModel: Identifiable {
         do {
             let result: CreditAcquisition
             if pkg.isStorePurchase, let productID = pkg.storeProductID {
-                switch try await purchases.purchase(productID: productID, accountToken: accountToken) {
+                switch try await storePurchase(productID) {
                 case let .purchased(purchase):
                     return await redeem(purchase)
                 case .cancelled:
@@ -158,9 +158,25 @@ public final class CreditPackagesViewModel: Identifiable {
             errorMessage = "This pack isn't available in the App Store right now."
             phase = .failure
             return false
+        } catch PurchaseError.storeFailed, PurchaseError.unverified {
+            errorMessage = "The App Store couldn't complete the purchase. Check your connection and try again."
+            phase = .failure
+            return false
         } catch {
             handle(error)
             return false
+        }
+    }
+
+    /// The App Store purchase. StoreKit's own errors become `storeFailed`, so
+    /// they don't read as a problem reaching our backend.
+    private func storePurchase(_ productID: String) async throws -> PurchaseOutcome {
+        do {
+            return try await purchases.purchase(productID: productID, accountToken: accountToken)
+        } catch let error as PurchaseError {
+            throw error
+        } catch {
+            throw PurchaseError.storeFailed
         }
     }
 

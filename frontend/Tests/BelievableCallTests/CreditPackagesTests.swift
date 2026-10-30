@@ -125,6 +125,22 @@ final class CreditPackagesViewModelTests: XCTestCase {
         XCTAssertNil(vm.errorMessage)
     }
 
+    func testFailedStorePurchaseSaysTheAppStoreFailed() async {
+        struct StoreKitFailure: Error {}
+        let purchases = MockPurchaseService()
+        purchases.purchaseError = StoreKitFailure()
+        let service = MockCreditPackagesService()
+        let vm = CreditPackagesViewModel(service: service, purchases: purchases)
+        await vm.load()
+        let ok = await vm.acquire()
+        XCTAssertFalse(ok)
+        XCTAssertEqual(vm.phase, .failure)
+        XCTAssertEqual(vm.errorMessage,
+                       "The App Store couldn't complete the purchase. Check your connection and try again.")
+        XCTAssertNil(vm.unredeemedNotice)  // nothing was paid, so nothing to add later
+        XCTAssertTrue(purchases.finished.isEmpty)
+    }
+
     func testPendingPurchaseExplains() async {
         let purchases = MockPurchaseService()
         purchases.outcome = .pending

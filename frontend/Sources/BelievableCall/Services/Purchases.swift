@@ -43,10 +43,14 @@ public protocol PurchaseServicing: Sendable {
 public enum PurchaseError: Error, Equatable {
     case productUnavailable
     case unverified
+    /// StoreKit threw: the purchase did not go through.
+    case storeFailed
 }
 
 public final class MockPurchaseService: PurchaseServicing, @unchecked Sendable {
     public var outcome: PurchaseOutcome?
+    /// Thrown by `purchase`, as StoreKit does when a purchase fails.
+    public var purchaseError: Error?
     public var storePrices: [String: String]
     public private(set) var finished: [String] = []
     public private(set) var purchased: [String] = []
@@ -58,6 +62,7 @@ public final class MockPurchaseService: PurchaseServicing, @unchecked Sendable {
 
     public func purchase(productID: String, accountToken: UUID?) async throws -> PurchaseOutcome {
         purchased.append(productID)
+        if let purchaseError { throw purchaseError }
         if let outcome { return outcome }
         let id = UUID().uuidString
         return .purchased(StorePurchase(signedTransaction: "mock:\(productID):\(id)", transactionID: id))

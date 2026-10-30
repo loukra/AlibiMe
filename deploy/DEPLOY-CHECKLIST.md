@@ -52,17 +52,21 @@ port, domain and database there; `deploy/README.md` has the steps.
 
 ## 2. Still to test locally (simulator, StoreKit scheme)
 
-- [ ] Backend stopped during a purchase: "Add my credits" appears, a retry
-  after restarting adds them once, nothing is charged twice. (Backend side and
-  view model done, see 1; the click-through is left.)
+- [x] Backend stopped during a purchase, in the simulator with the StoreKit
+  scheme: the sheet says the payment went through and offers "Add my credits";
+  after restarting the backend one tap adds 10 plus the 3 bonus, one claim in
+  the database, and the sheet is back to "Buy".
 - [x] Free credits, against the local API with the app's calls and mock
   DeviceCheck: the first number gets 3, a second number on the same device 0,
   a VoIP number 0.
 - [ ] Ask to Buy: enable it in `App/AlibiMe.storekit`, buy, approve in Xcode's
   transaction manager; the credits arrive without restarting the app.
-- [ ] Failed and interrupted purchases (StoreKit file options): a clear
-  message, no credits, no charge. (Unit tested: a cancel stays quiet, a
-  pending purchase explains itself, a server error keeps the paid purchase.)
+- [x] Cancelled and failed purchases, in the simulator: closing the App Store
+  sheet stays quiet; a purchase error (`_storeKitErrors`, Purchase, generic)
+  says the App Store couldn't complete it, adds nothing and leaves "Buy".
+- [ ] Interrupted purchases: enable them in the StoreKit file in Xcode, buy,
+  then finish the purchase from the transaction manager; the credits arrive
+  without restarting the app.
 
 ## 3. Needs your accounts
 

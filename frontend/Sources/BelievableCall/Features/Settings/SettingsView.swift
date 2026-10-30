@@ -153,7 +153,8 @@ private extension SettingsView {
         } header: {
             SectionHeader("Credits")
         } footer: {
-            Text("One credit for each call or text.")
+            // The exact costs are configured on the backend and shown in the sheet.
+            Text("A call uses more credits than a text. Add Credits shows how many.")
         }
         .id(SettingsFocus.credits)
     }
