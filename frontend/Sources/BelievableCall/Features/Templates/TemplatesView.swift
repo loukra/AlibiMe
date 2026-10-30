@@ -1,8 +1,9 @@
 #if canImport(SwiftUI)
 import SwiftUI
 
-/// The Templates library page: built-in templates and the user's own custom
-/// templates, with a ＋ to create a new one and swipe-to-delete for customs.
+/// The Templates library page: the user's own templates first, then the
+/// built-in ones by category, each as its own card (like the picker on Home).
+/// ＋ creates a new one; own templates are deleted with a swipe.
 public struct TemplatesView: View {
     @Bindable var vm: TemplatesViewModel
     /// Non-nil while the editor sheet is open. `.sheet(item:)` hands the view
@@ -26,18 +27,21 @@ public struct TemplatesView: View {
                 }
             }
             if !vm.customTemplates.isEmpty {
-                Section("Your templates") {
-                    ForEach(vm.customTemplates) { TemplateRow(template: $0) }
+                Section {
+                    ForEach(vm.customTemplates) { cardRow($0) }
                         .onDelete { offsets in
                             let items = offsets.map { vm.customTemplates[$0] }
                             Task { for item in items { await vm.delete(item) } }
                         }
-                }
+                } header: { SectionHeader("Your templates") }
             }
-            Section("Built-in templates") {
-                ForEach(vm.systemTemplates) { TemplateRow(template: $0) }
+            ForEach(vm.systemTemplatesByCategory, id: \.category) { group in
+                Section {
+                    ForEach(group.templates) { cardRow($0) }
+                } header: { SectionHeader(group.category.title) }
             }
         }
+        .listStyle(.plain)
         .bcClearScrollBackground()
         .bcTabBarClearance()
         .bcScreenBackground()
@@ -64,6 +68,17 @@ public struct TemplatesView: View {
                 }
             )
         }
+    }
+}
+
+private extension TemplatesView {
+    /// A List row drawn as a separate card, so swipe-to-delete keeps working.
+    func cardRow(_ template: TemplateSummary) -> some View {
+        Card { TemplateRow(template: template) }
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets(top: Spacing.xs, leading: Spacing.m,
+                                      bottom: Spacing.xs, trailing: Spacing.m))
     }
 }
 

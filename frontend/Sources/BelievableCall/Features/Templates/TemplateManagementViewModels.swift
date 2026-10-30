@@ -23,6 +23,12 @@ public final class TemplatesViewModel {
 
     public var systemTemplates: [TemplateSummary] { templates.filter { !$0.isCustom } }
     public var customTemplates: [TemplateSummary] { templates.filter { $0.isCustom } }
+    /// The built-in templates by category, in the picker's order.
+    public var systemTemplatesByCategory: [(category: TemplateCategory, templates: [TemplateSummary])] {
+        Dictionary(grouping: systemTemplates, by: \.category)
+            .map { ($0.key, $0.value.sorted { $0.displayName < $1.displayName }) }
+            .sorted { $0.category.sortOrder < $1.category.sortOrder }
+    }
 
     /// Show the "configure your profile" note only when we know there's no context.
     public var showProfileNote: Bool { contextProfile != nil && !hasProfileContext }
