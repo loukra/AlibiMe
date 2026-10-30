@@ -11,6 +11,7 @@ import tempfile
 
 # --- Configure environment BEFORE importing the app ---
 _db_fd, _db_path = tempfile.mkstemp(suffix="-test.db")
+os.environ["APP_ENV"] = "test"
 os.environ["DATABASE_URL"] = f"sqlite+pysqlite:///{_db_path}"
 os.environ["APP_SECRET_KEY"] = "test-secret-key-for-pytest-0123456789"
 os.environ["PHONE_ENCRYPTION_KEY"] = ""  # derived from secret in dev/test
@@ -24,6 +25,8 @@ os.environ["FREE_TEST_CREDITS"] = "3"
 os.environ["CALL_CREDIT_COST"] = "1"
 os.environ["SMS_CREDIT_COST"] = "1"
 os.environ["STORE_VERIFIER"] = "mock"
+# Every test signs up from "test-device"; the DeviceCheck tests turn it on.
+os.environ["DEVICE_CHECK"] = "off"
 # Purchases grant exactly the pack; the first-purchase bonus has its own tests.
 os.environ["FIRST_PURCHASE_BONUS_CREDITS"] = "0"
 

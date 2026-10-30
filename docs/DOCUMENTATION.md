@@ -143,6 +143,11 @@ failure mode (`Unauthorized`, `InsufficientCredits`, `ActiveRequestExists`,
 - Twilio/Vapi/RevenueCat credentials are all optional and only read by the real
   providers.
 - `settings` is a cached singleton (`config.py:88`).
+- `assert_deployable()` runs when the API and the worker start. Outside
+  `APP_ENV=local` or `test` it refuses to start while a provider, the purchase
+  verifier or DeviceCheck is a mock, the secret is the dev default or
+  `PHONE_ENCRYPTION_KEY` is empty. An unset `APP_ENV` counts as production, so
+  a server that lost its `.env` stops instead of accepting code 123456.
 
 ### 4.3 Database layer
 
@@ -315,6 +320,11 @@ Credits are an **append-only ledger**, never a mutable balance —
 (`entitlements.py:21`) feeds `/v1/me`, and `grant_free_test_allowance()`
 (`entitlements.py:40`) gives new users the configured free credits once per
 phone number (`FreeAllowanceClaim` keeps the hash after an account is deleted).
+Virtual numbers get none: the line type comes from Twilio's carrier lookup when
+the verification starts, since a number range can't tell Google Voice from a
+mobile. With `DEVICE_CHECK=apple` the credits are also once per iPhone: the app
+sends a DeviceCheck token with the code, and the backend sets Apple's per-device
+bit (`app/providers/device_check.py`), which survives reinstalls.
 
 A call costs `CALL_CREDIT_COST` (2) and a text `SMS_CREDIT_COST` (1), and a
 phone number's first App Store purchase gets `FIRST_PURCHASE_BONUS_CREDITS` (3)
@@ -554,7 +564,9 @@ Each feature folder pairs an `@Observable` view model with SwiftUI views:
 - **Credits** (`Features/Credits/`): `CreditPackagesViewModel` buys a pack
   through `PurchaseServicing` (`Services/Purchases.swift`: `StoreKitPurchaseService`
   or `MockPurchaseService`), redeems the signed transaction with the backend,
-  and only then finishes it. `AppModel` redeems unfinished transactions on
+  and only then finishes it. If the backend can't be reached after Apple
+  charged, the purchase is kept (`unredeemed`) and the button turns into
+  "Add my credits", which only retries the redemption. `AppModel` redeems unfinished transactions on
   launch and listens to `Transaction.updates` while the app runs (Ask to Buy,
   purchases from another device). Debug builds use the mock; the
   "BelievableCall StoreKit" scheme sets `BC_PURCHASES=storekit` and loads

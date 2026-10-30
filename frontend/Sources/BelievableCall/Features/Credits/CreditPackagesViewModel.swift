@@ -29,6 +29,10 @@ public final class CreditPackagesViewModel: Identifiable {
     public private(set) var storePrices: [String: String] = [:]
     /// Set while a purchase waits for approval (Ask to Buy).
     public private(set) var pendingNotice: String?
+    /// A purchase Apple has charged for whose credits the backend hasn't
+    /// granted yet (offline, server down). While set, the button only retries
+    /// the redemption, so nobody pays twice for one pack.
+    public private(set) var unredeemed: StorePurchase?
 
     private let service: CreditPackagesServicing
     private let purchases: PurchaseServicing
@@ -76,7 +80,12 @@ public final class CreditPackagesViewModel: Identifiable {
     public var didFailToLoad: Bool { phase == .failure && packages.isEmpty }
     public var isEmptyCatalog: Bool { phase == .ready && packages.isEmpty }
 
+    public var unredeemedNotice: String? {
+        unredeemed == nil ? nil : "Your payment went through. Your credits weren't added yet."
+    }
+
     public var primaryButtonTitle: String {
+        if unredeemed != nil { return "Add my credits" }
         if let pkg = selectedPackage {
             return pkg.isStorePurchase ? "Buy \(pkg.credits) Credits for \(price(for: pkg))" : "Add \(pkg.credits) Credits"
         }
@@ -95,6 +104,7 @@ public final class CreditPackagesViewModel: Identifiable {
             let productIDs = list.compactMap(\.storeProductID)
             if !productIDs.isEmpty {
                 storePrices = await purchases.prices(for: productIDs)
+                unredeemed = await purchases.unfinished().first
             }
             // Preserve a still-valid selection, else default to the first pack.
             if selectedCode == nil || !list.contains(where: { $0.code == selectedCode }) {
@@ -118,7 +128,9 @@ public final class CreditPackagesViewModel: Identifiable {
     /// by `phase == .submitting` and backend idempotency.
     @discardableResult
     public func acquire() async -> Bool {
-        guard let pkg = selectedPackage, phase != .submitting else { return false }
+        guard phase != .submitting else { return false }
+        if let purchase = unredeemed { return await redeem(purchase) }
+        guard let pkg = selectedPackage else { return false }
         phase = .submitting
         errorMessage = nil
         pendingNotice = nil
@@ -127,10 +139,7 @@ public final class CreditPackagesViewModel: Identifiable {
             if pkg.isStorePurchase, let productID = pkg.storeProductID {
                 switch try await purchases.purchase(productID: productID, accountToken: accountToken) {
                 case let .purchased(purchase):
-                    result = try await service.redeem(signedTransaction: purchase.signedTransaction)
-                    // Only finish once the credits are ours; an unfinished
-                    // transaction is redeemed again on the next launch.
-                    await purchases.finish(transactionID: purchase.transactionID)
+                    return await redeem(purchase)
                 case .cancelled:
                     phase = .ready
                     return false
@@ -150,6 +159,29 @@ public final class CreditPackagesViewModel: Identifiable {
             phase = .failure
             return false
         } catch {
+            handle(error)
+            return false
+        }
+    }
+
+    /// Has the backend grant a paid purchase, then finishes it. A transaction
+    /// is only finished once the credits are ours; if the backend can't be
+    /// reached it stays unfinished and `unredeemed` offers a retry.
+    private func redeem(_ purchase: StorePurchase) async -> Bool {
+        phase = .submitting
+        errorMessage = nil
+        do {
+            let result = try await service.redeem(signedTransaction: purchase.signedTransaction)
+            await purchases.finish(transactionID: purchase.transactionID)
+            unredeemed = nil
+            lastGranted = result
+            phase = .success
+            return true
+        } catch {
+            // The backend refused this purchase for good (refunded, another
+            // account's): retrying can't help, so let the user buy normally.
+            let refused = ["invalid_store_transaction", "transaction_already_redeemed"]
+            unredeemed = refused.contains(asAPIError(error).backendCode ?? "") ? nil : purchase
             handle(error)
             return false
         }

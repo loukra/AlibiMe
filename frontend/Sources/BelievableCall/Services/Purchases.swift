@@ -49,6 +49,7 @@ public final class MockPurchaseService: PurchaseServicing, @unchecked Sendable {
     public var outcome: PurchaseOutcome?
     public var storePrices: [String: String]
     public private(set) var finished: [String] = []
+    public private(set) var purchased: [String] = []
     public var pending: [StorePurchase] = []
 
     public init(storePrices: [String: String] = [:]) { self.storePrices = storePrices }
@@ -56,6 +57,7 @@ public final class MockPurchaseService: PurchaseServicing, @unchecked Sendable {
     public func prices(for productIDs: [String]) async -> [String: String] { storePrices }
 
     public func purchase(productID: String, accountToken: UUID?) async throws -> PurchaseOutcome {
+        purchased.append(productID)
         if let outcome { return outcome }
         let id = UUID().uuidString
         return .purchased(StorePurchase(signedTransaction: "mock:\(productID):\(id)", transactionID: id))

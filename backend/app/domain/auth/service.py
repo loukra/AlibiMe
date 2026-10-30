@@ -52,6 +52,15 @@ def start_phone_verification(
     phone_hash = hash_phone(normalized.e164)
     rate_limit.check_and_increment(db, rate_limit.OTP_START, phone_hash)
 
+    # The number range alone can't tell a virtual number (Google Voice sits in
+    # ordinary US ranges); the carrier lookup can. After the rate limit, since
+    # a lookup costs money.
+    line_type = normalized.line_type
+    looked_up = provider.lookup_number(normalized.e164).line_type
+    if looked_up != "unknown":
+        line_type = looked_up
+        assert_supported_line_type(line_type)
+
     try:
         start = provider.start_verification(normalized.e164, locale)
     except TransientProviderError as exc:
@@ -65,7 +74,7 @@ def start_phone_verification(
         phone_hash=phone_hash,
         phone_e164_encrypted=encrypt_phone(normalized.e164),
         country_code=normalized.country_code,
-        line_type=normalized.line_type,
+        line_type=line_type,
         locale=locale,
         channel=start.channel,
         status="pending",
@@ -159,6 +168,7 @@ def confirm_phone_verification(
     verification_id: str,
     code: str,
     device_id: str | None,
+    device_check_token: str | None = None,
 ) -> dict:
     try:
         vid = uuid.UUID(str(verification_id))
@@ -215,7 +225,16 @@ def confirm_phone_verification(
     )
 
     if is_new_user:
-        grant_free_test_allowance(db, user.id, verification.phone_hash)
+        # The simulator has no DeviceCheck; locally the app's device id stands in.
+        if not device_check_token and settings.device_check == "mock":
+            device_check_token = device_id
+        grant_free_test_allowance(
+            db,
+            user.id,
+            verification.phone_hash,
+            line_type=verification.line_type,
+            device_token=device_check_token,
+        )
 
     verification.status = "confirmed"
     verification.confirmed_at = utcnow()

@@ -37,6 +37,7 @@ def phone_confirm(body: PhoneConfirmRequest, db: Session = Depends(get_db)) -> P
         verification_id=body.verification_id,
         code=body.code,
         device_id=body.device_id,
+        device_check_token=body.device_check_token,
     )
     return PhoneConfirmResponse(**result)
 

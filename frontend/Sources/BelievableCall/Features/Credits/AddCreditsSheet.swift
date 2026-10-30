@@ -95,11 +95,12 @@ public struct AddCreditsSheet: View {
             if let error = vm.errorMessage {
                 ErrorBanner(error)
             }
-            if let notice = vm.pendingNotice {
+            if let notice = vm.unredeemedNotice ?? vm.pendingNotice {
                 Text(notice)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             PrimaryButton(vm.primaryButtonTitle, isLoading: vm.isSubmitting) {
                 Haptics.play(.impact)

@@ -107,7 +107,11 @@ public protocol ContactsServicing: Sendable {
 
 public struct LiveAuthService: AuthServicing {
     let client: APIClient
-    public init(client: APIClient) { self.client = client }
+    let deviceToken: DeviceTokenProviding
+    public init(client: APIClient, deviceToken: DeviceTokenProviding = NoDeviceToken()) {
+        self.client = client
+        self.deviceToken = deviceToken
+    }
 
     public func start(phoneNumber: String, locale: String, deviceID: String?) async throws -> PhoneStartResult {
         let body = try BCCoding.encoder.encode(
@@ -124,7 +128,8 @@ public struct LiveAuthService: AuthServicing {
 
     public func confirm(verificationID: String, code: String, deviceID: String?) async throws -> Session {
         let body = try BCCoding.encoder.encode(
-            PhoneConfirmRequestDTO(verification_id: verificationID, code: code, device_id: deviceID)
+            PhoneConfirmRequestDTO(verification_id: verificationID, code: code, device_id: deviceID,
+                                   device_check_token: await deviceToken.deviceToken())
         )
         let dto = try await client.send(
             Endpoint(.POST, "v1/auth/phone/confirm", body: body, requiresAuth: false),

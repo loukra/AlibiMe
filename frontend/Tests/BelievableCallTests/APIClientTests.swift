@@ -54,6 +54,22 @@ final class APIClientTests: XCTestCase {
         XCTAssertTrue(bodyString.contains("+14155550123"))
     }
 
+    func testConfirmSendsTheDeviceCheckToken() async throws {
+        struct FixedToken: DeviceTokenProviding {
+            func deviceToken() async -> String? { "dc-token" }
+        }
+        let stub = StubTransport(statusCode: 200, body: Data("""
+        {"session_token":"s","user":{"id":"u","locale":"en","phone_number_masked":"+1***23"}}
+        """.utf8))
+        let client = APIClient(baseURL: URL(string: "http://x")!, transport: stub,
+                               tokenProvider: TestTokenProvider(nil))
+        let auth = LiveAuthService(client: client, deviceToken: FixedToken())
+        _ = try await auth.confirm(verificationID: "v", code: "123456", deviceID: "d1")
+        let body = try JSONSerialization.jsonObject(with: stub.lastRequest?.httpBody ?? Data()) as? [String: Any]
+        XCTAssertEqual(body?["device_check_token"] as? String, "dc-token")
+        XCTAssertEqual(body?["device_id"] as? String, "d1")
+    }
+
     func testThrowsMappedAPIErrorOnFailure() async {
         let stub = StubTransport(statusCode: 402, body: Data("""
         {"error":{"code":"insufficient_credits","message":"x","retryable":false,"request_id":"r"}}

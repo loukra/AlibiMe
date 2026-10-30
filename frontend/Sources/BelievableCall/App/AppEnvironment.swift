@@ -37,7 +37,7 @@ public final class AppEnvironment: @unchecked Sendable {
         self.tokenHolder = holder
         let client = APIClient(baseURL: baseURL, transport: transport, tokenProvider: holder)
         self.apiClient = client
-        self.auth = LiveAuthService(client: client)
+        self.auth = LiveAuthService(client: client, deviceToken: AppleDeviceToken())
         self.templates = LiveTemplateService(client: client)
         self.requests = LiveRequestService(client: client)
         self.history = LiveHistoryService(client: client)

@@ -57,6 +57,63 @@ final class CreditPackagesViewModelTests: XCTestCase {
         XCTAssertNotNil(vm.errorMessage)
     }
 
+    func testRetryAfterFailedRedeemDoesNotChargeAgain() async {
+        let service = MockCreditPackagesService(balance: 3)
+        service.acquireError = APIError.transport(message: "offline")
+        let purchases = MockPurchaseService()
+        let vm = CreditPackagesViewModel(service: service, purchases: purchases)
+        await vm.load()
+        _ = await vm.acquire()
+        XCTAssertNotNil(vm.unredeemed)
+        XCTAssertEqual(vm.primaryButtonTitle, "Add my credits")
+        XCTAssertNotNil(vm.unredeemedNotice)
+
+        vm.select("credits_25")  // changing the pack must not drop the paid one
+        XCTAssertEqual(vm.primaryButtonTitle, "Add my credits")
+
+        service.acquireError = nil
+        let ok = await vm.acquire()
+        XCTAssertTrue(ok)
+        XCTAssertEqual(purchases.purchased.count, 1)  // one charge only
+        XCTAssertEqual(service.redeemed.count, 1)
+        XCTAssertEqual(purchases.finished.count, 1)
+        XCTAssertNil(vm.unredeemed)
+    }
+
+    func testRefusedPurchaseIsNotRetried() async {
+        let service = MockCreditPackagesService()
+        service.acquireError = APIError.api(code: "transaction_already_redeemed", message: "x",
+                                            retryable: false, requestID: nil)
+        let vm = CreditPackagesViewModel(service: service, purchases: MockPurchaseService())
+        await vm.load()
+        _ = await vm.acquire()
+        XCTAssertNil(vm.unredeemed)
+        XCTAssertEqual(vm.primaryButtonTitle, "Buy 10 Credits for €4.99")
+    }
+
+    func testServerErrorKeepsThePaidPurchase() async {
+        let service = MockCreditPackagesService()
+        service.acquireError = APIError.api(code: "internal_error", message: "x",
+                                            retryable: false, requestID: nil)
+        let vm = CreditPackagesViewModel(service: service, purchases: MockPurchaseService())
+        await vm.load()
+        _ = await vm.acquire()
+        XCTAssertNotNil(vm.unredeemed)
+    }
+
+    func testOpeningTheSheetFindsAnUnredeemedPurchase() async {
+        let purchases = MockPurchaseService()
+        purchases.pending = [StorePurchase(signedTransaction: "mock:com.believablecall.app.credits10:t1",
+                                           transactionID: "t1")]
+        let vm = CreditPackagesViewModel(service: MockCreditPackagesService(), purchases: purchases)
+        await vm.load()
+        XCTAssertEqual(vm.primaryButtonTitle, "Add my credits")
+        let ok = await vm.acquire()
+        XCTAssertTrue(ok)
+        XCTAssertTrue(purchases.purchased.isEmpty)
+        XCTAssertEqual(purchases.finished, ["t1"])
+    }
+
     func testCancelledPurchaseIsQuiet() async {
         let purchases = MockPurchaseService()
         purchases.outcome = .cancelled

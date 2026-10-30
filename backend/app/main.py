@@ -22,10 +22,12 @@ from app.api.routes import (
     webhooks_sms,
     webhooks_voice,
 )
+from app.core.config import assert_deployable
 from app.core.errors import AppError, error_envelope
 from app.core.logging import configure_logging, get_logger
 
 configure_logging()
+assert_deployable()
 logger = get_logger("app")
 
 app = FastAPI(title="BelievableCall API", version="0.1.0")

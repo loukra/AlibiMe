@@ -23,6 +23,8 @@ class PhoneConfirmRequest(BaseModel):
     verification_id: str
     code: str = Field(min_length=3, max_length=10)
     device_id: str | None = Field(default=None, max_length=128)
+    # DCDevice token, base64; lets the backend grant free credits once per iPhone.
+    device_check_token: str | None = Field(default=None, max_length=8192)
 
 
 class UserPublic(BaseModel):

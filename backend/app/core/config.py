@@ -15,6 +15,10 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
+DEV_ENVS = ("local", "test")
+_DEV_SECRET = "dev-secret-change-me-0123456789abcdef"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -23,9 +27,11 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    # Application
-    app_env: str = "local"
-    app_secret_key: str = "dev-secret-change-me-0123456789abcdef"
+    # Application. Unset counts as production, so a server that forgot its
+    # .env refuses to start (see assert_deployable) instead of running mocks.
+    # Local runs and tests set "local" / "test".
+    app_env: str = "production"
+    app_secret_key: str = _DEV_SECRET
     session_token_ttl_days: int = 30
 
     # Database
@@ -56,6 +62,14 @@ class Settings(BaseSettings):
     # Max request-create calls per user per hour. 5 is the production default;
     # raise it in dev (env REQUEST_CREATE_MAX_PER_HOUR) for rapid testing.
     request_create_max_per_hour: int = 5
+    # Free credits once per iPhone through Apple's DeviceCheck, on top of once
+    # per phone number: "apple", "mock" (local) or "off" (see
+    # app/providers/device_check.py).
+    device_check: str = "off"
+    device_check_team_id: str | None = None
+    device_check_key_id: str | None = None
+    device_check_private_key_path: str | None = None  # the .p8 key file
+    device_check_environment: str = "development"  # or "production"
     supported_countries: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["DE", "US", "GB", "AT", "CH"]
     )
@@ -114,6 +128,10 @@ class Settings(BaseSettings):
         return v
 
     @property
+    def is_dev(self) -> bool:
+        return self.app_env in DEV_ENVS
+
+    @property
     def is_sqlite(self) -> bool:
         return self.database_url.startswith("sqlite")
 
@@ -128,6 +146,39 @@ class Settings(BaseSettings):
             return self.phone_encryption_key.encode()
         digest = hashlib.sha256(("phone-enc::" + self.app_secret_key).encode()).digest()
         return base64.urlsafe_b64encode(digest)
+
+
+def production_problems(s: Settings) -> list[str]:
+    """Settings that are fine on a laptop and dangerous on a server."""
+    problems = []
+    if s.otp_provider == "mock":
+        problems.append("OTP_PROVIDER=mock accepts code 123456 for any number")
+    if s.voice_provider == "mock" or s.message_provider == "mock":
+        problems.append("VOICE_PROVIDER / MESSAGE_PROVIDER=mock deliver nothing")
+    if s.store_verifier == "mock":
+        problems.append("STORE_VERIFIER=mock grants credits for made-up purchases")
+    if s.device_check == "mock":
+        problems.append("DEVICE_CHECK=mock forgets every device on restart")
+    if s.app_store_environment == "Xcode":
+        problems.append("APP_STORE_ENVIRONMENT=Xcode skips Apple's signature")
+    if s.app_secret_key == _DEV_SECRET or len(s.app_secret_key) < 32:
+        problems.append("APP_SECRET_KEY is the dev default or shorter than 32 characters")
+    if not s.phone_encryption_key:
+        problems.append("PHONE_ENCRYPTION_KEY is empty")
+    return problems
+
+
+def assert_deployable(s: Settings | None = None) -> None:
+    """Called when the API and the worker start. Outside local/test, refuse
+    to run with any setting from production_problems."""
+    s = s or settings
+    if s.is_dev:
+        return
+    problems = production_problems(s)
+    if problems:
+        raise RuntimeError(
+            f"Refusing to start with APP_ENV={s.app_env}:\n- " + "\n- ".join(problems)
+        )
 
 
 @lru_cache

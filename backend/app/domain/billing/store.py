@@ -7,8 +7,8 @@ bundle id and the product, so a client can't invent purchases.
 ``AppStoreVerifier`` uses Apple's own app-store-server-library and needs Apple's
 root certificates (https://www.apple.com/certificateauthority/) in
 ``APP_STORE_ROOT_CERTS_DIR``. ``MockStoreVerifier`` accepts ``mock:<product>:<id>``
-tokens so purchases work end to end locally and in tests; it refuses to run with
-``APP_ENV=production``.
+tokens so purchases work end to end locally and in tests; it only runs with
+``APP_ENV=local`` or ``test``.
 """
 from __future__ import annotations
 
@@ -51,8 +51,8 @@ class MockStoreVerifier:
     ``mock:<TYPE>:<product_id>:<transaction_id>`` for notifications."""
 
     def __init__(self) -> None:
-        if settings.app_env == "production":
-            raise RuntimeError("The mock store verifier must not run in production.")
+        if not settings.is_dev:
+            raise RuntimeError("The mock store verifier only runs with APP_ENV=local or test.")
 
     def verify_transaction(self, signed_transaction: str) -> VerifiedTransaction:
         parts = signed_transaction.split(":")
@@ -79,8 +79,8 @@ class AppStoreVerifier:  # pragma: no cover - needs Apple's certificates
         # Purchases from an Xcode StoreKit configuration are signed by Xcode,
         # not Apple: the library skips the signature, so never in production.
         if environment == Environment.XCODE:
-            if settings.app_env == "production":
-                raise RuntimeError("APP_STORE_ENVIRONMENT=Xcode must not run in production.")
+            if not settings.is_dev:
+                raise RuntimeError("APP_STORE_ENVIRONMENT=Xcode only runs with APP_ENV=local or test.")
             roots = []
         else:
             certs_dir = settings.app_store_root_certs_dir

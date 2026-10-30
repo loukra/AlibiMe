@@ -23,6 +23,7 @@ struct PhoneConfirmRequestDTO: Encodable {
     let verification_id: String
     let code: String
     let device_id: String?
+    let device_check_token: String?
 }
 
 struct UserPublicDTO: Decodable {
