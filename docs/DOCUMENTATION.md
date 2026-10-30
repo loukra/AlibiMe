@@ -80,7 +80,7 @@ pick template/channel/time
         │                          • idempotency check
         │                          • resolve own verified number
         │                          • one-active-request guard
-        │                          • (SMS) allocate sender binding
+        │                          • allocate sender binding
         │                          • credit pre-check
         │                          • persist status=scheduled
         │  ◄─── 201 {request_id, sender_identity}
@@ -269,7 +269,7 @@ This is the heart of the system. `backend/app/domain/requests/service.py`:
      `requests/service.py:65`; allowed delays `{0,30,300}`, schedule horizon
      24h);
   8. **credit pre-check**;
-  9. for SMS, **resolve/allocate a sender binding** and snapshot it (§6);
+  9. **resolve/allocate a sender binding** and snapshot it (§6);
   10. persist `status=scheduled`. Concurrent duplicates collapse on the
       `uq_user_client_request` constraint.
 - `get_request` / `cancel_request` (cancel only allowed while `scheduled`,
@@ -313,9 +313,21 @@ Credits are an **append-only ledger**, never a mutable balance —
 
 `backend/app/domain/billing/entitlements.py`: `entitlement_summary()`
 (`entitlements.py:21`) feeds `/v1/me`, and `grant_free_test_allowance()`
-(`entitlements.py:40`) gives new users the configured free credits once. Plans &
-entitlement status come from RevenueCat in production
-(`api/routes/webhooks_revenuecat.py`, `providers/revenuecat.py`).
+(`entitlements.py:40`) gives new users the configured free credits once per
+phone number (`FreeAllowanceClaim` keeps the hash after an account is deleted).
+
+A call costs `CALL_CREDIT_COST` (4) and a text `SMS_CREDIT_COST` (1); the
+reasoning is in `docs/pricing.md`.
+
+Credit packs are consumable App Store products
+(`domain/billing/credit_packages.py`). The app buys with StoreKit 2 and posts
+the signed transaction to `POST /v1/credit-packages/redeem`;
+`domain/billing/store.py` verifies it with Apple's app-store-server-library
+(`STORE_VERIFIER=app_store`) or, locally, a mock that accepts
+`mock:<product>:<id>` and refuses to run in production. Redemption is
+idempotent per transaction and bound to the account through `appAccountToken`.
+App Store Server Notifications (`POST /v1/webhooks/app-store`) take refunded
+credits back. `free_dev` packs still work through `/acquire` for local builds.
 
 ### 4.10 Providers (the adapter layer)
 
@@ -336,8 +348,25 @@ Selection by config: `backend/app/providers/factory.py` —
 Each channel has a `base.py` interface, a `mock.py`, and a real adapter:
 
 - OTP: `otp/mock.py` (code is always `123456`), `otp/twilio_verify.py`.
-- Voice: `voice/mock.py` (`MockVoiceCallProvider`, `voice/mock.py:26`, with a
-  `simulate_lifecycle()` helper at `voice/mock.py:77`), `voice/vapi.py`.
+- Voice: `voice/mock.py` (`MockVoiceCallProvider`, with a
+  `simulate_lifecycle()` helper), `voice/vapi.py`. The Vapi adapter sends the
+  whole agent with each call as a transient assistant (`build_assistant`), and
+  picks the caller line in order: the line's own Vapi number, the line's Twilio
+  number inline, then `VAPI_PHONE_NUMBER_ID`.
+
+**The agent** (`backend/app/agent`): `prompt.py` builds the system prompt
+(English and German, versioned by `PROMPT_VERSION`, snapshotted on the request)
+from the call variables; `config.py` holds model, voice, transcriber, background
+sound and silence timeout, all overridable per environment. Calls into another
+country than the sender line's are capped at `CROSS_BORDER_CALL_MAX_SECONDS`
+(55) so they bill as one minute.
+
+**Evals** (`backend/evals`): scenarios are every call template × locale × a
+scripted callee (cooperative, suspicious, curious, busy). `run.py` plays the
+call against the real prompt, `checks.py` applies rule checks, `judge.py` scores
+naturalness with an LLM. `make eval` runs offline with `llm.MockClient`;
+`EVAL_LLM_PROVIDER=openai|anthropic` uses the real model. Reports land in
+`evals/reports/` (git-ignored).
 - Messaging: `messaging/mock.py`, `messaging/twilio_sms.py`
   (`TwilioMessagingProvider`, sends one-way SMS, maps Twilio status →
   `MessageAttemptStatus`).
@@ -384,6 +413,8 @@ Routes:
   signature; accepts form-encoded (Twilio) or JSON (mock). Signature helper:
   `backend/app/core/twilio_webhook.py`.
 - `POST /v1/webhooks/revenuecat` — purchase / entitlement updates.
+- `POST /v1/webhooks/app-store` (`api/routes/webhooks_app_store.py`) — App Store
+  Server Notifications V2, verified like purchases; refunds take credits back.
 
 ### 4.13 API surface (quick reference)
 
@@ -393,6 +424,7 @@ Routes:
 | `POST /v1/auth/phone/confirm` | `auth.py` | no | verify OTP → session |
 | `POST /v1/auth/logout` | `auth.py` | yes | revoke session |
 | `GET/PATCH /v1/me` | `me.py` | yes | profile + credits + active request |
+| `DELETE /v1/me` | `me.py` | yes | delete the account and its data |
 | `PUT /v1/devices/current` | `devices.py` | yes | register device/push |
 | `GET /v1/templates` | `templates.py` | yes | template catalog |
 | `POST /v1/requests` | `requests.py` | yes | create call/text |
@@ -400,7 +432,9 @@ Routes:
 | `POST /v1/requests/{id}/cancel` | `requests.py` | yes | cancel while scheduled |
 | `GET /v1/history` | `history.py` | yes | past requests (+ sender snapshot) |
 | `GET /v1/entitlements` | `entitlements.py` | yes | credits/plans |
-| `POST /v1/webhooks/{voice,sms,revenuecat}` | `webhooks_*.py` | signed | provider callbacks |
+| `GET /v1/credit-packages` | `credit_packages.py` | yes | packs, store product ids, credit costs |
+| `POST /v1/credit-packages/redeem` | `credit_packages.py` | yes | grant an App Store purchase |
+| `POST /v1/webhooks/{voice,sms,revenuecat,app-store}` | `webhooks_*.py` | signed | provider callbacks |
 | `GET /health/{live,ready}` | `health.py` | no | health checks |
 
 ---
@@ -511,7 +545,18 @@ Each feature folder pairs an `@Observable` view model with SwiftUI views:
   `ContactSaveViews.swift` (the Save Contact UI, §11).
 - **History** (`Features/History/`): `HistoryViewModel` (pull-to-refresh +
   pagination, `HistoryViewModel.swift:27`) and `HistoryView`.
-- **Settings** (`Features/Settings/`): profile edit, sign out, credits.
+- **Settings** (`Features/Settings/`): profile edit, credits, the Action
+  Button's quick alibi, sign out, and Delete account (`DELETE /v1/me`).
+- **Credits** (`Features/Credits/`): `CreditPackagesViewModel` buys a pack
+  through `PurchaseServicing` (`Services/Purchases.swift`: `StoreKitPurchaseService`
+  or `MockPurchaseService`), redeems the signed transaction with the backend,
+  and only then finishes it. `AppModel` redeems unfinished transactions on
+  launch. Debug builds use the mock unless `BC_PURCHASES=storekit`
+  (`App/AlibiMe.storekit` has the products for StoreKit testing).
+- **Quick alibi** (`Features/QuickAlibi/`): `QuickAlibiRunner` sends the alibi
+  picked in Settings. The app target's `GetMeOutIntent` (an App Intent with an
+  `AppShortcutsProvider`) runs it without opening the app, which is what the
+  Action Button, Siri and Shortcuts call.
 
 ### 5.7 Design system
 
@@ -540,13 +585,17 @@ Continuity is **backend-bound** and never depends on whether a contact is saved.
   `resolve_or_allocate_binding()` reuses an active binding, else picks an active
   capable line (`select_sender_line()`); if the bound line was disabled it
   re-points the binding to a replacement (status `orphaned` → `active`) without
-  mutating past history. Called from `create_request()` for SMS, which snapshots
+  mutating past history. A persona's first binding on a channel takes the line
+  it already uses on the other channel, so calls and texts from "Mom" share one
+  number; new personas prefer a line this user hasn't bound yet, and lines that
+  can both call and text. Called from `create_request()` for calls and texts, which snapshots
   `sender_binding_id` + persona + display name + E.164 onto the `Request`.
 - **Dispatch** uses the request's bound line (`_resolve_dispatch_identity` in
   `dispatch.py`), so the number the user saw is the number that sends.
 - **API**: `POST/GET /v1/requests` return a `sender_identity` object;
-  `GET /v1/history` exposes the snapshot. Calls return `null` (SMS-only this
-  pass; the model is ready for Vapi voice reuse).
+  `GET /v1/history` exposes the snapshot, for calls and texts alike. Calls go
+  out from the line's Vapi number (`vapi_phone_number_id`, linked by
+  `make sync-senders-vapi`).
 
 ### Frontend
 - `SenderIdentity` flows onto `RequestSummary` (and `HistoryEntry` for re-entry).
@@ -614,14 +663,16 @@ contact sheet. Future SMS from the same persona reuse the same binding/number.
 mock providers — see `tests/conftest.py` (recreates + seeds the schema per test;
 mock OTP is `123456`). Suites: `unit/`, `integration/` (full HTTP round-trips
 incl. `test_sender_identity.py` and `test_dispatch.py`), `contract/`
-(stable response shapes for the iOS client). Run: `make test` (114 tests).
+(stable response shapes for the iOS client). Run: `make test` (185 tests,
+including the agent evals on the mock model). `make eval` runs the evals on
+their own and writes a report; set `EVAL_LLM_PROVIDER` to test the real model.
 
 **Frontend** (`frontend/Tests/`): the package compiles for macOS, so logic runs
 with `swift test` on the host (Xcode toolchain needed for XCTest):
 
 ```bash
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
-  swift test --filter BelievableCallTests          # 77 unit tests
+  swift test --filter BelievableCallTests          # 120 unit tests
 ```
 
 Integration tests (`BelievableCallIntegrationTests`) are gated by
@@ -640,7 +691,7 @@ make start       # migrate + seed + uvicorn on :8000  (http://localhost:8000/doc
 make worker      # scheduler + dispatch + reconciliation loop
 ```
 
-Mock OTP code is always `123456`; new users get 3 free credits. Switch to real
+Mock OTP code is always `123456`; new numbers get 4 free credits (one call). Switch to real
 providers by setting `OTP_PROVIDER` / `VOICE_PROVIDER` / `MESSAGE_PROVIDER` and
 the matching credentials (see `backend/README.md`).
 

@@ -54,14 +54,14 @@ is a pure convenience layer on top of it — continuity never depends on it.
 - Templates carry `sender_persona_key` / `sender_display_name` /
   `supports_contact_save` (defaulted from `caller_persona` / `display_name` at
   seed time), so different templates from one persona share a binding.
-- Each SMS request persists an immutable **sender snapshot**
+- Each request persists an immutable **sender snapshot**
   (`sender_binding_id`, `sender_persona_key`, `sender_display_name_snapshot`,
   `sender_phone_e164_snapshot`); the dispatcher sends through the bound line.
 - API: `POST /v1/requests` and `GET /v1/requests/{id}` return a
   `sender_identity` object (`sender_binding_id`, `sender_persona_key`,
   `sender_display_name`, `sender_phone_e164`, `contact_prompt_recommended`);
-  `GET /v1/history` exposes the snapshot fields. Calls return `null` (SMS-only
-  in this pass; the model is ready for Vapi voice reuse).
+  `GET /v1/history` exposes the snapshot fields. Calls and texts from one
+  persona share a line whenever it can do both, so a saved contact shows for both.
 - The own-number delivery invariant is unchanged: `sender_*` is the *from*
   side; delivery still only ever goes to the user's verified primary number.
 
