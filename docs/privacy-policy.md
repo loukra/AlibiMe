@@ -45,7 +45,9 @@ template.
 To place a call or send a text we pass your phone number, the text or the
 instructions for the AI voice, and the sender number to the providers below.
 During a call the AI hears and transcribes what is said on the line,
-including anyone near you who can be heard.
+including anyone near you who can be heard, so it can answer. This happens
+live: calls are not recorded, and neither we nor Vapi keep a transcript or a
+summary of the call.
 
 Legal basis: carrying out our contract with you (Art. 6(1)(b) GDPR).
 
@@ -79,7 +81,7 @@ These companies process data for us on our instructions:
 | Provider | What for | Data |
 |---|---|---|
 | Twilio Inc. (USA) | sign-in codes, texts, phone lines | phone number, text content, delivery status |
-| Vapi Inc. (USA) | carrying out AI calls | phone number, call instructions, the call audio [and a recording and transcript, see note] |
+| Vapi Inc. (USA) | carrying out AI calls | phone number, call instructions, the call audio while the call runs |
 | OpenAI (USA) | the AI model that writes the caller's words | call instructions, profile text, what is said on the call |
 | ElevenLabs (USA) | turning those words into a voice | the words the caller says |
 | Deepgram (USA) | transcribing what you say during the call | the call audio |
@@ -90,14 +92,15 @@ These companies process data for us on our instructions:
 the EU-US Data Privacy Framework, or standard contractual clauses, and that a
 data processing agreement is in place.]
 
-[Note on Vapi: by default Vapi may record calls and keep transcripts in its own
-account. Either switch that off before launch or name the retention here.]
+[Confirm how long OpenAI, ElevenLabs and Deepgram keep API data on their side
+(OpenAI, for example, may keep API inputs for abuse monitoring for a limited
+time) and name it here.]
 
 ## How long we keep data
 
 - Account, history and profile: until you delete your account.
-- Raw delivery reports from Twilio and Vapi: 30 days. [These can include the
-  call transcript; see the open point in the deploy checklist.]
+- Delivery reports from Twilio and Vapi, reduced to status, duration, cost
+  and error code: 30 days.
 - Server backups: 14 days, so deleted data is fully gone after at most 14 days.
 - Purchase records: as long as tax law requires [usually up to 10 years].
 - Phone number hashes for free credits: kept, as explained above.

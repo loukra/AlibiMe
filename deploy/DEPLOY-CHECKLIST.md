@@ -40,6 +40,11 @@ port, domain and database there; `deploy/README.md` has the steps.
   credits. Locally a request waits at `provider_accepted` until
   `python scripts/cli.py simulate <request id>` sends the mock delivery
   events; without that, reconciliation marks it failed after 30 minutes.
+- [x] **No recordings or transcripts.** Every call tells Vapi to keep no
+  recording, packet capture, call log, transcript or summary, and to send only
+  `status-update` and `end-of-call-report`. The webhook log stores the parsed
+  status, duration, cost and error code, never the raw report (which can carry
+  the transcript, message text or phone numbers).
 - [x] **Backend URL per build configuration.** `BC_BACKEND_URL` in
   `App/Signing.xcconfig`: the local server for Debug, a placeholder
   (`api.alibime.example`) for Release. Only Debug builds accept an override
@@ -92,6 +97,8 @@ Vapi:
 
 - [ ] Funded account, API key, webhook secret; voices picked
   (`AGENT_VOICE_ID_*`, placeholders now).
+- [ ] Turn on **Zero Data Retention** for the organization (dashboard, no extra
+  cost) as a second guard next to the per-call settings.
 
 OpenAI (or Anthropic):
 
@@ -142,11 +149,8 @@ Tests that need these accounts:
 - [ ] Privacy policy: the draft is `docs/privacy-policy.md`. Fill in the
   brackets (controller, hosting, transfer basis per US provider), have it
   checked once, put it online, and add a German version.
-- [ ] **Decide on call transcripts.** Vapi may record calls and keep
-  transcripts in its account by default (no `artifactPlan` is sent), and the
-  backend keeps raw Vapi webhooks, which can include the transcript, for 30
-  days (`webhook_events`). Either switch recording off and store only the
-  fields the backend needs, or name both in the privacy policy.
+- [ ] Check the first real calls in the Vapi dashboard: no recording, no
+  transcript, no summary.
 - [ ] Privacy nutrition labels: phone number, purchases, call content
   (processed by Vapi), no tracking.
 - [ ] Review notes: a demo account the reviewer can sign in with, and how the

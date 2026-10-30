@@ -43,6 +43,9 @@ from app.providers.voice.base import VoiceProvider
 
 _API_BASE = "https://api.vapi.ai"
 
+# The webhook events ``parse_webhook`` acts on.
+SERVER_MESSAGES = ("status-update", "end-of-call-report")
+
 # Vapi call status -> our neutral CallAttemptStatus.
 _STATUS_MAP = {
     "queued": CallAttemptStatus.queued.value,
@@ -82,6 +85,19 @@ def build_assistant(plan: RequestPlan, config: AgentConfig) -> dict:
         "backgroundSound": config.background_sound,
         "silenceTimeoutSeconds": config.silence_timeout_seconds,
         "metadata": {"request_id": plan.request_id, "template": plan.template_code},
+        # Nothing about the call stays at Vapi: no recording, packet capture,
+        # call log, stored transcript or summary. The live transcriber above
+        # still lets the agent hear the user. Recording, logging and packet
+        # capture are on unless switched off.
+        "artifactPlan": {
+            "recordingEnabled": False,
+            "pcapEnabled": False,
+            "loggingEnabled": False,
+            "transcriptPlan": {"enabled": False},
+        },
+        "analysisPlan": {"summaryPrompt": "", "successEvaluationPrompt": ""},
+        # Only the events the backend reads, not the running conversation.
+        "serverMessages": list(SERVER_MESSAGES),
     }
     if plan.max_duration_seconds:
         assistant["maxDurationSeconds"] = plan.max_duration_seconds

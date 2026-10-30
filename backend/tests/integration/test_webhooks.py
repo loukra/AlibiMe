@@ -125,3 +125,35 @@ def test_unanswered_call_resolves_to_no_answer(client):
 
     detail = client.get(f"/v1/requests/{rid}", headers=a["headers"]).json()
     assert detail["status"] == "no_answer"
+
+
+def test_stored_webhook_keeps_no_transcript_text_or_numbers(client):
+    """Provider reports can carry the transcript, the message text and phone
+    numbers; the webhook log keeps only the parsed fields."""
+    from app.db.models.webhook_event import WebhookEvent
+
+    a = signup(client)
+    tid = get_template_id(client, a["headers"], "boss_travel_assignment")
+    rid = client.post(
+        "/v1/requests",
+        headers=a["headers"],
+        json={"client_request_id": "c-raw", "template_id": tid, "channel": "call", "delay_seconds": 0},
+    ).json()["request_id"]
+    _dispatch_now()
+
+    call_id = _provider_call_id(rid)
+    for event in MockVoiceCallProvider.simulate_lifecycle(call_id, duration_seconds=30):
+        event = {**event, "transcript": "User: I really have to go.",
+                 "customer": {"number": "+491701234567"}}
+        assert client.post("/v1/webhooks/voice", json=event).status_code == 200
+
+    db = SessionLocal()
+    try:
+        stored = db.execute(select(WebhookEvent.payload_json)).scalars().all()
+    finally:
+        db.close()
+    assert stored
+    for payload in stored:
+        assert set(payload) == {"provider_ref_id", "mapped_status", "fields"}
+        assert "I really have to go" not in str(payload)
+        assert "+491701234567" not in str(payload)

@@ -1,4 +1,4 @@
-"""Webhook ingestion: persist raw, dedupe by external event id, then apply."""
+"""Webhook ingestion: persist the parsed event, dedupe by external event id, then apply."""
 from __future__ import annotations
 
 from sqlalchemy import select
@@ -11,16 +11,25 @@ from app.db.models.enums import WebhookProcessingStatus
 from app.db.models.webhook_event import WebhookEvent
 from app.domain.requests import lifecycle
 from app.providers.messaging.base import MessageProvider
+from app.providers.types import WebhookParseResult
 from app.providers.voice.base import VoiceProvider
 
 
-def _persist_raw(db: Session, provider: str, external_event_id: str | None, event_type: str | None, payload: dict) -> tuple[WebhookEvent, bool]:
-    """Persist the raw event. Returns (event, is_duplicate)."""
+def _persist(db: Session, provider: str, parsed: WebhookParseResult) -> tuple[WebhookEvent, bool]:
+    """Persist the event. Returns (event, is_duplicate).
+
+    Only the parsed fields are kept, never the raw payload: a provider's report
+    can carry the call transcript, the message text or phone numbers.
+    """
     event = WebhookEvent(
         provider=provider,
-        external_event_id=external_event_id,
-        event_type=event_type,
-        payload_json=payload,
+        external_event_id=parsed.external_event_id,
+        event_type=parsed.event_type,
+        payload_json={
+            "provider_ref_id": parsed.provider_ref_id,
+            "mapped_status": parsed.mapped_status,
+            "fields": parsed.fields,
+        },
         processing_status=WebhookProcessingStatus.received.value,
     )
     db.add(event)
@@ -34,9 +43,7 @@ def _persist_raw(db: Session, provider: str, external_event_id: str | None, even
 
 def ingest_voice_webhook(db: Session, provider: VoiceProvider, payload: dict) -> dict:
     parsed = provider.parse_webhook(payload)
-    event, is_dup = _persist_raw(
-        db, provider.name, parsed.external_event_id, parsed.event_type, payload
-    )
+    event, is_dup = _persist(db, provider.name, parsed)
     if is_dup:
         return {"status": "duplicate"}
 
@@ -56,9 +63,7 @@ def ingest_voice_webhook(db: Session, provider: VoiceProvider, payload: dict) ->
 
 def ingest_sms_webhook(db: Session, provider: MessageProvider, payload: dict) -> dict:
     parsed = provider.parse_webhook(payload)
-    event, is_dup = _persist_raw(
-        db, provider.name, parsed.external_event_id, parsed.event_type, payload
-    )
+    event, is_dup = _persist(db, provider.name, parsed)
     if is_dup:
         return {"status": "duplicate"}
 

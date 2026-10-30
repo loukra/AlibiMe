@@ -124,6 +124,22 @@ def test_call_without_any_caller_number_is_rejected(vapi_creds, monkeypatch):
         VapiVoiceProvider().create_outbound_call(_plan())
 
 
+def test_call_keeps_no_recording_transcript_or_summary_at_vapi(vapi_creds, monkeypatch):
+    captured = _capture_post(monkeypatch)
+    VapiVoiceProvider().create_outbound_call(_plan())
+    assistant = captured["json"]["assistant"]
+    assert assistant["artifactPlan"] == {
+        "recordingEnabled": False,
+        "pcapEnabled": False,
+        "loggingEnabled": False,
+        "transcriptPlan": {"enabled": False},
+    }
+    assert assistant["analysisPlan"] == {"summaryPrompt": "", "successEvaluationPrompt": ""}
+    assert assistant["serverMessages"] == ["status-update", "end-of-call-report"]
+    # The live transcriber stays: the agent has to hear the user.
+    assert assistant["transcriber"]["provider"]
+
+
 def test_webhook_server_and_secret_sent_when_configured(vapi_creds, monkeypatch):
     monkeypatch.setattr(settings, "public_base_url", "https://api.example.com/")
     monkeypatch.setattr(settings, "vapi_webhook_secret", "s3cret")

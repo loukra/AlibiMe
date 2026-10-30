@@ -13,7 +13,8 @@ from app.db.models.enums import WebhookProcessingStatus
 
 
 class WebhookEvent(Base):
-    """Append-only raw webhook log; raw payload persisted before processing."""
+    """Append-only webhook log: the parsed event, stored before processing.
+    Provider voice and SMS reports keep no raw payload (see webhook_ingest)."""
 
     __tablename__ = "webhook_events"
     __table_args__ = (
