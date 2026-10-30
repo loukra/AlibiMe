@@ -37,18 +37,19 @@ struct WelcomeView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.l) {
             Spacer()
-            VStack(alignment: .leading, spacing: Spacing.m) {
-                Image("AppLogo", bundle: .module)
+            // Same logo as LaunchView, so launch flows straight into welcome.
+            VStack(spacing: Spacing.xs) {
+                Image("LaunchLogo", bundle: .module)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 64, height: 64)
-                    .accessibilityHidden(true)
-                Text("AlibiMe")
-                    .font(.largeTitle.bold())
+                    .frame(maxWidth: 180, maxHeight: 180)
+                    .accessibilityLabel("AlibiMe")
                 Text("Get a call or text when you need a reason to leave.")
                     .font(.body)
                     .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
+            .frame(maxWidth: .infinity)
             if sessionExpiredNotice {
                 ErrorBanner("Your session expired. Please sign in again.")
             }
