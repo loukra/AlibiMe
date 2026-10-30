@@ -136,3 +136,57 @@ def test_call_variables_threaded_to_plan(client, db):
     assert v["forbidden_facts"]
     assert "site field" in v["user_context"]  # profile anchor surfaced
     assert v["target_turn_count"]
+
+
+def _plan_variables(client, db, headers, client_request_id):
+    import uuid
+    from app.db.models.request import Request
+    from app.workers.dispatch import _build_plan, _resolve_dispatch_identity
+
+    created = _create(client, headers, persona="manager", reason="work_urgent_task",
+                      category="work", context_modules=["work"], channels=["call"]).json()
+    resp = client.post("/v1/requests", headers=headers, json={
+        "client_request_id": client_request_id, "template_id": created["id"],
+        "channel": "call", "delay_seconds": 0,
+    })
+    db.expire_all()
+    request = db.get(Request, uuid.UUID(resp.json()["request_id"]))
+    return created, _build_plan(db, request, _resolve_dispatch_identity(db, request)).call_variables
+
+
+def test_keep_it_vague_sends_no_profile_and_a_clear_rule(client, db):
+    """"Keep it vague" applies to every call, not only partner templates: no
+    profile details reach the caller, the opening line has no anchor, and the
+    prompt says so in words."""
+    from app.agent.prompt import build_system_prompt
+
+    a = signup(client)
+    client.put("/v1/me/context-profile", headers=a["headers"],
+               json={"work_setting_code": "site_field", "privacy_preference_code": "high"})
+    created, v = _plan_variables(client, db, a["headers"], "vague-1")
+    assert "site field" not in v["user_context"]
+    assert "site" not in (created["preview_opening_line"] or "").lower()
+    assert "no names" in v["detail_rule"]
+    assert v["detail_rule"] in build_system_prompt(v)
+
+
+def test_details_fine_keeps_profile_and_says_so(client, db):
+    from app.agent.prompt import build_system_prompt
+
+    a = signup(client)
+    client.put("/v1/me/context-profile", headers=a["headers"],
+               json={"work_setting_code": "site_field", "privacy_preference_code": "low"})
+    created, v = _plan_variables(client, db, a["headers"], "detail-1")
+    assert "back on site" in (created["preview_opening_line"] or "").lower()
+    assert "site field" in v["user_context"]
+    assert "Privacy preference" not in v["user_context"]
+    assert "are fine" in build_system_prompt(v)
+
+
+def test_no_detail_answer_adds_no_rule(client, db):
+    from app.agent.prompt import build_system_prompt
+
+    a = signup(client)
+    _, v = _plan_variables(client, db, a["headers"], "plain-1")
+    assert v["detail_rule"] == ""
+    assert "- -" not in build_system_prompt(v)

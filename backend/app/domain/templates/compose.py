@@ -131,8 +131,11 @@ def sms_sender_style_for(formality: str, category: str) -> str:
 
 def _context_anchor(locale: str, modules: list[str], detail_profile: str, context: dict) -> str | None:
     """A single safe, generic anchor derived from the user's context profile.
-    Returns None when context is absent or the detail profile doesn't allow it."""
+    Returns None when context is absent, the detail profile doesn't allow it,
+    or the user asked to keep calls vague."""
     if detail_profile not in ("contextual", "continuity"):
+        return None
+    if context.get("privacy_preference_code") == "high":
         return None
     modules = modules or []
     if "work" in modules:

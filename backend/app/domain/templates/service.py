@@ -531,7 +531,6 @@ _PROFILE_MODULE_FIELDS = {
     "relationship": [
         ("Relationship visibility", "relationship_visibility_code"),
         ("Relationship stage", "relationship_stage_code"),
-        ("Privacy preference", "privacy_preference_code"),
     ],
     "transition": [
         ("Life transition", "transition_state_code"),
@@ -544,10 +543,37 @@ def _humanize(code: str | None) -> str:
     return (code or "").replace("_", " ").strip()
 
 
+# "How much may the caller say about you?" applies to every call, whatever the
+# template's modules, and is spelled out so the model can't misread "high".
+_DETAIL_RULES = {
+    "en": {
+        "low": "Specific details about their life (work, family, partner) are fine on this call.",
+        "medium": "Use at most one small detail about their life, nothing personal.",
+        "high": "Others near them may hear this call: no names and nothing specific about "
+                "their work, family or partner. Keep the reason general.",
+    },
+    "de": {
+        "low": "Konkrete Details aus ihrem Leben (Arbeit, Familie, Partner) sind bei diesem "
+               "Anruf in Ordnung.",
+        "medium": "Höchstens ein kleines Detail aus ihrem Leben, nichts Persönliches.",
+        "high": "Andere könnten mithören: keine Namen und nichts Konkretes über Arbeit, "
+                "Familie oder Partner. Der Grund bleibt allgemein.",
+    },
+}
+
+
+def _detail_rule(context: dict, locale: str) -> str:
+    rules = _DETAIL_RULES["de" if locale == "de" else "en"]
+    return rules.get(context.get("privacy_preference_code") or "", "")
+
+
 def _profile_summary(context: dict, modules: list[str], locale: str) -> str:
     """Compact, human-readable summary of *present* profile fields, limited to
-    the template's allowed context modules. Empty -> a 'none' note."""
+    the template's allowed context modules. Empty -> a 'none' note. With "keep
+    it vague" nothing from the profile goes to the caller."""
     lines: list[str] = []
+    if context.get("privacy_preference_code") == "high":
+        modules = []
     for module in modules or []:
         for label, field in _PROFILE_MODULE_FIELDS.get(module, []):
             value = context.get(field)
@@ -625,6 +651,7 @@ def build_call_variables(
         "forbidden_facts": _FORBIDDEN_FACTS[loc],
         # reusable user context (gated by the template's allowed modules)
         "user_context": _profile_summary(context, modules, loc),
+        "detail_rule": _detail_rule(context, loc),
         # misc
         "name": first_name or "",
         "locale": loc,

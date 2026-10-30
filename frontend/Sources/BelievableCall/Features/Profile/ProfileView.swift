@@ -217,7 +217,7 @@ enum ProfileTopic: String, CaseIterable, Identifiable {
         case .family: return "Family"
         case .partner: return "Partner"
         case .changes: return "Recent changes"
-        case .details: return "Details"
+        case .details: return "On the call"
         }
     }
 
@@ -229,7 +229,7 @@ enum ProfileTopic: String, CaseIterable, Identifiable {
         case .family: return "For a relative who suddenly needs you."
         case .partner: return "Tells the caller whether mentioning your partner is fine."
         case .changes: return "Something new, like a job or a move, makes a sudden call easy to believe."
-        case .details: return "With \"Keep it vague\" the caller sticks to general reasons."
+        case .details: return "How much the caller may say about your life, in case others hear the call. \"Keep it vague\" leaves out everything else in your profile."
         }
     }
 }
@@ -323,7 +323,7 @@ struct ProfileQuestion: Identifiable {
                   answer: .single(\.transitionState), options: o.transitionStates),
             .init(id: "transitionHorizon", topic: .changes, title: "For how long?",
                   answer: .single(\.transitionHorizon), options: o.transitionHorizons),
-            .init(id: "privacy", topic: .details, title: "How much detail?",
+            .init(id: "privacy", topic: .details, title: "How much about you?",
                   answer: .single(\.privacyPreference), options: o.privacyPreferences),
         ]
         .filter { !$0.options.isEmpty }

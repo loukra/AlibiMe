@@ -7,7 +7,7 @@ the caller wants something, says it briefly and hangs up.
 """
 from __future__ import annotations
 
-PROMPT_VERSION = "2026-10-30.1"
+PROMPT_VERSION = "2026-10-30.2"
 
 _EN = """\
 You are calling {who} on their mobile. From their point of view you are: {caller}. \
@@ -32,7 +32,7 @@ in character.
 - Facts you may use if asked: {allowed_facts}
 - Never mention: {forbidden_facts}. If they want details you don't have, stay vague \
 ("I'll tell you in a minute").
-- Keep it to about {turns} turns, then end the call.
+{detail}- Keep it to about {turns} turns, then end the call.
 {context}"""
 
 _DE = """\
@@ -57,7 +57,7 @@ dem Display. Fragt sie, wer dran ist, sag "Na, ich!" und mach weiter.
 - Fakten, die du nennen darfst, wenn gefragt: {allowed_facts}
 - Erwähne nie: {forbidden_facts}. Will sie Details, die du nicht hast, bleib vage \
 ("Erzähl ich dir gleich").
-- Etwa {turns} Wortwechsel, dann beende das Gespräch.
+{detail}- Etwa {turns} Wortwechsel, dann beende das Gespräch.
 {context}"""
 
 _CONTEXT = {
@@ -79,6 +79,8 @@ def build_system_prompt(variables: dict[str, str]) -> str:
         if user_context and user_context not in _NONE.values()
         else ""
     )
+    rule = variables.get("detail_rule") or ""
+    detail = f"- {rule}\n" if rule else ""
     template = _EN if loc == "en" else _DE
     return template.format(
         caller=variables.get("caller_label", ""),
@@ -95,4 +97,5 @@ def build_system_prompt(variables: dict[str, str]) -> str:
         forbidden_facts=variables.get("forbidden_facts", ""),
         turns=variables.get("target_turn_count", "4"),
         context=context,
+        detail=detail,
     ).rstrip() + "\n"
