@@ -56,6 +56,9 @@ port, domain and database there; `deploy/README.md` has the steps.
   `REVIEW_CREDITS` (10). Every other number goes through Twilio as before. A
   server refuses to start with a code shorter than 8 digits.
 
+- [x] **App icon.** The existing logo (`AppLogo`) as a 1024 px icon without
+  transparency, in `App/BelievableCall/Assets.xcassets`.
+
 ## 2. Still to test locally (simulator, StoreKit scheme)
 
 - [x] Backend stopped during a purchase, in the simulator with the StoreKit
