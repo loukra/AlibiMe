@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query, Response
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentContext, get_current_context, get_db
 from app.core.config import settings
+from app.db.models.request import Request
 from app.domain.billing.entitlements import entitlement_summary
 from app.domain.profile import context as profile_context
 from app.domain.requests.service import get_active_request
@@ -39,6 +41,9 @@ def _build_me(db: Session, user) -> MeResponse:
         locale=user.locale,
         timezone=user.timezone,
         first_name=user.first_name,
+        has_requests=db.execute(
+            select(Request.id).where(Request.user_id == user.id).limit(1)
+        ).first() is not None,
         phone_number_masked=masked_primary_number(db, user.id),
         credits_available=summary["credits_available"],
         active_entitlements=[EntitlementSummaryItem(**e) for e in summary["active_entitlements"]],

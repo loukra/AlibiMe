@@ -93,6 +93,21 @@ struct MainTabView: View {
     }
 
     var body: some View {
+        // A new user plans their first alibi before seeing the tabs. Home's
+        // view model drives both, and only one of them is on screen, so the
+        // save-contact sheets have a single owner.
+        if home.needsFirstAlibi {
+            FirstAlibiView(vm: home) {
+                selection = .home
+                Task { await home.refresh() }
+            }
+            .transition(.opacity)
+        } else {
+            tabs
+        }
+    }
+
+    private var tabs: some View {
         ZStack(alignment: .bottom) {
             screens
             FloatingTabBar(selection: $selection)

@@ -20,6 +20,9 @@ public final class HomeViewModel {
     /// Bumps each time a job is successfully created; the channel of that job is
     /// in `lastCreatedChannel`. Drives the "fly to History" animation.
     public private(set) var createdJobCount = 0
+    /// A new user who hasn't sent anything yet gets walked through their first
+    /// alibi (a real one, as a text). Decided once per load, never mid-use.
+    public private(set) var needsFirstAlibi = false
     public private(set) var lastCreatedChannel: Channel = .call
 
     private let templateService: TemplateServicing
@@ -121,6 +124,11 @@ public final class HomeViewModel {
             templates = loadedTemplates
             activeRequest = loadedProfile.activeRequest
             restoreSelection()
+            let textCost = loadedProfile.creditCosts?.text ?? 1
+            needsFirstAlibi = !prefs.firstAlibiSeen && !loadedProfile.hasRequests
+                && loadedProfile.phone.isVerified
+                && loadedProfile.entitlements.creditsAvailable >= textCost
+                && !firstAlibiChoices.isEmpty
         } catch {
             handle(error)
         }
@@ -252,6 +260,50 @@ public final class HomeViewModel {
     }
 
     public func clearActiveRequest() { activeRequest = nil }
+
+    // MARK: First alibi
+
+    /// One built-in alibi per category that can come as a text, in category
+    /// order: a short, varied choice for the first real use.
+    public var firstAlibiChoices: [TemplateSummary] {
+        templatesByCategory.compactMap { group in group.templates.first { $0.supports(.text) } }
+    }
+
+    /// What a text costs, for the walkthrough's button.
+    public var textCost: Int { profile?.creditCosts?.text ?? 1 }
+
+    /// Sends the first alibi as a text. Returns the request so the walkthrough
+    /// can offer to save the sender and say when it arrives; nil on failure,
+    /// with `errorMessage` set. No contact alert: the walkthrough asks itself.
+    public func sendFirstAlibi(_ template: TemplateSummary, timing: TimingOption) async -> RequestSummary? {
+        selectTemplate(template)
+        selectChannel(.text)
+        selectTiming(timing)
+        isSubmitting = true
+        errorMessage = nil
+        defer { isSubmitting = false }
+        do {
+            let request = try await requestService.create(
+                RequestDraft(templateID: template.id, channel: .text, timing: timing))
+            await refreshProfileQuietly()
+            activeRequest = profile?.activeRequest
+            return request
+        } catch {
+            handle(error)
+            return nil
+        }
+    }
+
+    /// Whether the walkthrough should offer to save this sender as a contact.
+    public func shouldOfferContactSave(for sender: SenderIdentity) -> Bool {
+        sender.canSaveContact && contactLinks.shouldOfferPrompt(forBinding: sender.bindingID)
+    }
+
+    /// Finished or skipped: don't show the walkthrough again on this device.
+    public func finishFirstAlibi() {
+        prefs.firstAlibiSeen = true
+        needsFirstAlibi = false
+    }
 
     // MARK: Save Contact flow
 

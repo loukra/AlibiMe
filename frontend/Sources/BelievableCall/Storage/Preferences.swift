@@ -9,6 +9,8 @@ public protocol PreferencesStoring: AnyObject, Sendable {
     var lastTimingDelay: Int? { get set }
     /// The alibi the Action Button sends; nil until picked in Settings.
     var quickAlibi: QuickAlibi? { get set }
+    /// The first-alibi walkthrough was finished or skipped on this device.
+    var firstAlibiSeen: Bool { get set }
     var deviceID: String { get }
 }
 
@@ -19,11 +21,17 @@ public final class UserDefaultsPreferences: PreferencesStoring, @unchecked Senda
         static let channel = "bc.lastChannel"
         static let timing = "bc.lastTimingDelay"
         static let quickAlibi = "bc.quickAlibi"
+        static let firstAlibiSeen = "bc.firstAlibiSeen"
         static let device = "bc.deviceID"
     }
 
     public init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+    }
+
+    public var firstAlibiSeen: Bool {
+        get { defaults.bool(forKey: Key.firstAlibiSeen) }
+        set { defaults.set(newValue, forKey: Key.firstAlibiSeen) }
     }
 
     public var selectedTemplateID: String? {
@@ -67,6 +75,7 @@ public final class InMemoryPreferences: PreferencesStoring, @unchecked Sendable 
     public var lastChannel: String?
     public var lastTimingDelay: Int?
     public var quickAlibi: QuickAlibi?
+    public var firstAlibiSeen = false
     public let deviceID: String
     public init(deviceID: String = UUID().uuidString) { self.deviceID = deviceID }
 }

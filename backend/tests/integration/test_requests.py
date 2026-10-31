@@ -176,3 +176,16 @@ def test_history_exposes_pending_with_execute_at_and_cancelable(client):
     pending = next(i for i in items if i["final_status"] == "scheduled")
     assert pending["execute_at"]
     assert pending["cancelable"] is True
+
+
+def test_me_says_whether_anything_was_sent(client):
+    # The app walks a new user through a first alibi until this turns true.
+    a = signup(client)
+    assert client.get("/v1/me", headers=a["headers"]).json()["has_requests"] is False
+    tid = get_template_id(client, a["headers"], "safety_checkin")
+    client.post(
+        "/v1/requests",
+        headers=a["headers"],
+        json={"client_request_id": "c1", "template_id": tid, "channel": "sms", "delay_seconds": 300},
+    )
+    assert client.get("/v1/me", headers=a["headers"]).json()["has_requests"] is True

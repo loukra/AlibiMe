@@ -60,6 +60,7 @@ struct MeResponseDTO: Decodable {
     let locale: String
     let timezone: String
     var first_name: String? = nil
+    var has_requests: Bool? = nil
     let phone_number_masked: String?
     let credits_available: Int
     let active_entitlements: [EntitlementSummaryItemDTO]

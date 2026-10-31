@@ -18,6 +18,70 @@ final class HomeViewModelTests: XCTestCase {
                       contactLinks: contactLinks)
     }
 
+    // MARK: First alibi walkthrough
+
+    private func newUser(credits: Int = 3) -> UserProfile {
+        var profile = Fixtures.profile(credits: credits)
+        profile.hasRequests = false
+        return profile
+    }
+
+    func testANewUserIsWalkedThroughTheFirstAlibi() async {
+        let vm = makeVM(profile: newUser())
+        await vm.load()
+        XCTAssertTrue(vm.needsFirstAlibi)
+        // One text-capable built-in per category, in category order.
+        // The call-only work alibi (tpl-boss-travel) is left out.
+        XCTAssertEqual(vm.firstAlibiChoices.map(\.id),
+                       ["tpl-boss-urgent", "tpl-sibling", "tpl-friend", "tpl-roommate", "tpl-safety"])
+    }
+
+    func testNoWalkthroughForSomeoneWhoSentBeforeSkippedItOrHasNoCredits() async {
+        let sent = makeVM(profile: Fixtures.profile())
+        await sent.load()
+        XCTAssertFalse(sent.needsFirstAlibi, "the account sent something before")
+
+        let prefs = InMemoryPreferences()
+        prefs.firstAlibiSeen = true
+        let skipped = makeVM(profile: newUser(), prefs: prefs)
+        await skipped.load()
+        XCTAssertFalse(skipped.needsFirstAlibi, "finished or skipped on this device")
+
+        let broke = makeVM(profile: newUser(credits: 0))
+        await broke.load()
+        XCTAssertFalse(broke.needsFirstAlibi, "nothing to send it with")
+    }
+
+    func testFirstAlibiGoesOutAsATextAtTheChosenTime() async throws {
+        let request = MockRequestService()
+        let prefs = InMemoryPreferences()
+        let vm = makeVM(profile: newUser(), request: request, prefs: prefs)
+        await vm.load()
+        let choice = try XCTUnwrap(vm.firstAlibiChoices.first)
+        let at = Date().addingTimeInterval(3600)
+
+        let sent = await vm.sendFirstAlibi(choice, timing: .schedule(at))
+        XCTAssertNotNil(sent)
+        XCTAssertEqual(request.lastDraft?.channel, .text)
+        XCTAssertEqual(request.lastDraft?.templateID, choice.id)
+        XCTAssertEqual(request.lastDraft?.timing, .schedule(at))
+        XCTAssertNil(vm.pendingSenderPrompt, "the walkthrough asks about the contact itself")
+        XCTAssertTrue(vm.needsFirstAlibi, "still showing until the user is done")
+
+        vm.finishFirstAlibi()
+        XCTAssertFalse(vm.needsFirstAlibi)
+        XCTAssertTrue(prefs.firstAlibiSeen)
+    }
+
+    func testFirstAlibiOffersToSaveTheSenderOnlyOnce() {
+        let links = InMemoryContactLinkStore()
+        let vm = makeVM(contactLinks: links)
+        let sender = Fixtures.senderIdentity()
+        XCTAssertTrue(vm.shouldOfferContactSave(for: sender))
+        vm.markPromptSkipped(for: sender)
+        XCTAssertFalse(vm.shouldOfferContactSave(for: sender))
+    }
+
     func testLoadPopulatesAndSelectsFirstTemplate() async {
         let vm = makeVM()
         await vm.load()

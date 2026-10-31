@@ -95,6 +95,7 @@ final class MappingTests: XCTestCase {
         let profile = UserProfile(dto: dto)
         XCTAssertEqual(profile.creditCosts, CreditCosts(call: 2, text: 1))
         XCTAssertEqual(profile.firstName, "Mehmet")
+        XCTAssertTrue(profile.hasRequests, "unknown counts as yes: no walkthrough for existing users")
         XCTAssertEqual(profile.entitlements.creditsAvailable, 2)
         XCTAssertEqual(profile.activeRequest?.id, "r1")
         XCTAssertEqual(profile.activeRequest?.channel, .call)

@@ -24,6 +24,9 @@ class MeResponse(BaseModel):
     locale: str
     timezone: str
     first_name: str | None = None
+    # Whether the account ever sent a call or text, so the app knows when to
+    # walk a new user through their first alibi.
+    has_requests: bool = False
     phone_number_masked: str | None = None
     credits_available: int
     active_entitlements: list[EntitlementSummaryItem] = []

@@ -271,6 +271,8 @@ extension UserProfile {
             locale: dto.locale,
             timezone: dto.timezone,
             firstName: dto.first_name,
+            // Unknown counts as yes: never walk an existing user through it.
+            hasRequests: dto.has_requests ?? true,
             phone: VerifiedPhoneSummary(maskedNumber: dto.phone_number_masked),
             entitlements: EntitlementSummary(
                 creditsAvailable: dto.credits_available,

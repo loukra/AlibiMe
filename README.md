@@ -67,7 +67,10 @@ since a call that late no longer helps. Phone numbers are stored encrypted and
 never logged.
 
 Each persona calls and texts from the same number, so once the user saves it as
-a contact, both show up under that name. The Action Button (or Siri with "Get
+a contact, both show up under that name. A new user starts with a short
+walkthrough that plans their first alibi as a text for a real moment coming up
+and saves its sender as a contact on the way, so the free credit goes to real
+use instead of a test. The Action Button (or Siri with "Get
 me out with AlibiMe", or a Shortcut) can send a preset alibi without opening
 the app. Credits are bought as App Store in-app purchases, and the backend
 checks Apple's signed transaction before granting them. New numbers get free

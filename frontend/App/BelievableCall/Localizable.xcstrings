@@ -46,6 +46,23 @@
         }
       }
     },
+    "%@ always texts and calls you from the same number. Save it as a contact now, and when the text comes, your phone shows %@ like any other message." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ schreibt und ruft dich immer von derselben Nummer an. Speicher sie jetzt als Kontakt, dann zeigt dein iPhone %2$@ an, wenn die SMS kommt, wie bei jeder anderen Nachricht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ always texts and calls you from the same number. Save it as a contact now, and when the text comes, your phone shows %2$@ like any other message."
+          }
+        }
+      }
+    },
     "%@ calls about %@." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -76,6 +93,23 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ texts about %2$@."
+          }
+        }
+      }
+    },
+    "%@ texts you %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ schreibt dir %2$@."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ texts you %2$@."
           }
         }
       }
@@ -395,6 +429,28 @@
         }
       }
     },
+    "At %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um %@"
+          }
+        }
+      }
+    },
+    "At a time…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu einer Uhrzeit…"
+          }
+        }
+      }
+    },
     "Back" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -650,6 +706,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ändern"
+          }
+        }
+      }
+    },
+    "Changed your mind? Cancel it in History before it goes out." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doch nicht nötig? Brich sie im Verlauf ab, bevor sie rausgeht."
           }
         }
       }
@@ -1342,6 +1409,17 @@
         }
       }
     },
+    "Later" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Später"
+          }
+        }
+      }
+    },
     "Life changes" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1595,6 +1673,17 @@
         }
       }
     },
+    "One more thing" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch ein Trick"
+          }
+        }
+      }
+    },
     "Open AlibiMe and sign in first." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1727,6 +1816,17 @@
         }
       }
     },
+    "Pick the alibi that fits. You can write your own later." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle das Alibi, das passt. Eigene kannst du später schreiben."
+          }
+        }
+      }
+    },
     "Pick your name from the list." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1745,6 +1845,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wähle zuerst dein Schnell-Alibi in den Einstellungen von AlibiMe."
+          }
+        }
+      }
+    },
+    "Plan it for a real moment coming up, like tonight's date or tomorrow's meeting. It comes as a text, so you see how it works, and it uses one of your credits." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan es für einen echten Moment, der bald ansteht, etwa das Date heute Abend oder das Meeting morgen. Es kommt als SMS, damit du siehst, wie es funktioniert, und kostet einen deiner Credits."
+          }
+        }
+      }
+    },
+    "Plan my first alibi" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mein erstes Alibi planen"
+          }
+        }
+      }
+    },
+    "Plan this text · %lld credits" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMS planen · %lld Credits"
+          }
+        }
+      }
+    },
+    "Plan this text · 1 credit" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMS planen · 1 Credit"
           }
         }
       }
@@ -1958,6 +2102,17 @@
         }
       }
     },
+    "Save as %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als %@ sichern"
+          }
+        }
+      }
+    },
     "Save this number as a contact?" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2141,6 +2296,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abmelden"
+          }
+        }
+      }
+    },
+    "Skip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überspringen"
           }
         }
       }
@@ -2444,6 +2610,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Die SMS kommt um %@."
+          }
+        }
+      }
+    },
+    "The text arrives then. Until it goes out, you can cancel it in History." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dann kommt die SMS. Bis sie rausgeht, kannst du sie im Verlauf abbrechen."
           }
         }
       }
@@ -2822,6 +2999,17 @@
         }
       }
     },
+    "What %@ writes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was %@ schreibt"
+          }
+        }
+      }
+    },
     "What do you look after?" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2862,6 +3050,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wann"
+          }
+        }
+      }
+    },
+    "When do you need it?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wann brauchst du es?"
           }
         }
       }
@@ -2976,6 +3175,17 @@
         }
       }
     },
+    "Who gets you out?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wer holt dich raus?"
+          }
+        }
+      }
+    },
     "Who knows you're together?" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3016,6 +3226,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Geht als"
+          }
+        }
+      }
+    },
+    "You still have %lld credits, enough for a call next time." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast noch %lld Credits, genug für einen Anruf beim nächsten Mal."
+          }
+        }
+      }
+    },
+    "You're set" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles bereit"
           }
         }
       }
@@ -3082,6 +3314,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Deine Änderungen werden verworfen und das ursprüngliche Alibi kommt zurück."
+          }
+        }
+      }
+    },
+    "Your first alibi" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein erstes Alibi"
           }
         }
       }

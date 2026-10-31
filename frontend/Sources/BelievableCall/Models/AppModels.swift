@@ -9,6 +9,8 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
     public var timezone: String
     /// Always an entry of the server's first-name list, never typed text.
     public var firstName: String?
+    /// Whether the account ever sent a call or text.
+    public var hasRequests: Bool
     public var phone: VerifiedPhoneSummary
     public var entitlements: EntitlementSummary
     public var activeRequest: RequestSummary?
@@ -19,6 +21,7 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
                 locale: String,
                 timezone: String,
                 firstName: String? = nil,
+                hasRequests: Bool = true,
                 phone: VerifiedPhoneSummary,
                 entitlements: EntitlementSummary,
                 activeRequest: RequestSummary?,
@@ -27,6 +30,7 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
         self.locale = locale
         self.timezone = timezone
         self.firstName = firstName
+        self.hasRequests = hasRequests
         self.phone = phone
         self.entitlements = entitlements
         self.activeRequest = activeRequest
