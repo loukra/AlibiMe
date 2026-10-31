@@ -203,7 +203,8 @@ extension RequestSummary {
             executeAt: executeAt,
             requestedAt: nil,
             cancelable: RequestStatus(wireValue: active.status).isLive,
-            lastErrorCode: nil
+            lastErrorCode: nil,
+            senderIdentity: active.sender_identity.map(SenderIdentity.init(dto:))
         )
     }
 

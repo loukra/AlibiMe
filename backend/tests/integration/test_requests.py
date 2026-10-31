@@ -188,4 +188,7 @@ def test_me_says_whether_anything_was_sent(client):
         headers=a["headers"],
         json={"client_request_id": "c1", "template_id": tid, "channel": "sms", "delay_seconds": 300},
     )
-    assert client.get("/v1/me", headers=a["headers"]).json()["has_requests"] is True
+    me = client.get("/v1/me", headers=a["headers"]).json()
+    assert me["has_requests"] is True
+    # Home names who is about to text: "... texts you at 21:58".
+    assert me["active_request"]["sender_identity"]["sender_display_name"]

@@ -7,8 +7,8 @@ public struct HomeView: View {
     @Bindable var vm: HomeViewModel
     @State private var showTemplatePicker = false
     @State private var showSchedule = false
-    /// The taller of the two cards (next job, template); both take it, so
-    /// the screen keeps its shape whatever they show.
+    /// The template card's height, fed back as its minimum, so the screen
+    /// keeps its shape whichever alibi it shows.
     @State private var cardHeight: CGFloat = 0
     /// Invoked from the number and credits pills; the tab container opens the
     /// Settings tab at the part that was tapped.
@@ -70,9 +70,13 @@ public struct HomeView: View {
             // scheduled" card would push the actual choice down.
             if vm.hasActiveRequest, let request = vm.activeRequest {
                 NextJobChip(request: request,
-                            minHeight: cardHeight,
                             onCancel: { Haptics.play(.warning); Task { await vm.cancelActive() } },
                             onOpen: { onOpenHistory?() })
+                // Marks where planning another one starts, below the running one.
+                Text("New alibi")
+                    .font(.title3.bold())
+                    .padding(.top, Spacing.xs)
+                    .accessibilityAddTraits(.isHeader)
             }
             requestComposer
             if pinned { Spacer(minLength: Spacing.s) }

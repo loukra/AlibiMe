@@ -80,6 +80,23 @@
         }
       }
     },
+    "%@ calls you at %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ruft dich um %2$@ an"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ calls you at %2$@"
+          }
+        }
+      }
+    },
     "%@ texts about %@." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -110,6 +127,23 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ texts you %2$@."
+          }
+        }
+      }
+    },
+    "%@ texts you at %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ schreibt dir um %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ texts you at %2$@"
           }
         }
       }
@@ -1486,24 +1520,24 @@
         }
       }
     },
-    "Next call" : {
+    "Next call at %@" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nächster Anruf"
+            "value" : "Nächster Anruf um %@"
           }
         }
       }
     },
-    "Next text" : {
+    "Next text at %@" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nächste SMS"
+            "value" : "Nächste SMS um %@"
           }
         }
       }

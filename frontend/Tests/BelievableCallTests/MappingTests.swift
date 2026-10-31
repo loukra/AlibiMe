@@ -100,6 +100,16 @@ final class MappingTests: XCTestCase {
         XCTAssertEqual(profile.activeRequest?.id, "r1")
         XCTAssertEqual(profile.activeRequest?.channel, .call)
         XCTAssertTrue(profile.phone.isVerified)
+        XCTAssertNil(profile.activeRequest?.senderIdentity)
+    }
+
+    func testActiveRequestCarriesItsSender() {
+        var active = ActiveRequestSummaryDTO(request_id: "r1", channel: "sms", status: "scheduled",
+                                             execute_at: "2026-06-13T14:37:59.855827Z")
+        active.sender_identity = .init(sender_binding_id: "b1", sender_persona_key: "boss",
+                                       sender_display_name: "Chef", sender_phone_e164: "+15550100123",
+                                       contact_prompt_recommended: true)
+        XCTAssertEqual(RequestSummary(active: active)?.senderIdentity?.displayName, "Chef")
     }
 
     func testSecondsRemainingNeverNegative() {

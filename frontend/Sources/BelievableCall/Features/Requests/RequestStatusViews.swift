@@ -76,47 +76,47 @@ public struct NextJobChip: View {
     let request: RequestSummary?
     let onCancel: () -> Void
     let onOpen: () -> Void
-    /// See `Card`: lets the chip match the cards around it.
-    var minHeight: CGFloat?
     @State private var now = Date()
+    @State private var pulsing = false
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    public init(request: RequestSummary?, minHeight: CGFloat? = nil,
+    public init(request: RequestSummary?,
                 onCancel: @escaping () -> Void, onOpen: @escaping () -> Void) {
         self.request = request
-        self.minHeight = minHeight
         self.onCancel = onCancel
         self.onOpen = onOpen
     }
 
     public var body: some View {
-        // The glass capsule (frame/background) is stable so nothing shifts; the
-        // inner row is keyed by job id and push-transitions ("woosh") whenever
-        // the displayed job changes — idle→job, job→next, job→idle. Same-job
-        // ticks keep the same id, so they morph in place (no woosh).
+        // The frame and background are stable so nothing shifts; the inner row
+        // is keyed by job id and push-transitions ("woosh") whenever the
+        // displayed job changes. Same-job ticks keep the id and morph in place.
         ZStack {
             row
                 .id(request?.id ?? "idle")
-                // Idle ⇄ job is a gentle fade; job ⇄ job (switch/delete-to-next)
-                // is a clearly visible horizontal slide.
                 .transition(rowTransition)
         }
-        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(Spacing.m)
-        .reportsCardHeight(minHeight != nil)
-        .frame(minHeight: minHeight)
-        .fixedSize(horizontal: false, vertical: true)
-        // Same glass, corners and shadow as `Card`, so it pairs with the
-        // template card below it.
+        // Tinted, not the white glass of the cards below: this is something
+        // already running, not part of the form for a new alibi.
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+        .background(Theme.accent.opacity(0.16), in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
-                .strokeBorder(Theme.glassBorder, lineWidth: 1)
+                .fill(Theme.accent.opacity(0.10))
+                // Tint only: taps go through to the row and the cancel button.
+                .allowsHitTesting(false)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+                .strokeBorder(Theme.accent.opacity(0.45), lineWidth: 1.5)
         )
         .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
         .shadow(color: Theme.cardShadow, radius: 16, x: 0, y: 8)
         .animation(.spring(response: 0.38, dampingFraction: 0.74), value: request?.id)
         .onReceive(timer) { now = $0 }
+        .onAppear { pulsing = true }
         .accessibilityHint(request == nil ? "Opens History" : "Opens History to see all pending jobs")
     }
 
@@ -132,17 +132,37 @@ public struct NextJobChip: View {
     }
 
     private var row: some View {
-        HStack(spacing: Spacing.m) {
+        HStack(alignment: .center, spacing: Spacing.m) {
             Button(action: onOpen) {
-                HStack(spacing: Spacing.s) {
-                    IconBadge(leadingIcon)
-                        .opacity(request == nil ? 0.5 : 1)
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(captionText)
-                            .font(.caption).foregroundStyle(.secondary)
+                HStack(spacing: Spacing.m) {
+                    ZStack {
+                        Circle().fill(Theme.accentFill)
+                        Image(systemName: leadingIcon)
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.white)
+                    }
+                    .frame(width: 44, height: 44)
+                    .opacity(request == nil ? 0.5 : 1)
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: Spacing.xs + 2) {
+                            if request != nil {
+                                Circle()
+                                    .fill(Theme.accent)
+                                    .frame(width: 7, height: 7)
+                                    .opacity(pulsing ? 0.25 : 1)
+                                    .animation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: pulsing)
+                                    .accessibilityHidden(true)
+                            }
+                            Text(captionText)
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(.primary)
+                                .lineLimit(2)
+                        }
                         Text(mainText)
-                            .font(.headline.monospacedDigit())
-                            .foregroundStyle(request == nil ? Color.secondary : Color.primary)
+                            .font(.title.weight(.bold).monospacedDigit())
+                            .foregroundStyle(request == nil ? Color.secondary : Theme.accent)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                             // Same-job countdown ticks morph rather than woosh.
                             .contentTransition(.numericText())
                     }
@@ -169,9 +189,16 @@ public struct NextJobChip: View {
         guard let request else { return "moon.stars" }
         return request.channel.outlineSymbol
     }
+    /// Who and when, so it is clear this one is already on its way.
     private var captionText: String {
         guard let request else { return String(localized: "Upcoming") }
-        return request.channel == .call ? String(localized: "Next call") : String(localized: "Next text")
+        let time = ScheduleSheet.clockTime(request.executeAt)
+        if let name = request.senderIdentity?.displayName {
+            return request.channel == .call ? String(localized: "\(name) calls you at \(time)")
+                : String(localized: "\(name) texts you at \(time)")
+        }
+        return request.channel == .call ? String(localized: "Next call at \(time)")
+            : String(localized: "Next text at \(time)")
     }
     private var mainText: String {
         guard let request else { return String(localized: "Nothing scheduled") }

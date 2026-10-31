@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.credit_packages import CreditCosts
+from app.schemas.requests import SenderIdentityOut
 
 
 class EntitlementSummaryItem(BaseModel):
@@ -17,6 +18,8 @@ class ActiveRequestSummary(BaseModel):
     channel: str
     status: str
     execute_at: str
+    # Who calls or texts, so Home can say "Boss texts you at 21:58".
+    sender_identity: SenderIdentityOut | None = None
 
 
 class MeResponse(BaseModel):

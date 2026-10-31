@@ -9,7 +9,7 @@ from app.core.config import settings
 from app.db.models.request import Request
 from app.domain.billing.entitlements import entitlement_summary
 from app.domain.profile import context as profile_context
-from app.domain.requests.service import get_active_request
+from app.domain.requests.service import get_active_request, sender_identity_payload
 from app.domain.users import first_names
 from app.domain.users.service import delete_account, masked_primary_number
 from app.schemas.context_profile import ContextProfileBody, ContextProfileOut
@@ -35,6 +35,7 @@ def _build_me(db: Session, user) -> MeResponse:
             channel=active.channel,
             status=active.status,
             execute_at=active.execute_at.isoformat(),
+            sender_identity=sender_identity_payload(db, active, user.locale),
         )
     return MeResponse(
         id=str(user.id),

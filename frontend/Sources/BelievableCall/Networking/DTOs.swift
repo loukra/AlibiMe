@@ -53,6 +53,7 @@ struct ActiveRequestSummaryDTO: Decodable {
     let channel: String
     let status: String
     let execute_at: String
+    var sender_identity: SenderIdentityDTO? = nil
 }
 
 struct MeResponseDTO: Decodable {
