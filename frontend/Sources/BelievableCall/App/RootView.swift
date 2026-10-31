@@ -266,8 +266,9 @@ struct FloatingTabBar: View {
                 .frame(width: centerDiameter, height: centerDiameter)
                 // Not the interactive glass: it grows on press on its own and
                 // leaves the selection ring behind. PressScaleStyle scales
-                // glass, logo and ring together.
-                .bcGlassCircle()
+                // glass, logo and ring together. Selected, the glass turns
+                // light purple like the other tabs' labels.
+                .bcGlassCircle(tint: isSelected ? Theme.accent.opacity(0.3) : nil)
                 .overlay(
                     Circle().strokeBorder(
                         isSelected ? Theme.accent : Color.clear,
@@ -278,7 +279,7 @@ struct FloatingTabBar: View {
                 .contentShape(Circle())
         }
         .buttonStyle(PressScaleStyle())
-        .accessibilityLabel("Home")
+        .accessibilityLabel("Home screen")
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 

@@ -77,11 +77,14 @@ extension View {
     }
 
     /// Liquid Glass circle (iOS 26+), used for the raised center tab button.
-    @ViewBuilder func bcGlassCircle(interactive: Bool = false) -> some View {
+    /// A tint colors the glass itself (a fill underneath would be hidden by it).
+    @ViewBuilder func bcGlassCircle(interactive: Bool = false, tint: Color? = nil) -> some View {
         if #available(iOS 26, macOS 26, *) {
-            self.glassEffect(interactive ? .regular.interactive() : .regular, in: Circle())
+            let glass: Glass = tint.map { Glass.regular.tint($0) } ?? .regular
+            self.glassEffect(interactive ? glass.interactive() : glass, in: Circle())
         } else {
-            self.background(.regularMaterial, in: Circle())
+            self.background(Circle().fill(tint ?? .clear))
+                .background(.regularMaterial, in: Circle())
                 .overlay(Circle().strokeBorder(Theme.glassBorder, lineWidth: 1))
         }
     }
