@@ -157,12 +157,12 @@ public struct HomeView: View {
             }
             .buttonStyle(.plain)
         }
-        PrimaryButton(vm.primaryCTATitle, systemImage: vm.channel.systemImage, isLoading: vm.isSubmitting) {
-            Haptics.play(.impact)
+        // A slide, not a tap: sending costs credits.
+        SlideToSend(vm.primaryCTATitle, subtitle: vm.sendCostNote,
+                    systemImage: vm.channel.systemImage,
+                    isLoading: vm.isSubmitting, isEnabled: vm.canSend) {
             Task { await vm.send() }
         }
-        .disabled(!vm.canSend)
-        .opacity(vm.canSend ? 1 : 0.5)
     }
 
     private var isScheduling: Bool {

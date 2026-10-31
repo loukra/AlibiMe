@@ -4,11 +4,13 @@ from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentContext, get_current_context, get_db
+from app.core.config import settings
 from app.domain.billing.entitlements import entitlement_summary
 from app.domain.profile import context as profile_context
 from app.domain.requests.service import get_active_request
 from app.domain.users.service import delete_account, masked_primary_number
 from app.schemas.context_profile import ContextProfileBody, ContextProfileOut
+from app.schemas.credit_packages import CreditCosts
 from app.schemas.me import (
     ActiveRequestSummary,
     EntitlementSummaryItem,
@@ -39,6 +41,7 @@ def _build_me(db: Session, user) -> MeResponse:
         credits_available=summary["credits_available"],
         active_entitlements=[EntitlementSummaryItem(**e) for e in summary["active_entitlements"]],
         active_request=active_summary,
+        credit_costs=CreditCosts(call=settings.call_credit_cost, sms=settings.sms_credit_cost),
     )
 
 

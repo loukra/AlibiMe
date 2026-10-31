@@ -86,6 +86,13 @@ public final class HomeViewModel {
         }
     }
 
+    /// What sending costs, under the send slider: "Slide to send · 2 credits".
+    public var sendCostNote: String {
+        guard let costs = profile?.creditCosts else { return "Slide to send" }
+        let cost = channel == .call ? costs.call : costs.text
+        return cost == 1 ? "Slide to send · 1 credit" : "Slide to send · \(cost) credits"
+    }
+
     public var canSend: Bool {
         // Multiple jobs may be queued (up to the backend cap), so an existing
         // pending job no longer blocks sending — the backend enforces the cap

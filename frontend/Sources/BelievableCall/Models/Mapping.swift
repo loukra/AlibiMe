@@ -275,7 +275,8 @@ extension UserProfile {
                 creditsAvailable: dto.credits_available,
                 items: dto.active_entitlements
             ),
-            activeRequest: RequestSummary(active: dto.active_request)
+            activeRequest: RequestSummary(active: dto.active_request),
+            creditCosts: dto.credit_costs.map { CreditCosts(call: $0.call, text: $0.sms) }
         )
     }
 }

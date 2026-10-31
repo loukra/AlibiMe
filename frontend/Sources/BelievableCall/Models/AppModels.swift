@@ -11,6 +11,8 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
     public var phone: VerifiedPhoneSummary
     public var entitlements: EntitlementSummary
     public var activeRequest: RequestSummary?
+    /// What a call and a text cost, when the backend says so.
+    public var creditCosts: CreditCosts?
 
     public init(id: String,
                 locale: String,
@@ -18,7 +20,8 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
                 displayName: String?,
                 phone: VerifiedPhoneSummary,
                 entitlements: EntitlementSummary,
-                activeRequest: RequestSummary?) {
+                activeRequest: RequestSummary?,
+                creditCosts: CreditCosts? = nil) {
         self.id = id
         self.locale = locale
         self.timezone = timezone
@@ -26,6 +29,7 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
         self.phone = phone
         self.entitlements = entitlements
         self.activeRequest = activeRequest
+        self.creditCosts = creditCosts
     }
 }
 

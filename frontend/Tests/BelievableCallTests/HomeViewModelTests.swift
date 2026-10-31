@@ -117,6 +117,23 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertEqual(vm.primaryCTATitle, "Schedule text")
     }
 
+    func testSendCostNoteShowsWhatTheChannelCosts() async {
+        var profile = Fixtures.profile()
+        profile.creditCosts = CreditCosts(call: 2, text: 1)
+        let vm = makeVM(profile: profile)
+        await vm.load()
+        vm.selectChannel(.call)
+        XCTAssertEqual(vm.sendCostNote, "Slide to send · 2 credits")
+        vm.selectChannel(.text)
+        XCTAssertEqual(vm.sendCostNote, "Slide to send · 1 credit")
+    }
+
+    func testSendCostNoteWithoutCostsStillSaysToSlide() async {
+        let vm = makeVM()
+        await vm.load()
+        XCTAssertEqual(vm.sendCostNote, "Slide to send")
+    }
+
     func testSendBuildsDraftAndSyncsNextJobFromBackend() async {
         let created = Fixtures.scheduledRequest(channel: .call, seconds: 30)
         let request = MockRequestService(created: created)

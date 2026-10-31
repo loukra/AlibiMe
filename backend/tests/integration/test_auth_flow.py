@@ -62,3 +62,8 @@ def test_relogin_reuses_same_user(client):
 def test_unauthenticated_me_is_401(client):
     resp = client.get("/v1/me")
     assert resp.status_code == 401
+
+
+def test_me_says_what_a_call_and_a_text_cost(client, auth):
+    costs = client.get("/v1/me", headers=auth["headers"]).json()["credit_costs"]
+    assert costs == {"call": 1, "sms": 1}  # the test env charges one credit each

@@ -89,9 +89,11 @@ final class MappingTests: XCTestCase {
             phone_number_masked: "+14******123", credits_available: 2,
             active_entitlements: [.init(plan_code: "free", status: "active")],
             active_request: .init(request_id: "r1", channel: "call", status: "scheduled",
-                                  execute_at: "2026-06-13T14:37:59.855827Z")
+                                  execute_at: "2026-06-13T14:37:59.855827Z"),
+            credit_costs: .init(call: 2, sms: 1)
         )
         let profile = UserProfile(dto: dto)
+        XCTAssertEqual(profile.creditCosts, CreditCosts(call: 2, text: 1))
         XCTAssertEqual(profile.displayName, "Sam")
         XCTAssertEqual(profile.entitlements.creditsAvailable, 2)
         XCTAssertEqual(profile.activeRequest?.id, "r1")

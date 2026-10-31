@@ -64,6 +64,7 @@ struct MeResponseDTO: Decodable {
     let credits_available: Int
     let active_entitlements: [EntitlementSummaryItemDTO]
     let active_request: ActiveRequestSummaryDTO?
+    let credit_costs: CreditCostsDTO?
 }
 
 struct MeUpdateDTO: Encodable {
