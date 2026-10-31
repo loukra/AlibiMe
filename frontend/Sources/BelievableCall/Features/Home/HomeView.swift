@@ -66,10 +66,14 @@ public struct HomeView: View {
             if let error = vm.errorMessage {
                 ErrorBanner(error)
             }
-            NextJobChip(request: vm.hasActiveRequest ? vm.activeRequest : nil,
-                        minHeight: cardHeight,
-                        onCancel: { Haptics.play(.warning); Task { await vm.cancelActive() } },
-                        onOpen: { onOpenHistory?() })
+            // Only while something is scheduled; an empty "nothing
+            // scheduled" card would push the actual choice down.
+            if vm.hasActiveRequest, let request = vm.activeRequest {
+                NextJobChip(request: request,
+                            minHeight: cardHeight,
+                            onCancel: { Haptics.play(.warning); Task { await vm.cancelActive() } },
+                            onOpen: { onOpenHistory?() })
+            }
             requestComposer
             if pinned { Spacer(minLength: Spacing.s) }
             sendButton
@@ -116,13 +120,13 @@ public struct HomeView: View {
 
     @ViewBuilder private var requestComposer: some View {
         VStack(alignment: .leading, spacing: Spacing.s) {
-            SectionHeader("Template")
+            SectionHeader("Which alibi?")
             Button { showTemplatePicker = true } label: { selectedTemplateCard }
                 .buttonStyle(.plain)
         }
         if vm.availableChannels.count > 1 {
             VStack(alignment: .leading, spacing: Spacing.s) {
-                SectionHeader("Channel")
+                SectionHeader("Call or text?")
                 SegmentedSelector(
                     items: vm.availableChannels.map { SegmentItem(id: $0.id, title: $0.title) },
                     selectedID: vm.channel.id
@@ -132,7 +136,7 @@ public struct HomeView: View {
             }
         }
         VStack(alignment: .leading, spacing: Spacing.s) {
-            SectionHeader("When")
+            SectionHeader("When?")
             SegmentedSelector(items: timingSegments, selectedID: selectedTimingID) { id in
                 if id == scheduleSegmentID {
                     showSchedule = true
@@ -187,7 +191,7 @@ public struct HomeView: View {
                         Text(template.displayName)
                             .font(.headline)
                             .foregroundStyle(.primary)
-                            .lineLimit(1)
+                            .lineLimit(2)
                         // Always two lines tall, so switching between Call and
                         // Text (whose previews differ in length) doesn't move
                         // the controls below.
@@ -196,7 +200,7 @@ public struct HomeView: View {
                             .foregroundStyle(.secondary)
                             .lineLimit(2, reservesSpace: true)
                     } else {
-                        Text("Choose a template")
+                        Text("Choose an alibi")
                             .font(.headline)
                     }
                 }

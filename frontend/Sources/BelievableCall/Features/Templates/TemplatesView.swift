@@ -21,7 +21,7 @@ public struct TemplatesView: View {
             }
             if vm.showProfileNote {
                 Section {
-                    Label("You can configure your Profile for more tailored custom templates.",
+                    Label("Fill in your Profile so your alibis fit your life.",
                           systemImage: "person.crop.circle")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -34,7 +34,7 @@ public struct TemplatesView: View {
                             let items = offsets.map { vm.customTemplates[$0] }
                             Task { for item in items { await vm.delete(item) } }
                         }
-                } header: { SectionHeader("Your templates") }
+                } header: { SectionHeader("Your alibis") }
             }
             ForEach(vm.systemTemplatesByCategory, id: \.category) { group in
                 Section {
@@ -46,7 +46,7 @@ public struct TemplatesView: View {
         .bcClearScrollBackground()
         .bcTabBarClearance()
         .bcScreenBackground()
-        .navigationTitle("Templates")
+        .navigationTitle("Alibis")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -54,7 +54,7 @@ public struct TemplatesView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
-                .accessibilityLabel("New template")
+                .accessibilityLabel("New alibi")
             }
         }
         .task { await vm.load() }

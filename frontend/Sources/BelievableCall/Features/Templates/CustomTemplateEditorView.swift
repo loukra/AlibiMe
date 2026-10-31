@@ -43,7 +43,7 @@ public struct CustomTemplateEditorView: View {
             // Each step is its own page and starts at the top.
             .id(vm.step)
             .bcScreenBackground()
-            .navigationTitle(vm.isEditing ? "Edit template" : "New template")
+            .navigationTitle(vm.isEditing ? "Edit alibi" : "New alibi")
             .bcInlineNavTitle()
             .toolbar { toolbar }
             .task { if vm.options == nil { await vm.load() } }
@@ -53,8 +53,8 @@ public struct CustomTemplateEditorView: View {
                 }
             } message: {
                 Text(vm.canReset
-                     ? "Your changes are removed and the original template comes back."
-                     : "This template is removed. Past calls and texts stay in History.")
+                     ? "Your changes are removed and the original alibi comes back."
+                     : "This alibi is removed. Past calls and texts stay in History.")
             }
         }
     }
@@ -82,7 +82,7 @@ public struct CustomTemplateEditorView: View {
     }
 
     private var removeTitle: String {
-        vm.canReset ? "Reset to the original?" : "Delete this template?"
+        vm.canReset ? "Reset to the original?" : "Delete this alibi?"
     }
 
     // MARK: Steps
@@ -163,7 +163,7 @@ public struct CustomTemplateEditorView: View {
             VStack(alignment: .leading, spacing: Spacing.s) {
                 SectionHeader("Name")
                 Card {
-                    TextField("Template name", text: $vm.draft.displayName)
+                    TextField("Alibi name", text: $vm.draft.displayName)
                         .font(.body)
                 }
             }
@@ -211,7 +211,7 @@ public struct CustomTemplateEditorView: View {
 
             if vm.canReset || vm.canDelete {
                 Button(role: .destructive) { confirmRemove = true } label: {
-                    Label(vm.canReset ? "Reset to original" : "Delete template",
+                    Label(vm.canReset ? "Reset to original" : "Delete alibi",
                           systemImage: vm.canReset ? "arrow.uturn.backward" : "trash")
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, Spacing.s)

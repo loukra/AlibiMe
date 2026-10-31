@@ -232,7 +232,7 @@ struct FloatingTabBar: View {
             // Home button (keeps the bar symmetric).
             HStack(spacing: 0) {
                 sideItem(.history, icon: "clock.fill", label: "History")
-                sideItem(.templates, icon: "square.stack.3d.up.fill", label: "Templates")
+                sideItem(.templates, icon: "square.stack.3d.up.fill", label: "Alibis")
                 Spacer(minLength: centerDiameter)
                 sideItem(.profile, icon: "person.crop.circle.fill", label: "Profile")
                 sideItem(.settings, icon: "gearshape.fill", label: "Settings")

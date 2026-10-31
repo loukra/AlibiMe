@@ -17,7 +17,7 @@ public struct TemplatePickerView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.l) {
                     if !vm.customTemplates.isEmpty {
-                        group("Your templates", vm.customTemplates)
+                        group("Your alibis", vm.customTemplates)
                     }
                     ForEach(vm.templatesByCategory, id: \.category) { group in
                         self.group(group.category.title, group.templates)
@@ -26,7 +26,7 @@ public struct TemplatePickerView: View {
                 .padding(Spacing.m)
             }
             .bcScreenBackground()
-            .navigationTitle("Choose a template")
+            .navigationTitle("Choose an alibi")
             .bcInlineNavTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

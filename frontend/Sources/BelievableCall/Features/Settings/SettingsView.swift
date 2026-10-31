@@ -58,7 +58,7 @@ public struct SettingsView: View {
                         }
                         .disabled(vm.isDeleting)
                     } footer: {
-                        Text("Deleting removes your number, history, own templates and any credits left.")
+                        Text("Deleting removes your number, history, own alibis and any credits left.")
                     }
                 }
                 .onChange(of: focus) { _, target in
@@ -81,7 +81,7 @@ public struct SettingsView: View {
                 Button("Delete account", role: .destructive) { Task { await vm.deleteAccount() } }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Your number, history, custom templates and remaining credits are deleted. Credits you bought are not refunded. This can't be undone.")
+                Text("Your number, history, own alibis and remaining credits are deleted. Credits you bought are not refunded. This can't be undone.")
             }
             .sheet(item: $creditPackagesVM) { packagesVM in
                 AddCreditsSheet(
@@ -164,7 +164,7 @@ private extension SettingsView {
             Text("Press the Action Button and AlibiMe calls or texts you, without opening the app. Choose what it sends.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-            Picker("Template", selection: Binding(
+            Picker("Alibi", selection: Binding(
                 get: { vm.quickAlibi?.templateID ?? "" },
                 set: { vm.setQuickAlibi(templateID: $0.isEmpty ? nil : $0) }
             )) {

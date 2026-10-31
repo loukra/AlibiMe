@@ -90,7 +90,7 @@ public enum ErrorCopy {
         case "active_request_exists":
             return "You’ve reached the limit of queued jobs. Cancel one to schedule another."
         case "template_channel_not_supported":
-            return "This template can’t be sent on that channel."
+            return "This alibi can’t be sent that way."
         case "insufficient_credits":
             return "You’re out of credits. Add more to keep sending."
         case "invalid_schedule_window":
