@@ -141,3 +141,32 @@ def test_same_country_call_keeps_template_length(client, db):
     voice = _CapturingVoice()
     _run_dispatch(voice_provider=voice)
     assert voice.plan.max_duration_seconds == 90
+
+
+def test_badly_overdue_request_expires_without_charging(client, db):
+    # The worker was down: a "call me now" from 15 minutes ago is no use any more.
+    a = signup(client)
+    rid = _create_sms(client, a["headers"])
+    balance = client.get("/v1/me", headers=a["headers"]).json()["credits_available"]
+    db_ = SessionLocal()
+    try:
+        assert dispatch.run_once(db_, now=utcnow() + timedelta(minutes=15)) == []
+    finally:
+        db_.close()
+
+    db.expire_all()
+    req = db.get(Request, __import__("uuid").UUID(rid))
+    assert req.status == "expired"
+    assert req.last_error_code == "missed_window"
+    assert req.credits_reserved is False
+    assert client.get("/v1/me", headers=a["headers"]).json()["credits_available"] == balance
+
+
+def test_slightly_late_request_still_goes_out(client, db):
+    a = signup(client)
+    _create_sms(client, a["headers"])
+    db_ = SessionLocal()
+    try:
+        assert dispatch.run_once(db_, now=utcnow() + timedelta(minutes=5)) == ["dispatched"]
+    finally:
+        db_.close()

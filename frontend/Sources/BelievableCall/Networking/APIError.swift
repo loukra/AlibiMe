@@ -99,6 +99,10 @@ public enum ErrorCopy {
             return String(localized: "This request can no longer be canceled.")
         case "provider_unavailable":
             return String(localized: "The service is briefly unavailable. Please try again shortly.")
+        case "invalid_verification_code":
+            return String(localized: "That code isn’t right. Check it and try again.")
+        case "verification_expired":
+            return String(localized: "This code can’t be used anymore. Request a new one.")
         case "validation_failed":
             return String(localized: "Some details weren’t accepted. Please review and try again.")
         case "not_found":

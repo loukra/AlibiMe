@@ -39,6 +39,7 @@ from app.db.models.template import Template
 from app.domain.billing import credits
 from app.domain.requests import state
 from app.domain.sender_identity import service as sender_identity
+from app.domain.templates import rendering
 from app.domain.templates import service as templates
 from app.domain.users.service import require_primary_phone
 
@@ -217,9 +218,9 @@ def credit_cost(channel: str) -> int:
     return settings.call_credit_cost if channel == Channel.call.value else settings.sms_credit_cost
 
 
-def sender_identity_payload(db: Session, request: Request) -> dict | None:
+def sender_identity_payload(db: Session, request: Request, locale: str = "en") -> dict | None:
     """Sender metadata for API responses; ``None`` when no binding was resolved
-    (an empty sender pool)."""
+    (an empty sender pool). The name is in the account's language."""
     if request.sender_binding_id is None:
         return None
     template = db.get(Template, request.template_id)
@@ -227,7 +228,9 @@ def sender_identity_payload(db: Session, request: Request) -> dict | None:
     return {
         "sender_binding_id": str(request.sender_binding_id),
         "sender_persona_key": request.sender_persona_key,
-        "sender_display_name": request.sender_display_name_snapshot,
+        "sender_display_name": rendering.contact_name(
+            request.sender_persona_key, locale, request.sender_display_name_snapshot
+        ),
         "sender_phone_e164": request.sender_phone_e164_snapshot,
         "contact_prompt_recommended": supports_contact_save,
     }

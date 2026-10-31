@@ -12,6 +12,8 @@ from app.core.clock import utcnow
 from app.core.config import settings
 from app.core.errors import (
     InvalidPhoneNumber,
+    InvalidVerificationCode,
+    VerificationExpired,
     ProviderUnavailable,
     SessionExpired,
     Unauthorized,
@@ -183,13 +185,13 @@ def confirm_phone_verification(
     if verification is None:
         raise ValidationFailed("Verification not found.")
     if verification.status == "confirmed":
-        raise ValidationFailed("This verification was already used.")
+        raise VerificationExpired("This verification was already used.")
     if verification.expires_at < utcnow():
         verification.status = "expired"
         db.commit()
-        raise ValidationFailed("This verification has expired.")
+        raise VerificationExpired("This verification has expired.")
     if verification.attempts >= _MAX_CONFIRM_ATTEMPTS:
-        raise ValidationFailed("Too many attempts for this verification.")
+        raise VerificationExpired("Too many attempts for this verification.")
 
     try:
         result = provider.confirm_verification(verification.provider_verification_id, code)
@@ -198,12 +200,12 @@ def confirm_phone_verification(
     except ProviderRejected as exc:
         verification.attempts += 1
         db.commit()
-        raise ValidationFailed("The verification code is incorrect.") from exc
+        raise InvalidVerificationCode() from exc
 
     verification.attempts += 1
     if not result.success:
         db.commit()
-        raise ValidationFailed("The verification code is incorrect.")
+        raise InvalidVerificationCode()
 
     e164 = decrypt_phone(verification.phone_e164_encrypted)
 

@@ -53,6 +53,13 @@ final class AuthViewModelTests: XCTestCase {
         XCTAssertEqual(vm.phoneNumber, "+4")
     }
 
+    func testCodeScreenShowsTheNumberReadably() {
+        let vm = AuthViewModel(auth: MockAuthService())
+        vm.phoneNumber = "0170 1234599"
+        XCTAssertEqual(vm.fullNumber, "+491701234599")
+        XCTAssertEqual(vm.displayNumber, "+49\u{00A0}1701234599")
+    }
+
     func testNormalizationStripsFormatting() {
         XCTAssertEqual(AuthViewModel.normalizedPhone("+1 (415) 555-0123", dialCode: "49"), "+14155550123")
         XCTAssertEqual(AuthViewModel.normalizedPhone("0151 2345 6789", dialCode: "49"), "+4915123456789")

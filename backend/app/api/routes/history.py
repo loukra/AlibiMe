@@ -11,6 +11,7 @@ from app.db.models.request import Request
 from app.db.models.template import Template
 from app.domain.requests import service as requests_service
 from app.domain.requests import state
+from app.domain.templates import rendering
 from app.domain.templates import service as templates_service
 from app.schemas.history import HistoryItem, HistoryResponse
 
@@ -62,7 +63,9 @@ def get_history(
                 delivered_preview=preview,
                 sender_binding_id=str(req.sender_binding_id) if req.sender_binding_id else None,
                 sender_persona_key=req.sender_persona_key,
-                sender_display_name=req.sender_display_name_snapshot,
+                sender_display_name=rendering.contact_name(
+                    req.sender_persona_key, ctx.user.locale, req.sender_display_name_snapshot
+                ),
                 sender_phone_e164=req.sender_phone_e164_snapshot,
             )
         )

@@ -59,6 +59,7 @@ struct WelcomeView: View {
                 Text("We only ever contact your own verified number.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
             }
         }
@@ -128,7 +129,7 @@ struct OTPView: View {
             VStack(alignment: .leading, spacing: Spacing.s) {
                 Text("Enter the code")
                     .font(.title2.bold())
-                Text("We sent a 6-digit code to \(vm.fullNumber ?? vm.phoneNumber).")
+                Text("We sent a 6-digit code to \(vm.displayNumber).")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Button("Use a different number") { vm.editPhoneNumber() }

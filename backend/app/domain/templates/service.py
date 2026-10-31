@@ -75,7 +75,9 @@ def _catalog_item(db: Session, tmpl: Template, locale: str) -> dict | None:
         "caller_persona": tmpl.caller_persona,
         "reason_code": tmpl.reason_code,
         "sender_persona_key": tmpl.sender_persona_key,
-        "sender_display_name": tmpl.sender_display_name,
+        "sender_display_name": rendering.contact_name(
+            tmpl.sender_persona_key, locale, tmpl.sender_display_name
+        ),
         "supports_contact_save": tmpl.supports_contact_save,
         # An edited built-in is still listed as built-in, marked as edited.
         "is_custom": tmpl.owner_user_id is not None and tmpl.overrides_template_id is None,
@@ -301,7 +303,7 @@ def _apply(tmpl: Template, c: dict) -> None:
     tmpl.display_name = c["name"]
     tmpl.description = c["description"]
     tmpl.sender_persona_key = c["persona"]
-    tmpl.sender_display_name = rendering._label(rendering.PERSONA_LABELS, "en", c["persona"])
+    tmpl.sender_display_name = rendering.contact_name(c["persona"], "en")
     tmpl.urgency_code = c["urgency"]
     tmpl.outcome_code = c["outcome"]
     tmpl.setting_code = c["setting"]
@@ -552,6 +554,26 @@ def _humanize(code: str | None) -> str:
     return (code or "").replace("_", " ").strip()
 
 
+_WEEKDAYS_DE = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
+
+
+def _said(code: str | None, loc: str, default_en: str, default_de: str) -> str:
+    """A coded option as the call model reads it: German calls get the editor's
+    German label, so no English slips into a German prompt."""
+    if loc == "de":
+        return catalogs.option_label(code, "de") if code else default_de
+    return _humanize(code) or default_en
+
+
+def _weekday(now, loc: str) -> str:
+    return _WEEKDAYS_DE[now.weekday()] if loc == "de" else now.strftime("%A")
+
+
+def _facts(facts: list[str]) -> str:
+    # Facts are sentences; join them as sentences ("Abend. Die ...", not "Abend.; Die").
+    return " ".join(f if f.rstrip().endswith((".", "!", "?")) else f"{f}." for f in facts)
+
+
 # "How much may the caller say about you?" applies to every call, whatever the
 # template's modules, and is spelled out so the model can't misread "high".
 _DETAIL_RULES = {
@@ -629,7 +651,7 @@ def build_call_variables(
         now = datetime.now(ZoneInfo(timezone or "UTC"))
     except Exception:
         now = datetime.now(ZoneInfo("UTC"))
-    local_time = now.strftime("%A %H:%M")
+    local_time = f"{_weekday(now, loc)} {now:%H:%M}"
 
     persona_label = rendering._label(rendering.PERSONA_LABELS, loc, template.caller_persona)
     reason_label = rendering._label(rendering.REASON_LABELS, loc, template.reason_code)
@@ -644,19 +666,19 @@ def build_call_variables(
         "reason_summary": reason_label,
         "reason_code": template.reason_code,
         "category": template.category,
-        "urgency": _humanize(template.urgency_code) or "normal",
-        "outcome": _humanize(template.outcome_code) or "step out briefly",
-        "setting": _humanize(template.setting_code),
-        "tone": _humanize(template.tone_code) or "calm",
-        "detail_level": _humanize(template.detail_profile_code) or "minimal",
-        "discretion": _humanize(template.discretion_level_code) or "normal",
-        "formality": _humanize(template.formality_code) or "neutral",
-        "expected_response": _humanize(template.expected_response_code) or "no reply needed",
-        "followup_behavior": _humanize(template.followup_behavior_code) or "one touch only",
-        "continuity_scope": _humanize(template.continuity_scope_code) or "one off",
+        "urgency": _said(template.urgency_code, loc, "normal", "normal"),
+        "outcome": _said(template.outcome_code, loc, "step out briefly", "Kurz rausgehen"),
+        "setting": _said(template.setting_code, loc, "", ""),
+        "tone": _said(template.tone_code, loc, "calm", "Ruhig"),
+        "detail_level": _said(template.detail_profile_code, loc, "minimal", "Minimal"),
+        "discretion": _said(template.discretion_level_code, loc, "normal", "Normal"),
+        "formality": _said(template.formality_code, loc, "neutral", "Neutral"),
+        "expected_response": _said(template.expected_response_code, loc, "no reply needed", "Keine Antwort nötig"),
+        "followup_behavior": _said(template.followup_behavior_code, loc, "one touch only", "Nur einmal"),
+        "continuity_scope": _said(template.continuity_scope_code, loc, "one off", "Einmalig"),
         # content
         "opening_line": rendered_opening_line or "",
-        "allowed_facts": "; ".join(facts) if facts else ("None." if loc == "en" else "Keine."),
+        "allowed_facts": _facts(facts) if facts else ("None." if loc == "en" else "Keine."),
         "forbidden_facts": _FORBIDDEN_FACTS[loc],
         # reusable user context (gated by the template's allowed modules)
         "user_context": _profile_summary(context, modules, loc),

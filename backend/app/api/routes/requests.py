@@ -46,7 +46,7 @@ def create_request(
         scheduled_at=body.scheduled_at,
         user_locale=ctx.user.locale,
     )
-    sender = requests_service.sender_identity_payload(db, req)
+    sender = requests_service.sender_identity_payload(db, req, ctx.user.locale)
     return CreateRequestResponse(
         request_id=str(req.id),
         channel=req.channel,
@@ -67,7 +67,7 @@ def get_request(
     rid = _parse_uuid(request_id, "request_id")
     req = requests_service.get_request(db, ctx.user.id, rid)
     summary = requests_service.latest_attempt_summary(db, req)
-    sender = requests_service.sender_identity_payload(db, req)
+    sender = requests_service.sender_identity_payload(db, req, ctx.user.locale)
     return RequestDetail(
         request_id=str(req.id),
         channel=req.channel,

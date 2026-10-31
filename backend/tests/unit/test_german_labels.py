@@ -67,3 +67,47 @@ def test_fallback_price_is_written_the_german_way():
     assert price_label(pack, "de") == "4,99 €"
     free = Plan(fulfillment_mode="free_dev")
     assert price_label(free, "de") == "Vorerst kostenlos"
+
+
+def test_german_call_prompt_has_no_english_values():
+    # The call model reads these; English codes in a German prompt can pull
+    # the caller into English or a stiff tone.
+    from app.agent.prompt import build_system_prompt
+    from app.db.models.template import Template, TemplateVersion
+    from app.domain.templates.service import build_call_variables
+
+    tmpl = Template(
+        code="t", caller_persona="boss", reason_code="travel_assignment_abroad",
+        category="work", urgency_code="high", outcome_code="leave_now",
+        tone_code="calm", formality_code="neutral", setting_code="dinner",
+    )
+    version = TemplateVersion(
+        call_followup_facts_json=["Der Flug geht heute Abend.", "Details kommen per Mail"],
+        call_max_duration_seconds=60,
+    )
+    variables = build_call_variables(
+        template=tmpl, version=version, locale="de", first_name=None,
+        timezone="Europe/Berlin", rendered_opening_line="Hallo!",
+    )
+    prompt = build_system_prompt(variables)
+    assert "Dringlichkeit: hoch. Was du willst: Sofort gehen." in prompt
+    assert "Situation: Abendessen." in prompt
+    weekday = variables["local_time"].split()[0]
+    assert weekday in {"Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"}
+    assert variables["allowed_facts"] == "Der Flug geht heute Abend. Details kommen per Mail."
+    for english in ("leave now", "calm", "neutral,", "dinner", "Saturday", "Sunday", "Monday"):
+        assert english not in prompt, english
+
+
+def test_every_caller_has_a_german_contact_name(client):
+    from app.domain.templates import rendering
+    from tests.conftest import signup
+
+    personas = set(catalogs.PERSONAS) | {"boss", "coworker", "roommate", "best_friend", "sibling"}
+    assert sorted(personas - rendering.CONTACT_NAMES["de"].keys()) == []
+    assert sorted(personas - rendering.CONTACT_NAMES["en"].keys()) == []
+
+    headers = signup(client, locale="de")["headers"]
+    names = {t["code"]: t["sender_display_name"] for t in client.get("/v1/templates", headers=headers).json()["templates"]}
+    assert names["boss_travel_assignment"] == "Chef"
+    assert names["best_friend_need_you_outside"] == "Bester Freund"

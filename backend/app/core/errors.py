@@ -115,6 +115,18 @@ class ValidationFailed(AppError):
     default_message = "The request failed validation."
 
 
+class InvalidVerificationCode(ValidationFailed):
+    code = "invalid_verification_code"
+    default_message = "The verification code is incorrect."
+
+
+class VerificationExpired(ValidationFailed):
+    """Expired, already used or out of attempts: a new code is needed."""
+
+    code = "verification_expired"
+    default_message = "This code can no longer be used. Request a new one."
+
+
 def error_envelope(code: str, message: str, retryable: bool, request_id: str | None) -> dict:
     return {
         "error": {

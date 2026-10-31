@@ -402,7 +402,9 @@ run and be tested with **zero external accounts**.
 1. **Dispatch** `backend/app/workers/dispatch.py`:
    - `claim_due_requests()` (`dispatch.py:62`): atomically flips due
      `scheduled` rows to `dispatching` using `FOR UPDATE SKIP LOCKED` on
-     Postgres (so multiple workers don't double-dispatch).
+     Postgres (so multiple workers don't double-dispatch). A row more than
+     10 minutes overdue (the worker was down) becomes `expired` with
+     `missed_window` instead: a late alibi is useless, and no credit is taken.
    - `dispatch_one()` (`dispatch.py:148`): reserve credit → pick the sender line
      (`_resolve_dispatch_identity`, prefers the request's bound line, else
      `_select_service_identity`, `dispatch.py:85`) → build the `RequestPlan`

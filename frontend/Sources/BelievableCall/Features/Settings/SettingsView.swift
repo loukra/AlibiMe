@@ -57,6 +57,13 @@ public struct SettingsView: View {
                             }
                         }
                         .disabled(vm.isDeleting)
+                        // On the button, so the confirmation points at it.
+                        .confirmationDialog("Delete your account?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+                            Button("Delete account", role: .destructive) { Task { await vm.deleteAccount() } }
+                            Button("Cancel", role: .cancel) {}
+                        } message: {
+                            Text("Your number, history, own alibis and remaining credits are deleted. Credits you bought are not refunded. This can't be undone.")
+                        }
                     } footer: {
                         Text("Deleting removes your number, history, own alibis and any credits left.")
                     }
@@ -77,12 +84,6 @@ public struct SettingsView: View {
             .bcScreenBackground()
             .navigationTitle("Settings")
             .task { await vm.load() }
-            .confirmationDialog("Delete your account?", isPresented: $confirmingDelete, titleVisibility: .visible) {
-                Button("Delete account", role: .destructive) { Task { await vm.deleteAccount() } }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("Your number, history, own alibis and remaining credits are deleted. Credits you bought are not refunded. This can't be undone.")
-            }
             .sheet(item: $creditPackagesVM) { packagesVM in
                 AddCreditsSheet(
                     vm: packagesVM,

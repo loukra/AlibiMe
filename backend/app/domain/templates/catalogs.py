@@ -313,6 +313,11 @@ PROFILE_OPTION_LABELS = {
 OPTION_LABELS = {
     "en": {},
     "de": {
+        # urgencies (only the call prompt shows them)
+        "low": "gering",
+        "medium": "mittel",
+        "high": "hoch",
+        "immediate": "sofort",
         # outcomes
         "step_out_briefly": "Kurz rausgehen",
         "leave_now": "Sofort gehen",

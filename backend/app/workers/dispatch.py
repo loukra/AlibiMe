@@ -18,6 +18,7 @@ Retry policy:
 from __future__ import annotations
 
 import uuid
+from datetime import timedelta
 
 import phonenumbers
 from sqlalchemy import select
@@ -58,6 +59,11 @@ logger = get_logger("worker.dispatch")
 
 MAX_PREDISPATCH_RETRIES = 1
 
+# An alibi that arrives much later than asked for is useless: one this overdue
+# (the worker was down) expires instead of going out. Credits are only taken
+# at dispatch, so nothing is charged.
+MISSED_AFTER = timedelta(minutes=10)
+
 
 def _supports_skip_locked(db: Session) -> bool:
     return db.bind.dialect.name == "postgresql"
@@ -79,8 +85,13 @@ def claim_due_requests(db: Session, now=None, batch_size: int = 20) -> list[uuid
     rows = db.execute(stmt).scalars().all()
     ids = []
     for req in rows:
-        req.status = RequestStatus.dispatching.value
         req.updated_at = now
+        if req.execute_at < now - MISSED_AFTER:
+            req.status = RequestStatus.expired.value
+            req.last_error_code = "missed_window"
+            req.last_error_message = "Not sent: too late to be useful."
+            continue
+        req.status = RequestStatus.dispatching.value
         ids.append(req.id)
     db.commit()
     return ids

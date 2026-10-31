@@ -2327,6 +2327,17 @@
         }
       }
     },
+    "That code isn’t right. Check it and try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Code stimmt nicht. Prüf ihn und versuch es noch mal."
+          }
+        }
+      }
+    },
     "That phone number doesn’t look right. Please check it and try again." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2411,6 +2422,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dieses Alibi wird gelöscht. Frühere Anrufe und SMS bleiben im Verlauf."
+          }
+        }
+      }
+    },
+    "This code can’t be used anymore. Request a new one." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Code gilt nicht mehr. Lass dir einen neuen schicken."
           }
         }
       }

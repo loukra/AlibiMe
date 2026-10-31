@@ -80,6 +80,15 @@ public final class AuthViewModel {
         AuthViewModel.normalizedPhone(phoneNumber, dialCode: country.dialCode)
     }
 
+    /// The same number for reading: "+49 1701234599", not "+491701234599".
+    /// A no-break space keeps the dial code on the number's line.
+    public var displayNumber: String {
+        guard let full = fullNumber else { return phoneNumber }
+        let prefix = "+\(country.dialCode)"
+        guard full.hasPrefix(prefix) else { return full }
+        return "\(prefix)\u{00A0}\(full.dropFirst(prefix.count))"
+    }
+
     public var canSubmitCode: Bool {
         !isLoading && code.trimmingCharacters(in: .whitespaces).count >= 4
     }

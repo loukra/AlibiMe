@@ -232,6 +232,50 @@ def _label(table: dict, locale: str, code: str) -> str:
     return table.get(locale, {}).get(code) or table["en"].get(code, code)
 
 
+# The name a caller shows up under, suggested when the user saves the number
+# as a contact: a bare noun, unlike the "your manager" labels above.
+CONTACT_NAMES = {
+    "en": {
+        "boss": "Boss", "manager": "Manager", "team_lead": "Team Lead",
+        "coworker": "Coworker", "hr_office_contact": "HR", "client": "Client",
+        "office_line": "Office", "roommate": "Roommate",
+        "landlord_building_contact": "Building Manager", "neighbor": "Neighbor",
+        "repair_service_contact": "Repair Service", "delivery_service_contact": "Delivery",
+        "sibling": "Sibling", "parent": "Parent", "family_member": "Family",
+        "childcare_contact": "Childcare", "eldercare_contact": "Care Service",
+        "family_friend": "Family Friend", "best_friend": "Best Friend",
+        "close_friend": "Close Friend", "friend": "Friend", "group_organizer": "Organizer",
+        "ride_contact": "Ride", "partner": "Partner", "spouse": "Spouse",
+        "romantic_contact": "Date", "trusted_friend": "Trusted Friend", "pickup_contact": "Pickup",
+    },
+    "de": {
+        "boss": "Chef", "manager": "Vorgesetzter", "team_lead": "Teamleitung",
+        "coworker": "Kollege", "hr_office_contact": "Personalabteilung", "client": "Kunde",
+        "office_line": "Büro", "roommate": "Mitbewohner",
+        "landlord_building_contact": "Hausverwaltung", "neighbor": "Nachbar",
+        "repair_service_contact": "Reparaturdienst", "delivery_service_contact": "Lieferdienst",
+        "sibling": "Geschwister", "parent": "Eltern", "family_member": "Familie",
+        "childcare_contact": "Kinderbetreuung", "eldercare_contact": "Pflegedienst",
+        "family_friend": "Familienfreund", "best_friend": "Bester Freund",
+        "close_friend": "Guter Freund", "friend": "Freund", "group_organizer": "Organisator",
+        "ride_contact": "Mitfahrgelegenheit", "partner": "Partner", "spouse": "Ehepartner",
+        "romantic_contact": "Date", "trusted_friend": "Guter Freund", "pickup_contact": "Abholung",
+    },
+}
+
+
+def contact_name(persona_key: str | None, locale: str, fallback: str | None = None) -> str | None:
+    """The caller's contact name in the account's language."""
+    if not persona_key:
+        return fallback
+    return (
+        CONTACT_NAMES.get(locale, {}).get(persona_key)
+        or CONTACT_NAMES["en"].get(persona_key)
+        or fallback
+        or persona_key.replace("_", " ").title()
+    )
+
+
 def render(text: str | None, context: dict[str, str]) -> str | None:
     if text is None:
         return None

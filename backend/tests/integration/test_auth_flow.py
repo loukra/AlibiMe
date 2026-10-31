@@ -32,7 +32,17 @@ def test_confirm_wrong_code_rejected(client):
     vid = start.json()["verification_id"]
     resp = client.post("/v1/auth/phone/confirm", json={"verification_id": vid, "code": "000000"})
     assert resp.status_code == 422
-    assert resp.json()["error"]["code"] == "validation_failed"
+    # Its own code, so the app can say the code is wrong rather than something generic.
+    assert resp.json()["error"]["code"] == "invalid_verification_code"
+
+
+def test_used_code_asks_for_a_new_one(client):
+    start = client.post("/v1/auth/phone/start", json={"phone_number": DEFAULT_PHONE})
+    vid = start.json()["verification_id"]
+    assert client.post("/v1/auth/phone/confirm", json={"verification_id": vid, "code": "123456"}).status_code == 200
+    resp = client.post("/v1/auth/phone/confirm", json={"verification_id": vid, "code": "123456"})
+    assert resp.status_code == 422
+    assert resp.json()["error"]["code"] == "verification_expired"
 
 
 def test_me_returns_free_credits(client):

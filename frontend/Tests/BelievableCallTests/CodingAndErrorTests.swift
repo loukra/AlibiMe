@@ -68,6 +68,7 @@ final class CodingAndErrorTests: XCTestCase {
             "unsupported_line_type", "rate_limited", "active_request_exists",
             "template_channel_not_supported", "insufficient_credits", "invalid_schedule_window",
             "request_not_cancelable", "provider_unavailable", "validation_failed", "not_found",
+            "invalid_verification_code", "verification_expired",
         ]
         for code in codes {
             let msg = ErrorCopy.userMessage(for: .api(code: code, message: "raw", retryable: false, requestID: nil))
@@ -75,6 +76,14 @@ final class CodingAndErrorTests: XCTestCase {
             XCTAssertFalse(msg.contains("_"), "copy for \(code) leaked a raw code: \(msg)")
             XCTAssertFalse(msg.contains(code), "copy for \(code) leaked the code")
         }
+    }
+
+    func testWrongSignInCodeSaysSo() {
+        // Not the generic "some details weren't accepted".
+        let wrong = ErrorCopy.userMessage(for: .api(code: "invalid_verification_code", message: "", retryable: false, requestID: nil))
+        let generic = ErrorCopy.userMessage(for: .api(code: "validation_failed", message: "", retryable: false, requestID: nil))
+        XCTAssertNotEqual(wrong, generic)
+        XCTAssertTrue(wrong.contains("code"))
     }
 
     func testTransportErrorCopy() {
