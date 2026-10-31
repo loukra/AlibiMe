@@ -77,6 +77,8 @@ class Settings(BaseSettings):
     review_phone_number: str | None = None
     review_otp_code: str | None = None
     review_credits: int = 10
+    # Shown on /support and in the privacy policy page.
+    support_email: str | None = None
     supported_countries: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["DE", "US", "GB", "AT", "CH"]
     )

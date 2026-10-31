@@ -164,7 +164,8 @@ public final class AppModel {
                                    templates: env.templates,
                                    prefs: env.prefs,
                                    purchases: env.purchases,
-                                   accountToken: session.flatMap { UUID(uuidString: $0.userID) })
+                                   accountToken: session.flatMap { UUID(uuidString: $0.userID) },
+                                   backendURL: env.baseURL)
         vm.onSignOut = { [weak self] in self?.signOut() }
         vm.onSessionExpired = { [weak self] in self?.handleSessionExpired() }
         return vm

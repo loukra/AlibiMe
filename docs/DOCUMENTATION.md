@@ -455,6 +455,7 @@ Routes:
 | `POST /v1/credit-packages/redeem` | `credit_packages.py` | yes | grant an App Store purchase |
 | `POST /v1/webhooks/{voice,sms,revenuecat,app-store}` | `webhooks_*.py` | signed | provider callbacks |
 | `GET /health/{live,ready}` | `health.py` | no | health checks |
+| `GET /privacy`, `GET /support` | `pages.py` | no | public pages from `app/pages/*.md`, linked from Settings and App Store Connect |
 
 ---
 

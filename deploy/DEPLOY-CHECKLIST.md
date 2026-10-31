@@ -59,6 +59,11 @@ port, domain and database there; `deploy/README.md` has the steps.
 - [x] **App icon.** The existing logo (`AppLogo`) as a 1024 px icon without
   transparency, in `App/BelievableCall/Assets.xcassets`.
 
+- [x] **Support and privacy pages on the API domain.** `/support` and
+  `/privacy` render `backend/app/pages/*.md` as plain pages (phone width, dark
+  mode), and Settings links to them on whatever backend the build uses. No
+  second domain needed.
+
 ## 2. Still to test locally (simulator, StoreKit scheme)
 
 - [x] Backend stopped during a purchase, in the simulator with the StoreKit
@@ -157,11 +162,14 @@ Tests that need these accounts:
 - [ ] The API domain in `App/Local.xcconfig` (gitignored):
   `BC_BACKEND_URL[config=Release] = https:/$()/api.<domain>`. Without it a
   Release build talks to the placeholder and nothing works.
-- [ ] Real support and privacy URLs (Settings still links to
-  `believablecall.example`).
-- [ ] Privacy policy: the draft is `docs/privacy-policy.md`. Fill in the
-  brackets (controller, hosting, transfer basis per US provider), have it
-  checked once, put it online, and add a German version.
+- [ ] `SUPPORT_EMAIL` in the server's `.env`: an address you read. It
+  appears on `/support` and in the privacy policy.
+- [ ] Privacy policy: `backend/app/pages/privacy.md`, served at
+  `https://<api domain>/privacy`. Fill in the brackets (controller, hosting,
+  transfer basis per US provider), remove the draft note at the top, have it
+  checked once, and add a German version.
+- [ ] In App Store Connect: privacy policy URL `https://<api domain>/privacy`,
+  support URL `https://<api domain>/support`.
 - [ ] Check the first real calls in the Vapi dashboard: no recording, no
   transcript, no summary.
 - [ ] Privacy nutrition labels: phone number, purchases, call content

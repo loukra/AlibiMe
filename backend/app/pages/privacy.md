@@ -2,7 +2,7 @@
 
 This is a working draft. Everything in [square brackets] still has to be filled
 in before it goes online, and a lawyer or a privacy generator should check it
-once. It describes what the app and backend in this repository actually do.
+once. It describes what the app and its server actually do.
 
 Last updated: [date]
 
@@ -121,7 +121,7 @@ your address book.
 
 You can ask us for access to your data, correction, deletion, restriction of
 processing and a copy in a portable format, and you can object to processing
-based on legitimate interest (Art. 15 to 21 GDPR). Write to [email]. You can
+based on legitimate interest (Art. 15 to 21 GDPR). Write to {support_email}. You can
 also complain to a data protection authority, for example [the authority for
 the controller's federal state].
 

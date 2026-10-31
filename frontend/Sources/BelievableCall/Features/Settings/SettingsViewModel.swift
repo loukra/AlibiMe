@@ -27,6 +27,10 @@ public final class SettingsViewModel {
     private let prefs: PreferencesStoring
     private let purchases: PurchaseServicing
     private let accountToken: UUID?
+    /// The support and privacy pages, served by the backend (`/support`,
+    /// `/privacy`), so they live on the API domain.
+    public let supportURL: URL
+    public let privacyURL: URL
     public var onSignOut: (() -> Void)?
     public var onSessionExpired: (() -> Void)?
 
@@ -36,7 +40,8 @@ public final class SettingsViewModel {
                 templates: TemplateServicing? = nil,
                 prefs: PreferencesStoring = InMemoryPreferences(),
                 purchases: PurchaseServicing = MockPurchaseService(),
-                accountToken: UUID? = nil) {
+                accountToken: UUID? = nil,
+                backendURL: URL = URL(string: "http://127.0.0.1:8000")!) {
         self.profileService = profileService
         self.auth = auth
         self.creditPackages = creditPackages
@@ -44,6 +49,8 @@ public final class SettingsViewModel {
         self.prefs = prefs
         self.purchases = purchases
         self.accountToken = accountToken
+        self.supportURL = backendURL.appendingPathComponent("support")
+        self.privacyURL = backendURL.appendingPathComponent("privacy")
         self.quickAlibi = prefs.quickAlibi
     }
 

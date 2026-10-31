@@ -39,8 +39,8 @@ public struct SettingsView: View {
                         Section { ErrorBanner(error) }
                     }
                     Section {
-                        Link("Help & support", destination: URL(string: "https://believablecall.example/help")!)
-                        Link("Privacy & terms", destination: URL(string: "https://believablecall.example/legal")!)
+                        Link("Help & support", destination: vm.supportURL)
+                        Link("Privacy policy", destination: vm.privacyURL)
                         LabeledContent("Version", value: vm.appVersion)
                     } header: {
                         SectionHeader("About")

@@ -125,4 +125,13 @@ final class SettingsViewModelTests: XCTestCase {
         packagesVM.onSessionExpired?()
         XCTAssertTrue(expired)
     }
+
+    func testHelpAndPrivacyLinksPointAtTheBackend() {
+        let vm = SettingsViewModel(profileService: MockProfileService(),
+                                   auth: MockAuthService(),
+                                   creditPackages: MockCreditPackagesService(),
+                                   backendURL: URL(string: "https://api.alibime.test")!)
+        XCTAssertEqual(vm.supportURL.absoluteString, "https://api.alibime.test/support")
+        XCTAssertEqual(vm.privacyURL.absoluteString, "https://api.alibime.test/privacy")
+    }
 }

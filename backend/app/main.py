@@ -15,6 +15,7 @@ from app.api.routes import (
     health,
     history,
     me,
+    pages,
     requests,
     templates,
     webhooks_app_store,
@@ -92,6 +93,7 @@ for module in (
     webhooks_sms,
     webhooks_revenuecat,
     webhooks_app_store,
+    pages,
 ):
     app.include_router(module.router)
 
