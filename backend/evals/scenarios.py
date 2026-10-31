@@ -57,8 +57,6 @@ CALLEES: dict[str, dict[str, list[str]]] = {
     },
 }
 
-USER_NAME = {"en": "Alex", "de": "Alex"}
-
 
 @dataclass(frozen=True)
 class Scenario:
@@ -99,13 +97,11 @@ def load_scenarios(
                 continue
             if locales and version.locale not in locales:
                 continue
-            name = USER_NAME.get(version.locale, "Alex")
             snapshot = build_request_plan_snapshot(
                 template=template,
                 version=version,
                 channel="call",
                 locale=version.locale,
-                first_name=name,
                 service_identity_value=None,
                 service_identity_type=None,
                 target_phone_number_id="eval",
@@ -114,7 +110,6 @@ def load_scenarios(
                 template=template,
                 version=version,
                 locale=version.locale,
-                first_name=name,
                 timezone="Europe/Berlin",
                 rendered_opening_line=snapshot.get("rendered_opening_line"),
             )

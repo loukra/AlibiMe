@@ -34,11 +34,25 @@ def test_channel_support_validation(db):
 
 def test_render_substitutes_allowed_variables():
     ctx = rendering.build_context(
-        locale="en", caller_persona="boss", reason_code="urgent_work_issue", first_name="Sam"
+        locale="en", caller_persona="boss", reason_code="urgent_work_issue"
     )
-    out = rendering.render("Hi {first_name}, it's {caller_persona_label}.", ctx)
-    assert "Sam" in out
-    assert "manager" in out
+    out = rendering.render("Calling {first_name}, it's {caller_persona_label}.", ctx)
+    assert out == "Calling them, it's your manager."
+
+
+def test_no_user_name_reaches_a_call(db):
+    # Nothing a user types may reach the model: there is no name to set, and
+    # the call variables and prompt carry none.
+    from app.agent.prompt import build_system_prompt
+
+    tmpl = _template(db, "boss_travel_assignment")
+    v = templates.resolve_version(db, tmpl.id, "en")
+    variables = templates.build_call_variables(
+        template=tmpl, version=v, locale="en", timezone="Europe/Berlin",
+        rendered_opening_line="Hey.",
+    )
+    assert "name" not in variables
+    assert "You are calling them on their mobile." in build_system_prompt(variables)
 
 
 def test_render_leaves_unknown_placeholders_literal():
@@ -50,7 +64,7 @@ def test_build_snapshot_for_call(db):
     tmpl = _template(db, "boss_travel_assignment")
     v = templates.resolve_version(db, tmpl.id, "en")
     snap = templates.build_request_plan_snapshot(
-        template=tmpl, version=v, channel="call", locale="en", first_name="Sam",
+        template=tmpl, version=v, channel="call", locale="en",
         service_identity_value="+10000000000", service_identity_type="phone_number",
         target_phone_number_id="abc",
     )
@@ -66,7 +80,7 @@ def test_build_snapshot_for_sms(db):
     tmpl = _template(db, "safety_checkin")
     v = templates.resolve_version(db, tmpl.id, "en")
     snap = templates.build_request_plan_snapshot(
-        template=tmpl, version=v, channel="sms", locale="en", first_name=None,
+        template=tmpl, version=v, channel="sms", locale="en",
         service_identity_value="+10000000000", service_identity_type="phone_number",
         target_phone_number_id="abc",
     )

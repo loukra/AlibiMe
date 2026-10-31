@@ -23,7 +23,6 @@ class MeResponse(BaseModel):
     id: str
     locale: str
     timezone: str
-    display_name: str | None = None
     phone_number_masked: str | None = None
     credits_available: int
     active_entitlements: list[EntitlementSummaryItem] = []
@@ -36,4 +35,3 @@ class MeUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
     locale: Literal["en", "de"] | None = None
     timezone: str | None = Field(default=None, max_length=64)
-    display_name: str | None = Field(default=None, max_length=120)

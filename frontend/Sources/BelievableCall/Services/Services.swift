@@ -59,7 +59,7 @@ public protocol HistoryServicing: Sendable {
 
 public protocol ProfileServicing: Sendable {
     func me() async throws -> UserProfile
-    func update(locale: String?, timezone: String?, displayName: String?) async throws -> UserProfile
+    func update(locale: String?, timezone: String?) async throws -> UserProfile
     /// Deletes the account and all its data on the backend.
     func deleteAccount() async throws
 }
@@ -277,10 +277,8 @@ public struct LiveProfileService: ProfileServicing {
         return UserProfile(dto: dto)
     }
 
-    public func update(locale: String?, timezone: String?, displayName: String?) async throws -> UserProfile {
-        let body = try BCCoding.encoder.encode(
-            MeUpdateDTO(locale: locale, timezone: timezone, display_name: displayName)
-        )
+    public func update(locale: String?, timezone: String?) async throws -> UserProfile {
+        let body = try BCCoding.encoder.encode(MeUpdateDTO(locale: locale, timezone: timezone))
         let dto = try await client.send(Endpoint(.PATCH, "v1/me", body: body), as: MeResponseDTO.self)
         return UserProfile(dto: dto)
     }

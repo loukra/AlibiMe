@@ -86,7 +86,7 @@ def test_german_call_prompt_has_no_english_values():
         call_max_duration_seconds=60,
     )
     variables = build_call_variables(
-        template=tmpl, version=version, locale="de", first_name=None,
+        template=tmpl, version=version, locale="de",
         timezone="Europe/Berlin", rendered_opening_line="Hallo!",
     )
     prompt = build_system_prompt(variables)

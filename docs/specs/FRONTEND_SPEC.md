@@ -97,7 +97,7 @@ This mirrors the backend safety invariant and must not be weakened in the UI.
 - **Home action flow:** select template, select channel, select timing, send.
 - **Pending request screen:** countdown, status, cancel if allowed.
 - **History screen:** previous calls/texts with outcome and summary preview.
-- **Settings screen:** verified number snapshot, locale, timezone, display name,
+- **Settings screen:** verified number snapshot, locale, timezone,
   credits summary, help/legal entry points, sign out.
 - **APNs registration:** send push token to backend if available.
 - **Light local persistence:** session, selected template, last-used channel,
@@ -347,7 +347,6 @@ Requirements:
 ### 5. Minimal Profile Setup
 
 Only collect what is truly needed in MVP:
-- display name (optional)
 - locale
 - timezone
 
@@ -457,7 +456,6 @@ Support:
 
 Include:
 - verified primary phone number snapshot
-- display name
 - locale
 - timezone
 - credits / plan summary

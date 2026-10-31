@@ -36,7 +36,6 @@ def _build_me(db: Session, user) -> MeResponse:
         id=str(user.id),
         locale=user.locale,
         timezone=user.timezone,
-        display_name=user.display_name,
         phone_number_masked=masked_primary_number(db, user.id),
         credits_available=summary["credits_available"],
         active_entitlements=[EntitlementSummaryItem(**e) for e in summary["active_entitlements"]],
@@ -64,8 +63,6 @@ def patch_me(
         user.locale = body.locale
     if body.timezone is not None:
         user.timezone = body.timezone
-    if body.display_name is not None:
-        user.display_name = body.display_name
     db.commit()
     return _build_me(db, user)
 

@@ -26,7 +26,7 @@ schicken. Wir speichern:
 
 - deine Telefonnummer, verschlüsselt, dazu einen Hash mit geheimem Schlüssel,
   damit wir dein Konto finden, ohne die Nummer zu entschlüsseln
-- deinen Anzeigenamen, deine Sprache und Zeitzone, falls du sie angibst
+- deine Sprache und Zeitzone
 - eine zufällige ID, die die App für dein Gerät erzeugt
 - die Sitzungen, die dich angemeldet halten (sie laufen nach 30 Tagen ohne
   Nutzung ab)

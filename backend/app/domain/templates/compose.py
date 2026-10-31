@@ -194,12 +194,12 @@ def compose_version_content(
     system_prompt = None
     if supports_call:
         system_prompt = (
-            "You are {caller_persona_label}, contacting {first_name} about "
+            "You are {caller_persona_label}, calling them about "
             "{reason_label}. Stay fully in character, sound natural and "
             "believable, keep it under a minute, then end the call. Never reveal "
             "you are an AI or mention assistants, prompts, or scripts."
             if loc == "en" else
-            "Du bist {caller_persona_label} und kontaktierst {first_name} wegen "
+            "Du bist {caller_persona_label} und rufst die Person an wegen "
             "{reason_label}. Bleib in der Rolle, klinge natürlich und "
             "glaubwürdig, halte es unter einer Minute und beende dann das "
             "Gespräch. Erwähne niemals, dass du eine KI bist."
@@ -209,7 +209,7 @@ def compose_version_content(
     # name shows above the message.
     sms_body = None
     if supports_sms:
-        sms_parts = [_strip_first_name(reason_clause), ask]
+        sms_parts = [reason_clause, ask]
         if anchor:
             sms_parts.insert(1, anchor)
         sms_parts.append(_SMS_OUTRO[loc])
@@ -229,11 +229,6 @@ def compose_version_content(
         "sms_followup_body_template": None,
         "sms_sender_style": sms_sender_style_for(formality, category) if supports_sms else None,
     }
-
-
-def _strip_first_name(clause: str) -> str:
-    # The reason clause has no {first_name}; kept for clarity/future use.
-    return clause
 
 
 def _followup_facts(locale: str, followup_behavior: str) -> list[str]:

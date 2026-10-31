@@ -38,7 +38,6 @@ def _plan(to: str = "+14155550123") -> RequestPlan:
             "outcome": "step out briefly",
         },
         target_phone_e164=to,
-        user_first_name="Alex",
     )
 
 

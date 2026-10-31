@@ -18,7 +18,6 @@ class User(Base, TimestampMixin):
     status: Mapped[str] = mapped_column(String(16), default=UserStatus.active.value, nullable=False)
     locale: Mapped[str] = mapped_column(String(8), default="en", nullable=False)
     timezone: Mapped[str] = mapped_column(String(64), default="UTC", nullable=False)
-    display_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
     last_login_at: Mapped[datetime | None] = mapped_column(nullable=True)
 
     phone_numbers: Mapped[list["PhoneNumber"]] = relationship(  # noqa: F821

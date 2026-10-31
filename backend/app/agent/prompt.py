@@ -71,8 +71,7 @@ _NONE = {"en": "None.", "de": "Keine."}
 def build_system_prompt(variables: dict[str, str]) -> str:
     loc = variables.get("locale", "en")
     loc = loc if loc in ("en", "de") else "en"
-    name = variables.get("name") or ""
-    who = name or ("them" if loc == "en" else "die Person")
+    who = "them" if loc == "en" else "die Person"
     user_context = variables.get("user_context") or ""
     context = (
         _CONTEXT[loc].format(user_context=user_context)

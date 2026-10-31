@@ -214,12 +214,13 @@ def build_context(
     locale: str,
     caller_persona: str,
     reason_code: str,
-    first_name: str | None = None,
     urgency_label: str | None = None,
 ) -> dict[str, str]:
     loc = locale if locale in PERSONA_LABELS else "en"
     return {
-        "first_name": first_name or ("there" if loc == "en" else "du"),
+        # Never the user's name: nothing the user types reaches a call. Older
+        # own alibis still have the placeholder in their stored prompt.
+        "first_name": "them" if loc == "en" else "die Person",
         "caller_persona_label": _label(PERSONA_LABELS, loc, caller_persona),
         "reason_label": _label(REASON_LABELS, loc, reason_code),
         "urgency_label": urgency_label or ("urgent" if loc == "en" else "dringend"),

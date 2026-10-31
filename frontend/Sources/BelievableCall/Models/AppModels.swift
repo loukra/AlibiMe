@@ -7,7 +7,6 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
     public let id: String
     public var locale: String
     public var timezone: String
-    public var displayName: String?
     public var phone: VerifiedPhoneSummary
     public var entitlements: EntitlementSummary
     public var activeRequest: RequestSummary?
@@ -17,7 +16,6 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
     public init(id: String,
                 locale: String,
                 timezone: String,
-                displayName: String?,
                 phone: VerifiedPhoneSummary,
                 entitlements: EntitlementSummary,
                 activeRequest: RequestSummary?,
@@ -25,7 +23,6 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
         self.id = id
         self.locale = locale
         self.timezone = timezone
-        self.displayName = displayName
         self.phone = phone
         self.entitlements = entitlements
         self.activeRequest = activeRequest

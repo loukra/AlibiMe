@@ -23,7 +23,7 @@ You sign in with your phone number and a code we send by SMS. We store:
 
 - your phone number, encrypted, plus a keyed hash of it so we can find your
   account without decrypting it
-- your display name, language and time zone, if you set them
+- your language and time zone
 - a random ID the app creates for your device
 - the sessions that keep you signed in (they expire after 30 days unused)
 

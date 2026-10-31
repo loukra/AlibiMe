@@ -59,7 +59,6 @@ struct MeResponseDTO: Decodable {
     let id: String
     let locale: String
     let timezone: String
-    let display_name: String?
     let phone_number_masked: String?
     let credits_available: Int
     let active_entitlements: [EntitlementSummaryItemDTO]
@@ -70,7 +69,6 @@ struct MeResponseDTO: Decodable {
 struct MeUpdateDTO: Encodable {
     var locale: String?
     var timezone: String?
-    var display_name: String?
 }
 
 // MARK: Devices

@@ -52,7 +52,7 @@ final class SettingsViewModelTests: XCTestCase {
     func testLoadPopulatesFields() async {
         let vm = SettingsViewModel(profileService: MockProfileService(), auth: MockAuthService(), creditPackages: MockCreditPackagesService())
         await vm.load()
-        XCTAssertEqual(vm.displayName, "Alex")
+        XCTAssertEqual(vm.locale, "en")
         XCTAssertEqual(vm.maskedNumber, "+14******123")
         XCTAssertEqual(vm.creditsAvailable, 3)
     }
@@ -61,10 +61,10 @@ final class SettingsViewModelTests: XCTestCase {
         let profileService = MockProfileService()
         let vm = SettingsViewModel(profileService: profileService, auth: MockAuthService(), creditPackages: MockCreditPackagesService())
         await vm.load()
-        vm.displayName = "Jordan"
+        vm.locale = "de"
         await vm.save()
         XCTAssertTrue(vm.didSave)
-        XCTAssertEqual(vm.profile?.displayName, "Jordan")
+        XCTAssertEqual(vm.profile?.locale, "de")
     }
 
     func testSavesOnlyWhatChanged() async {

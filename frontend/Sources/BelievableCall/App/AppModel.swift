@@ -84,7 +84,7 @@ public final class AppModel {
         let current = TimeZone.current.identifier
         Task {
             guard let me = try? await profile.me(), me.timezone != current else { return }
-            _ = try? await profile.update(locale: nil, timezone: current, displayName: nil)
+            _ = try? await profile.update(locale: nil, timezone: current)
         }
     }
 

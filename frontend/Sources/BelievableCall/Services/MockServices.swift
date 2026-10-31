@@ -106,7 +106,7 @@ public enum Fixtures {
 
     public static func profile(credits: Int = 3, activeRequest: RequestSummary? = nil) -> UserProfile {
         UserProfile(
-            id: "user-1", locale: "en", timezone: "UTC", displayName: "Alex",
+            id: "user-1", locale: "en", timezone: "UTC",
             phone: VerifiedPhoneSummary(maskedNumber: "+14******123"),
             entitlements: EntitlementSummary(creditsAvailable: credits, planCodes: ["free"]),
             activeRequest: activeRequest
@@ -299,9 +299,8 @@ public final class MockProfileService: ProfileServicing, @unchecked Sendable {
         if let error { throw error }
         return profile
     }
-    public func update(locale: String?, timezone: String?, displayName: String?) async throws -> UserProfile {
+    public func update(locale: String?, timezone: String?) async throws -> UserProfile {
         if let error { throw error }
-        if let displayName { profile.displayName = displayName }
         if let locale { profile.locale = locale }
         if let timezone { profile.timezone = timezone }
         return profile

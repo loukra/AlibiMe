@@ -3009,17 +3009,6 @@
         }
       }
     },
-    "Your name (optional)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dein Name (optional)"
-          }
-        }
-      }
-    },
     "Your number, history, own alibis and remaining credits are deleted. Credits you bought are not refunded. This can't be undone." : {
       "extractionState" : "manual",
       "localizations" : {

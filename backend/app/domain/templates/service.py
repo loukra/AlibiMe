@@ -466,7 +466,6 @@ def build_request_plan_snapshot(
     version: TemplateVersion,
     channel: str,
     locale: str,
-    first_name: str | None,
     service_identity_value: str | None,
     service_identity_type: str | None,
     target_phone_number_id: str,
@@ -474,7 +473,6 @@ def build_request_plan_snapshot(
     """Resolved snapshot stored on the request; makes history reproducible."""
     ctx = rendering.build_context(
         locale=locale, caller_persona=template.caller_persona, reason_code=template.reason_code,
-        first_name=first_name,
     )
     snapshot = {
         "template_code": template.code,
@@ -631,7 +629,6 @@ def build_call_variables(
     template: Template,
     version: TemplateVersion,
     locale: str,
-    first_name: str | None,
     timezone: str | None,
     rendered_opening_line: str | None,
     context: dict | None = None,
@@ -684,7 +681,6 @@ def build_call_variables(
         "user_context": _profile_summary(context, modules, loc),
         "detail_rule": _detail_rule(context, loc),
         # misc
-        "name": first_name or "",
         "locale": loc,
         "local_time": local_time,
         "target_turn_count": _turn_count(version.call_max_duration_seconds),

@@ -71,7 +71,6 @@ class RequestPlan:
     target_phone_e164: str | None = None  # decrypted at dispatch; never logged
     target_phone_number_id: str | None = None
     # optional personalization
-    user_first_name: str | None = None
     # mock-only behavior hints (ignored by real providers)
     mock_behavior: dict[str, Any] = field(default_factory=dict)
 

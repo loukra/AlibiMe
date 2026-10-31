@@ -147,7 +147,6 @@ def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None)
         version=version,
         channel=request.channel,
         locale=user.locale,
-        first_name=user.display_name,
         service_identity_value=identity.identity_value if identity else None,
         service_identity_type=identity.identity_type if identity else None,
         target_phone_number_id=str(phone.id),
@@ -161,7 +160,6 @@ def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None)
             template=template,
             version=version,
             locale=user.locale,
-            first_name=user.display_name,
             timezone=getattr(user, "timezone", None),
             rendered_opening_line=snapshot.get("rendered_opening_line"),
             context=context,
@@ -197,7 +195,6 @@ def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None)
         sender_vapi_phone_number_id=identity.vapi_phone_number_id if identity else None,
         target_phone_e164=target_e164,
         target_phone_number_id=snapshot["target_phone_number_id"],
-        user_first_name=user.display_name,
     )
 
 

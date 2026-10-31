@@ -18,7 +18,6 @@ public struct SettingsView: View {
     /// sheet never renders before the view model exists).
     @State private var creditPackagesVM: CreditPackagesViewModel?
     @State private var confirmingDelete = false
-    @FocusState private var editingName: Bool
     /// Set from outside (Home's pills); scrolled to once, then cleared.
     @Binding private var focus: SettingsFocus?
     private let locales = ["en", "de"]
@@ -104,13 +103,6 @@ private extension SettingsView {
         Section {
             LabeledContent("Number", value: vm.maskedNumber ?? "—")
                 .id(SettingsFocus.number)
-            TextField("Your name (optional)", text: $vm.displayName)
-                .focused($editingName)
-                .submitLabel(.done)
-                .onSubmit { Task { await vm.saveIfChanged() } }
-                .onChange(of: editingName) { _, editing in
-                    if !editing { Task { await vm.saveIfChanged() } }
-                }
             Picker("Call language", selection: $vm.locale) {
                 ForEach(locales, id: \.self) { code in
                     Text(code == "de" ? "Deutsch" : "English").tag(code)

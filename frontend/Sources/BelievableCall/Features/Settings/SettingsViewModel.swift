@@ -6,7 +6,6 @@ import Observation
 @Observable
 public final class SettingsViewModel {
     public private(set) var profile: UserProfile?
-    public var displayName: String = ""
     public var locale: String = "en"
     public var timezone: String = "UTC"
     public private(set) var isLoading = false
@@ -132,21 +131,17 @@ public final class SettingsViewModel {
 
     private func apply(_ profile: UserProfile) {
         self.profile = profile
-        displayName = profile.displayName ?? ""
         locale = profile.locale
         timezone = profile.timezone
     }
 
-    /// Whether the name or language differ from what the server has.
+    /// Whether the language differs from what the server has.
     public var hasChanges: Bool {
         guard let profile else { return false }
-        return trimmedName != (profile.displayName ?? "") || locale != profile.locale
+        return locale != profile.locale
     }
 
-    private var trimmedName: String { displayName.trimmingCharacters(in: .whitespaces) }
-
-    /// Settings save as they change: the language right away, the name when
-    /// the field is left or submitted.
+    /// Settings save as they change.
     public func saveIfChanged() async {
         guard hasChanges, !isSaving else { return }
         await save()
@@ -156,16 +151,11 @@ public final class SettingsViewModel {
         isSaving = true
         errorMessage = nil
         didSave = false
-        let sentName = trimmedName
         let sentLocale = locale
         do {
-            let updated = try await profileService.update(
-                locale: sentLocale,
-                timezone: timezone,
-                displayName: sentName.isEmpty ? nil : sentName
-            )
+            let updated = try await profileService.update(locale: sentLocale, timezone: timezone)
             // Keep what the user changed while this save was on its way.
-            if trimmedName == sentName && locale == sentLocale {
+            if locale == sentLocale {
                 apply(updated)
             } else {
                 profile = updated
