@@ -56,7 +56,7 @@ public struct ScheduleSheet: View {
                             RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                                 .strokeBorder(choice == .at ? Theme.accent : Color.clear, lineWidth: 2)
                         )
-                        Label("Times shown in \(timezone)", systemImage: "globe")
+                        Label("Times shown in \(AppLanguage.timeZoneName(timezone))", systemImage: "globe")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }

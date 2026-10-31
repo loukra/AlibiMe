@@ -290,10 +290,20 @@ extension CreditPackage {
             credits: dto.credits,
             fulfillmentMode: dto.fulfillment_mode,
             priceLabel: dto.price_label,
-            badgeText: dto.badge_text,
+            badgeText: dto.badge_text.map(Self.badge),
             sortOrder: dto.sort_order,
             storeProductID: dto.store_product_id
         )
+    }
+
+    /// The server names the badges in English; the known ones are shown in
+    /// the app's language.
+    static func badge(_ text: String) -> String {
+        switch text {
+        case "Popular": return String(localized: "Popular")
+        case "Best value": return String(localized: "Best value")
+        default: return text
+        }
     }
 }
 

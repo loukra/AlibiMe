@@ -51,14 +51,17 @@ def is_credit_package(plan: Plan) -> bool:
 _CURRENCY_SYMBOLS = {"EUR": "€", "USD": "$", "GBP": "£"}
 
 
-def price_label(plan: Plan) -> str:
+def price_label(plan: Plan, locale: str = "en") -> str:
     """Human-facing price string, controlled by package metadata so it can change
-    when packages become paid without any frontend change."""
+    when packages become paid without any frontend change. The app prefers the
+    App Store's own price; this is the fallback. German writes "4,99 €"."""
     if plan.fulfillment_mode == FulfillmentMode.free_dev.value:
-        return "Free for now"
+        return "Vorerst kostenlos" if locale == "de" else "Free for now"
     if plan.price_minor is not None and plan.currency_code:
         symbol = _CURRENCY_SYMBOLS.get(plan.currency_code)
         amount = f"{plan.price_minor / 100:.2f}"
+        if locale == "de":
+            return f"{amount.replace('.', ',')} {symbol or plan.currency_code}"
         return f"{symbol}{amount}" if symbol else f"{amount} {plan.currency_code}"
     return "—"
 

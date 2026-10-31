@@ -113,6 +113,20 @@ final class ExtendedCustomTemplateTests: XCTestCase {
         XCTAssertTrue(created?.isCustom == true)
     }
 
+    func testEveryProfileModuleIsNamedLikeItsProfileSection() async {
+        // The editor's "use details from my profile" toggles show the Profile
+        // tab's (translated) section names, not the bare codes.
+        let vm = CustomTemplateEditorViewModel(service: MockTemplateService())
+        await vm.load()
+        let modules = vm.options?.contextModules ?? []
+        XCTAssertFalse(modules.isEmpty)
+        for module in modules {
+            XCTAssertNotNil(ProfileTopic(contextModule: module), module)
+        }
+        XCTAssertEqual(ProfileTopic(contextModule: "relationship"), .partner)
+        XCTAssertEqual(ProfileTopic(contextModule: "transition"), .changes)
+    }
+
     func testTemplatesViewModelShowsProfileNoteWhenEmpty() async {
         let vm = TemplatesViewModel(service: MockTemplateService(),
                                     contextProfile: MockContextProfileService())

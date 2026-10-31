@@ -11,6 +11,9 @@
 # LocalizedStringResource and the components that take one). Xcode's own build
 # only extracts them; this script merges them into
 # App/BelievableCall/{Localizable,AppShortcuts}.xcstrings with xcstringstool.
+# Localizable's texts are kept "manually managed", so a build in Xcode (which
+# doesn't see the package's texts) leaves them alone; this script deletes the
+# ones the code no longer uses.
 set -eu
 
 cd "$(dirname "$0")/.."
@@ -46,9 +49,12 @@ if [ "${1:-}" = "--check" ]; then
             status=1
         fi
     done
-    python3 scripts/check_translations.py $CATALOGS App/BelievableCall/InfoPlist.xcstrings || status=1
+    python3 scripts/check_translations.py --used "$WORK/files" \
+        $CATALOGS App/BelievableCall/InfoPlist.xcstrings || status=1
     exit $status
 fi
 
 sync_into $CATALOGS
-python3 scripts/check_translations.py $CATALOGS App/BelievableCall/InfoPlist.xcstrings || true
+python3 scripts/check_translations.py --manage "$WORK/files" App/BelievableCall/Localizable.xcstrings
+python3 scripts/check_translations.py --used "$WORK/files" \
+    $CATALOGS App/BelievableCall/InfoPlist.xcstrings || true

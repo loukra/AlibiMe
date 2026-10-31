@@ -131,7 +131,7 @@ final class SettingsViewModelTests: XCTestCase {
                                    auth: MockAuthService(),
                                    creditPackages: MockCreditPackagesService(),
                                    backendURL: URL(string: "https://api.alibime.test")!)
-        XCTAssertEqual(vm.supportURL.absoluteString, "https://api.alibime.test/support")
-        XCTAssertEqual(vm.privacyURL.absoluteString, "https://api.alibime.test/privacy")
+        XCTAssertEqual(vm.supportURL.absoluteString, "https://api.alibime.test/support?lang=\(AppLanguage.current)")
+        XCTAssertEqual(vm.privacyURL.absoluteString, "https://api.alibime.test/privacy?lang=\(AppLanguage.current)")
     }
 }

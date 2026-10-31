@@ -49,8 +49,8 @@ public final class SettingsViewModel {
         self.prefs = prefs
         self.purchases = purchases
         self.accountToken = accountToken
-        self.supportURL = backendURL.appendingPathComponent("support")
-        self.privacyURL = backendURL.appendingPathComponent("privacy")
+        self.supportURL = Self.page("support", on: backendURL)
+        self.privacyURL = Self.page("privacy", on: backendURL)
         self.quickAlibi = prefs.quickAlibi
     }
 
@@ -207,5 +207,14 @@ public final class SettingsViewModel {
         let apiError = asAPIError(error)
         if apiError.requiresReauth { onSessionExpired?(); return }
         errorMessage = ErrorCopy.userMessage(for: apiError)
+    }
+}
+
+extension SettingsViewModel {
+    /// A public page on the server, in the app's language (German or English).
+    static func page(_ name: String, on backendURL: URL) -> URL {
+        var parts = URLComponents(url: backendURL.appendingPathComponent(name), resolvingAgainstBaseURL: false)
+        parts?.queryItems = [URLQueryItem(name: "lang", value: AppLanguage.current)]
+        return parts?.url ?? backendURL.appendingPathComponent(name)
     }
 }

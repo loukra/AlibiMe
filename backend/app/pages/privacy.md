@@ -31,7 +31,7 @@ Legal basis: carrying out our contract with you (Art. 6(1)(b) GDPR).
 
 ## Calls and texts
 
-For each call or text you request we store the template you picked, the
+For each call or text you request we store the alibi you picked, the
 channel, the time, its status (for example delivered or not answered) and a
 one-line summary or text preview. Your history stays until you delete it with
 your account.
@@ -39,7 +39,7 @@ your account.
 If you fill in the optional profile (work, home, family and similar, as
 choices from a list), we use it to make calls sound plausible. For a call, a
 short text built from those choices goes to the AI model together with the
-template.
+alibi.
 
 To place a call or send a text we pass your phone number, the text or the
 instructions for the AI voice, and the sender number to the providers below.
@@ -107,7 +107,7 @@ time) and name it here.]
 ## Deleting your account
 
 Settings, Delete account removes your account right away: phone numbers,
-sessions, history, custom templates, profile and credits. Calls or texts that
+sessions, history, your own alibis, profile and credits. Calls or texts that
 were still waiting are cancelled. Only the hashes described above and the
 purchase records we must keep remain.
 

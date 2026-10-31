@@ -31,7 +31,7 @@ def list_packages(
                 display_name=p.display_name or p.code.replace("_", " ").title(),
                 credits=p.included_credit_units,
                 fulfillment_mode=p.fulfillment_mode,
-                price_label=credit_packages.price_label(p),
+                price_label=credit_packages.price_label(p, ctx.user.locale),
                 badge_text=p.badge_text,
                 active=p.active,
                 sort_order=p.sort_order,

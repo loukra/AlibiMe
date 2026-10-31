@@ -25,7 +25,7 @@ purchase. Credits from a refunded purchase are taken off your balance.
 
 ## Deleting your account
 
-Settings, Delete account removes your number, history, own templates and any
+Settings, Delete account removes your number, history, own alibis and any
 credits left, right away. Credits you bought are not refunded.
 
 ## Privacy

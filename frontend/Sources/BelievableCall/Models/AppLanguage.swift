@@ -6,4 +6,11 @@ public enum AppLanguage {
     public static var current: String {
         Bundle.main.preferredLocalizations.first?.hasPrefix("de") == true ? "de" : "en"
     }
+
+    /// A time zone by its name in the app's language ("Mitteleuropäische
+    /// Zeit" for Europe/Berlin), not its ID.
+    public static func timeZoneName(_ identifier: String) -> String {
+        TimeZone(identifier: identifier)?
+            .localizedName(for: .generic, locale: Locale(identifier: current)) ?? identifier
+    }
 }

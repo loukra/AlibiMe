@@ -249,7 +249,8 @@ public struct CustomTemplateEditorView: View {
                         .font(.subheadline.weight(.semibold))
                         .frame(maxWidth: .infinity, alignment: .leading)
                     ForEach(options.contextModules, id: \.self) { module in
-                        Toggle(CustomTemplateEditorViewModel.humanized(module), isOn: Binding(
+                        Toggle(ProfileTopic(contextModule: module)?.title
+                               ?? CustomTemplateEditorViewModel.humanized(module), isOn: Binding(
                             get: { vm.draft.contextModules.contains(module) },
                             set: { on in
                                 if on { vm.draft.contextModules.insert(module) }

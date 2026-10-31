@@ -17,6 +17,11 @@ final class LocalizationTests: XCTestCase {
         return json?["strings"] as? [String: [String: Any]] ?? [:]
     }
 
+    /// Like the app name, which stays "AlibiMe" in every language.
+    private static func untranslatable(_ entry: [String: Any]) -> Bool {
+        entry["shouldTranslate"] as? Bool == false
+    }
+
     private func placeholders(_ text: String) -> [String] {
         let regex = try! NSRegularExpression(pattern: "%(?:\\d+\\$)?(?:lld|ld|d|@|lf|f)")
         return regex.matches(in: text, range: NSRange(text.startIndex..., in: text))
@@ -27,7 +32,7 @@ final class LocalizationTests: XCTestCase {
 
     func testEveryTextHasAGermanTranslation() throws {
         var problems: [String] = []
-        for (key, entry) in try strings("Localizable") {
+        for (key, entry) in try strings("Localizable") where !Self.untranslatable(entry) {
             if entry["extractionState"] as? String == "stale" {
                 problems.append("no longer used, delete it: \(key)")
                 continue
@@ -47,7 +52,7 @@ final class LocalizationTests: XCTestCase {
 
     func testSiriPhrasesAndPermissionTextsHaveGerman() throws {
         for name in ["AppShortcuts", "InfoPlist"] {
-            for (key, entry) in try strings(name) {
+            for (key, entry) in try strings(name) where !Self.untranslatable(entry) {
                 let german = (entry["localizations"] as? [String: Any])?["de"]
                 XCTAssertNotNil(german, "\(name): no German for \(key)")
             }

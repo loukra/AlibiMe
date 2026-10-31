@@ -116,7 +116,7 @@ private extension SettingsView {
                 }
             }
             .onChange(of: vm.locale) { Task { await vm.saveIfChanged() } }
-            LabeledContent("Timezone", value: vm.timezone)
+            LabeledContent("Timezone", value: AppLanguage.timeZoneName(vm.timezone))
         } header: {
             HStack {
                 SectionHeader("Account")

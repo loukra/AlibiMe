@@ -1,7 +1,8 @@
 """The public privacy policy and support pages, served on the API domain.
 
 The App Store listing and the app's Settings link here, so no second domain
-is needed. The texts are Markdown in ``app/pages``.
+is needed. The texts are Markdown in ``app/pages``, German in ``*.de.md``:
+``?lang=de`` picks it (the app passes its language), otherwise the browser's.
 """
 from __future__ import annotations
 
@@ -10,7 +11,7 @@ from functools import lru_cache
 from pathlib import Path
 
 import markdown
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
 from app.core.config import settings
@@ -20,7 +21,7 @@ router = APIRouter(include_in_schema=False)
 _PAGES = Path(__file__).resolve().parents[2] / "pages"
 
 _TEMPLATE = """<!doctype html>
-<html lang="en">
+<html lang="{lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -45,20 +46,35 @@ code {{ font-size: 15px; }}
 """
 
 
+_TITLES = {
+    "privacy": {"en": "AlibiMe privacy policy", "de": "AlibiMe Datenschutzerklärung"},
+    "support": {"en": "AlibiMe support", "de": "AlibiMe Hilfe"},
+}
+
+
+def _language(request: Request) -> str:
+    asked = request.query_params.get("lang")
+    if asked in ("en", "de"):
+        return asked
+    first = request.headers.get("accept-language", "").split(",")[0].strip().lower()
+    return "de" if first.startswith("de") else "en"
+
+
 @lru_cache
-def _render(name: str, title: str) -> str:
-    text = (_PAGES / f"{name}.md").read_text(encoding="utf-8")
+def _render(name: str, lang: str) -> str:
+    suffix = ".de" if lang == "de" else ""
+    text = (_PAGES / f"{name}{suffix}.md").read_text(encoding="utf-8")
     email = settings.support_email or "[support email]"
     text = text.replace("{support_email}", f"[{email}](mailto:{email})" if settings.support_email else email)
     body = markdown.markdown(text, extensions=["tables"])
-    return _TEMPLATE.format(title=html.escape(title), body=body)
+    return _TEMPLATE.format(lang=lang, title=html.escape(_TITLES[name][lang]), body=body)
 
 
 @router.get("/privacy", response_class=HTMLResponse)
-def privacy() -> str:
-    return _render("privacy", "AlibiMe privacy policy")
+def privacy(request: Request) -> str:
+    return _render("privacy", _language(request))
 
 
 @router.get("/support", response_class=HTMLResponse)
-def support() -> str:
-    return _render("support", "AlibiMe support")
+def support(request: Request) -> str:
+    return _render("support", _language(request))

@@ -56,3 +56,14 @@ def test_built_in_alibis_are_named_in_the_account_language(client):
     english = signup(client, phone="+491701239999")["headers"]
     names = {t["code"]: t["display_name"] for t in client.get("/v1/templates", headers=english).json()["templates"]}
     assert names["boss_travel_assignment"] == "Boss: urgent travel assignment"
+
+
+def test_fallback_price_is_written_the_german_way():
+    from app.db.models.plan import Plan
+    from app.domain.billing.credit_packages import price_label
+
+    pack = Plan(fulfillment_mode="app_store_iap", price_minor=499, currency_code="EUR")
+    assert price_label(pack, "en") == "€4.99"
+    assert price_label(pack, "de") == "4,99 €"
+    free = Plan(fulfillment_mode="free_dev")
+    assert price_label(free, "de") == "Vorerst kostenlos"

@@ -210,6 +210,16 @@ enum ProfileTopic: String, CaseIterable, Identifiable {
     case work, home, family, partner, changes, details
     var id: String { rawValue }
 
+    /// The section an alibi's "use details from my profile" module draws on;
+    /// the server calls partner and changes "relationship" and "transition".
+    init?(contextModule: String) {
+        switch contextModule {
+        case "relationship": self = .partner
+        case "transition": self = .changes
+        default: self.init(rawValue: contextModule)
+        }
+    }
+
     var title: String {
         switch self {
         case .work: return String(localized: "Work")

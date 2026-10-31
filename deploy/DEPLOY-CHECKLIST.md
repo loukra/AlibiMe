@@ -61,8 +61,9 @@ port, domain and database there; `deploy/README.md` has the steps.
 
 - [x] **Support and privacy pages on the API domain.** `/support` and
   `/privacy` render `backend/app/pages/*.md` as plain pages (phone width, dark
-  mode), and Settings links to them on whatever backend the build uses. No
-  second domain needed.
+  mode), in German (`*.de.md`) for the German app or a German browser, and
+  Settings links to them on whatever backend the build uses. No second domain
+  needed.
 
 ## 2. Still to test locally (simulator, StoreKit scheme)
 
@@ -164,10 +165,10 @@ Tests that need these accounts:
   Release build talks to the placeholder and nothing works.
 - [ ] `SUPPORT_EMAIL` in the server's `.env`: an address you read. It
   appears on `/support` and in the privacy policy.
-- [ ] Privacy policy: `backend/app/pages/privacy.md`, served at
-  `https://<api domain>/privacy`. Fill in the brackets (controller, hosting,
-  transfer basis per US provider), remove the draft note at the top, have it
-  checked once, and add a German version.
+- [ ] Privacy policy: `backend/app/pages/privacy.md` and `privacy.de.md`,
+  served at `https://<api domain>/privacy`. Fill in the brackets (controller,
+  hosting, transfer basis per US provider) in both, remove the draft note at
+  the top, and have it checked once.
 - [ ] In App Store Connect: privacy policy URL `https://<api domain>/privacy`,
   support URL `https://<api domain>/support`.
 - [ ] Check the first real calls in the Vapi dashboard: no recording, no

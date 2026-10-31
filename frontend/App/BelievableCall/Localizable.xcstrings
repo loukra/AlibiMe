@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "%@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -12,6 +13,7 @@
       }
     },
     "%@ %@ +%@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -28,6 +30,7 @@
       }
     },
     "%@ +%@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -44,6 +47,7 @@
       }
     },
     "%@ calls about %@." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -60,6 +64,7 @@
       }
     },
     "%@ texts about %@." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -76,6 +81,7 @@
       }
     },
     "%@, %@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -92,6 +98,7 @@
       }
     },
     "%lld credits" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -102,6 +109,7 @@
       }
     },
     "%lld credits added" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -112,6 +120,7 @@
       }
     },
     "%lld credits available" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -122,6 +131,7 @@
       }
     },
     "%lld minutes %lld seconds remaining" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -138,6 +148,7 @@
       }
     },
     "+%lld bonus credits on your first purchase" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -148,6 +159,7 @@
       }
     },
     "1 credit" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -158,6 +170,7 @@
       }
     },
     "123456" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -168,6 +181,7 @@
       }
     },
     "151 23456789" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -178,6 +192,7 @@
       }
     },
     "30 sec" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -188,6 +203,7 @@
       }
     },
     "5 min" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -198,6 +214,7 @@
       }
     },
     "A call uses %lld credits, a text %lld." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -214,6 +231,7 @@
       }
     },
     "A call uses more credits than a text. Add Credits shows how many." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -224,6 +242,7 @@
       }
     },
     "A message arrives" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -234,6 +253,7 @@
       }
     },
     "About" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -244,6 +264,7 @@
       }
     },
     "Account" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -254,6 +275,7 @@
       }
     },
     "Action Button" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -264,6 +286,7 @@
       }
     },
     "Add %lld Credits" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -274,6 +297,7 @@
       }
     },
     "Add Credits" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -284,6 +308,7 @@
       }
     },
     "Add my credits" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -294,6 +319,7 @@
       }
     },
     "Add something about you" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -304,6 +330,7 @@
       }
     },
     "Add to your profile" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -314,6 +341,7 @@
       }
     },
     "Alibi" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -324,6 +352,7 @@
       }
     },
     "Alibi name" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -334,6 +363,7 @@
       }
     },
     "AlibiMe" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -344,6 +374,7 @@
       }
     },
     "Alibis" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -354,6 +385,7 @@
       }
     },
     "Anything new in your life?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -364,6 +396,7 @@
       }
     },
     "Back" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -373,7 +406,19 @@
         }
       }
     },
+    "Best value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bester Preis"
+          }
+        }
+      }
+    },
     "Buy %lld Credits for %@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -390,6 +435,7 @@
       }
     },
     "Call" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -400,6 +446,7 @@
       }
     },
     "Call at %@." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -410,6 +457,7 @@
       }
     },
     "Call language" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -420,6 +468,7 @@
       }
     },
     "Call length: %lld s" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -430,6 +479,7 @@
       }
     },
     "Call me in 30 seconds" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -440,6 +490,7 @@
       }
     },
     "Call me in 5 minutes" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -450,6 +501,7 @@
       }
     },
     "Call me now" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -460,6 +512,7 @@
       }
     },
     "Call or text?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -470,6 +523,7 @@
       }
     },
     "Call scheduled in" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -480,6 +534,7 @@
       }
     },
     "Calling" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -490,6 +545,7 @@
       }
     },
     "Calling you now." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -500,6 +556,7 @@
       }
     },
     "Calling you…" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -510,6 +567,7 @@
       }
     },
     "Calls and texts come to this number. They, and your alibis, use the language you pick here." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -520,6 +578,7 @@
       }
     },
     "Calls and texts from %@ always come from this number. Save it and your phone shows the name instead." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -530,6 +589,7 @@
       }
     },
     "Calls and texts from this sender always come from this number. Save it and your phone shows the name instead." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -540,6 +600,7 @@
       }
     },
     "Cancel" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -550,6 +611,7 @@
       }
     },
     "Cancel next job" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -560,6 +622,7 @@
       }
     },
     "Cancel request" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -570,6 +633,7 @@
       }
     },
     "Canceled" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -580,6 +644,7 @@
       }
     },
     "Change" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -590,6 +655,7 @@
       }
     },
     "Choose a package" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -600,6 +666,7 @@
       }
     },
     "Choose an alibi" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -610,6 +677,7 @@
       }
     },
     "Clear" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -620,6 +688,7 @@
       }
     },
     "Clear all your answers?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -630,6 +699,7 @@
       }
     },
     "Clear my answers" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -640,6 +710,7 @@
       }
     },
     "Close" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -650,6 +721,7 @@
       }
     },
     "Completed" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -660,6 +732,7 @@
       }
     },
     "Contact" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -670,6 +743,7 @@
       }
     },
     "Contacts access is optional. You can still use this sender without saving a contact." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -680,6 +754,7 @@
       }
     },
     "Continuity" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -690,6 +765,7 @@
       }
     },
     "Country" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -700,6 +776,7 @@
       }
     },
     "Country code +%@, %@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -716,6 +793,7 @@
       }
     },
     "Credits" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -726,6 +804,7 @@
       }
     },
     "Credits available" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -736,6 +815,7 @@
       }
     },
     "Delete" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -746,6 +826,7 @@
       }
     },
     "Delete account" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -756,6 +837,7 @@
       }
     },
     "Delete alibi" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -766,6 +848,7 @@
       }
     },
     "Delete this alibi?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -776,6 +859,7 @@
       }
     },
     "Delete your account?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -786,6 +870,7 @@
       }
     },
     "Deleting removes your number, history, own alibis and any credits left." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -796,6 +881,7 @@
       }
     },
     "Detail" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -806,6 +892,7 @@
       }
     },
     "Deutsch" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -816,6 +903,7 @@
       }
     },
     "Discretion" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -826,6 +914,7 @@
       }
     },
     "Do you help your family?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -836,6 +925,7 @@
       }
     },
     "Do you travel for work?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -846,6 +936,7 @@
       }
     },
     "Done" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -856,6 +947,7 @@
       }
     },
     "Drop everything" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -866,6 +958,7 @@
       }
     },
     "Edit" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -876,6 +969,7 @@
       }
     },
     "Edit alibi" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -886,6 +980,7 @@
       }
     },
     "Edited" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -896,6 +991,7 @@
       }
     },
     "English" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -906,6 +1002,7 @@
       }
     },
     "Enter the code" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -916,6 +1013,7 @@
       }
     },
     "Enter your phone number." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -926,6 +1024,7 @@
       }
     },
     "Expected reply" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -936,6 +1035,7 @@
       }
     },
     "Expired" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -946,6 +1046,7 @@
       }
     },
     "Failed" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -956,6 +1057,7 @@
       }
     },
     "Family" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -966,6 +1068,7 @@
       }
     },
     "Fill in your Profile so your alibis fit your life." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -976,6 +1079,7 @@
       }
     },
     "Follow-up" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -986,6 +1090,7 @@
       }
     },
     "For a relative who suddenly needs you." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -996,6 +1101,7 @@
       }
     },
     "For how long?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1006,6 +1112,7 @@
       }
     },
     "For reasons like the landlord coming by or the dog sitter canceling." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1016,6 +1123,7 @@
       }
     },
     "Formality" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1026,6 +1134,7 @@
       }
     },
     "Friends" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1036,6 +1145,7 @@
       }
     },
     "Get Me Out" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1046,6 +1156,7 @@
       }
     },
     "Get a call or text when you need a reason to leave." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1056,6 +1167,7 @@
       }
     },
     "Get started" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1066,6 +1178,7 @@
       }
     },
     "Help & support" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1076,6 +1189,7 @@
       }
     },
     "History" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1086,6 +1200,7 @@
       }
     },
     "Home" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1096,6 +1211,7 @@
       }
     },
     "Home screen" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1106,6 +1222,7 @@
       }
     },
     "How hard it pulls you out." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1116,6 +1233,7 @@
       }
     },
     "How long have you been together?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1126,6 +1244,7 @@
       }
     },
     "How much about you?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1136,6 +1255,7 @@
       }
     },
     "How much the caller may say about your life, in case others hear the call. \"Keep it vague\" leaves out everything else in your profile." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1146,6 +1266,7 @@
       }
     },
     "How urgent?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1156,6 +1277,7 @@
       }
     },
     "In %lld h" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1166,6 +1288,7 @@
       }
     },
     "In %lld min" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1176,6 +1299,7 @@
       }
     },
     "In 30 seconds" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1186,6 +1310,7 @@
       }
     },
     "In 5 minutes" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1196,6 +1321,7 @@
       }
     },
     "In the next minutes" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1206,6 +1332,7 @@
       }
     },
     "Life changes" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1216,6 +1343,7 @@
       }
     },
     "Logistics" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1226,6 +1354,7 @@
       }
     },
     "More options" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1236,6 +1365,7 @@
       }
     },
     "Name" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1246,6 +1376,7 @@
       }
     },
     "Needs you soon" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1256,6 +1387,7 @@
       }
     },
     "New alibi" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1266,6 +1398,7 @@
       }
     },
     "Next call" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1276,6 +1409,7 @@
       }
     },
     "Next text" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1286,6 +1420,7 @@
       }
     },
     "No answer" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1296,6 +1431,7 @@
       }
     },
     "No credit packages are available right now." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1306,6 +1442,7 @@
       }
     },
     "No plan" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1316,6 +1453,7 @@
       }
     },
     "No requests yet" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1326,6 +1464,7 @@
       }
     },
     "No rush" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1336,6 +1475,7 @@
       }
     },
     "Not now" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1346,6 +1486,7 @@
       }
     },
     "Not verified" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1356,6 +1497,7 @@
       }
     },
     "Nothing scheduled" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1366,6 +1508,7 @@
       }
     },
     "Now" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1376,6 +1519,7 @@
       }
     },
     "Number" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1386,6 +1530,7 @@
       }
     },
     "OK" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1396,6 +1541,7 @@
       }
     },
     "Off" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1406,6 +1552,7 @@
       }
     },
     "On the call" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1416,6 +1563,7 @@
       }
     },
     "Open AlibiMe and sign in first." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1426,6 +1574,7 @@
       }
     },
     "Open Settings" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1436,6 +1585,7 @@
       }
     },
     "Opens History" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1446,6 +1596,7 @@
       }
     },
     "Opens History to see all pending jobs" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1456,6 +1607,7 @@
       }
     },
     "Opens Settings" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1466,6 +1618,7 @@
       }
     },
     "Or at a time" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1476,6 +1629,7 @@
       }
     },
     "Outcome" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1486,6 +1640,7 @@
       }
     },
     "Overrides the timing from Settings." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1496,6 +1651,7 @@
       }
     },
     "Partner" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1506,6 +1662,7 @@
       }
     },
     "Pending" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1516,6 +1673,7 @@
       }
     },
     "Pick a time within the next 24 hours." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1526,6 +1684,7 @@
       }
     },
     "Pick all that apply." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1536,6 +1695,7 @@
       }
     },
     "Pick your quick alibi in AlibiMe's settings first." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1546,6 +1706,7 @@
       }
     },
     "Please sign in to continue." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1555,7 +1716,19 @@
         }
       }
     },
+    "Popular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beliebt"
+          }
+        }
+      }
+    },
     "Press the Action Button and AlibiMe calls or texts you, without opening the app. Choose what it sends." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1566,6 +1739,7 @@
       }
     },
     "Privacy policy" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1576,6 +1750,7 @@
       }
     },
     "Profile" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1586,6 +1761,7 @@
       }
     },
     "Quick pick" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1596,6 +1772,7 @@
       }
     },
     "Recent" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1606,6 +1783,7 @@
       }
     },
     "Recent changes" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1616,6 +1794,7 @@
       }
     },
     "Remove" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1626,6 +1805,7 @@
       }
     },
     "Request a code first." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1636,6 +1816,7 @@
       }
     },
     "Resend code" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1646,6 +1827,7 @@
       }
     },
     "Resend code in %llds" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1656,6 +1838,7 @@
       }
     },
     "Reset" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1666,6 +1849,7 @@
       }
     },
     "Reset to original" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1676,6 +1860,7 @@
       }
     },
     "Reset to the original?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1686,6 +1871,7 @@
       }
     },
     "Right now" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1696,6 +1882,7 @@
       }
     },
     "Safety" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1706,6 +1893,7 @@
       }
     },
     "Save" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1716,6 +1904,7 @@
       }
     },
     "Save Contact" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1726,6 +1915,7 @@
       }
     },
     "Save this number as a contact?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1736,6 +1926,7 @@
       }
     },
     "Saved" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1746,6 +1937,7 @@
       }
     },
     "Saving contacts is optional" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1756,6 +1948,7 @@
       }
     },
     "Scenario" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1766,6 +1959,7 @@
       }
     },
     "Schedule" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1776,6 +1970,7 @@
       }
     },
     "Schedule %@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1786,6 +1981,7 @@
       }
     },
     "Schedule call" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1796,6 +1992,7 @@
       }
     },
     "Schedule text" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1806,6 +2003,7 @@
       }
     },
     "Scheduled" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1816,6 +2014,7 @@
       }
     },
     "Send as" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1826,6 +2025,7 @@
       }
     },
     "Send code" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1836,6 +2036,7 @@
       }
     },
     "Sending" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1846,6 +2047,7 @@
       }
     },
     "Sends your quick alibi: a call or text from the contact you picked." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1856,6 +2058,7 @@
       }
     },
     "Setting" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1866,6 +2069,7 @@
       }
     },
     "Settings" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1876,6 +2080,7 @@
       }
     },
     "Sign out" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1886,6 +2091,7 @@
       }
     },
     "Slide to send" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1896,6 +2102,7 @@
       }
     },
     "Slide to send · %lld credits" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1906,6 +2113,7 @@
       }
     },
     "Slide to send · 1 credit" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1916,6 +2124,7 @@
       }
     },
     "So a caller can say your shift moved or a client needs you." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1926,6 +2135,7 @@
       }
     },
     "Social" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1936,6 +2146,7 @@
       }
     },
     "Some details weren’t accepted. Please review and try again." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1946,6 +2157,7 @@
       }
     },
     "Something new, like a job or a move, makes a sudden call easy to believe." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1956,6 +2168,7 @@
       }
     },
     "Something went wrong. Please try again." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1966,6 +2179,7 @@
       }
     },
     "Soon" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1976,6 +2190,7 @@
       }
     },
     "Starting" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1986,6 +2201,7 @@
       }
     },
     "Step %lld of %lld" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2002,6 +2218,7 @@
       }
     },
     "Swipe left to cancel" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2012,6 +2229,7 @@
       }
     },
     "Tells the caller whether mentioning your partner is fine." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2022,6 +2240,7 @@
       }
     },
     "Text" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2032,6 +2251,7 @@
       }
     },
     "Text at %@." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2042,6 +2262,7 @@
       }
     },
     "Text me in 30 seconds" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2052,6 +2273,7 @@
       }
     },
     "Text me in 5 minutes" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2062,6 +2284,7 @@
       }
     },
     "Text me now" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2072,6 +2295,7 @@
       }
     },
     "Text scheduled in" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2082,6 +2306,7 @@
       }
     },
     "Texting you now." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2092,6 +2317,7 @@
       }
     },
     "Texting you…" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2102,6 +2328,7 @@
       }
     },
     "That phone number doesn’t look right. Please check it and try again." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2112,6 +2339,7 @@
       }
     },
     "The App Store couldn't complete the purchase. Check your connection and try again." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2122,6 +2350,7 @@
       }
     },
     "The person your phone shows." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2132,6 +2361,7 @@
       }
     },
     "The service is briefly unavailable. Please try again shortly." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2142,6 +2372,7 @@
       }
     },
     "The text arrives at %@." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2152,6 +2383,7 @@
       }
     },
     "The wording is written from your choices. You can't type the call or text yourself." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2162,6 +2394,7 @@
       }
     },
     "This alibi can’t be sent that way." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2172,6 +2405,7 @@
       }
     },
     "This alibi is removed. Past calls and texts stay in History." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2182,6 +2416,7 @@
       }
     },
     "This pack isn't available in the App Store right now." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2192,6 +2427,7 @@
       }
     },
     "This request can no longer be canceled." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2202,6 +2438,7 @@
       }
     },
     "Time" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2212,16 +2449,18 @@
       }
     },
     "Times shown in %@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zeiten in %@"
+            "value" : "Zeitzone: %@"
           }
         }
       }
     },
     "Timezone" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2232,6 +2471,7 @@
       }
     },
     "Timing" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2242,6 +2482,7 @@
       }
     },
     "To set it up: iPhone Settings › Action Button › Shortcut › AlibiMe › Get Me Out. Siri and the Shortcuts app can run it too." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2252,6 +2493,7 @@
       }
     },
     "Tone" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2262,6 +2504,7 @@
       }
     },
     "Try again" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2272,6 +2515,7 @@
       }
     },
     "Upcoming" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2282,6 +2526,7 @@
       }
     },
     "Updating" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2292,6 +2537,7 @@
       }
     },
     "Urgent" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2302,6 +2548,7 @@
       }
     },
     "Use a different number" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2312,6 +2559,7 @@
       }
     },
     "Use details from my Profile" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2322,6 +2570,7 @@
       }
     },
     "Verify" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2332,6 +2581,7 @@
       }
     },
     "Verify your phone number before sending a request." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2342,6 +2592,7 @@
       }
     },
     "Version" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2352,6 +2603,7 @@
       }
     },
     "Voice" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2362,6 +2614,7 @@
       }
     },
     "Waiting for approval. The credits arrive once it's approved." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2372,6 +2625,7 @@
       }
     },
     "We can’t use this type of phone line. Try a mobile number." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2382,6 +2636,7 @@
       }
     },
     "We couldn’t find that. Please try again." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2392,6 +2647,7 @@
       }
     },
     "We couldn’t reach the network. Check your connection and try again." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2402,6 +2658,7 @@
       }
     },
     "We only ever contact your own verified number." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2412,6 +2669,7 @@
       }
     },
     "We sent a 6-digit code to %@." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2422,6 +2680,7 @@
       }
     },
     "We’ll call your verified number when the timer ends." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2432,6 +2691,7 @@
       }
     },
     "We’ll send a verification code. The app only ever contacts this verified number." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2442,6 +2702,7 @@
       }
     },
     "We’ll text your verified number when the timer ends." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2452,6 +2713,7 @@
       }
     },
     "What %@ needs from you." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2462,6 +2724,7 @@
       }
     },
     "What do you look after?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2472,6 +2735,7 @@
       }
     },
     "What field do you work in?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2482,6 +2746,7 @@
       }
     },
     "What's your position?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2492,6 +2757,7 @@
       }
     },
     "When" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2502,6 +2768,7 @@
       }
     },
     "When do you work?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2512,6 +2779,7 @@
       }
     },
     "When you write your own call, the caller can mention your job, your home or your family, so the reason sounds like it's really about you. Add only what you like." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2522,6 +2790,7 @@
       }
     },
     "When?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2532,6 +2801,7 @@
       }
     },
     "Whenever you can" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2542,6 +2812,7 @@
       }
     },
     "Where do you work?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2552,6 +2823,7 @@
       }
     },
     "Where does your family live?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2562,6 +2834,7 @@
       }
     },
     "Which alibi?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2572,6 +2845,7 @@
       }
     },
     "Who calls?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2582,6 +2856,7 @@
       }
     },
     "Who depends on you?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2592,6 +2867,7 @@
       }
     },
     "Who do you live with?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2602,6 +2878,7 @@
       }
     },
     "Who knows you're together?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2612,6 +2889,7 @@
       }
     },
     "Why?" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2622,6 +2900,7 @@
       }
     },
     "Work" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2632,6 +2911,7 @@
       }
     },
     "Works as" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2642,6 +2922,7 @@
       }
     },
     "Your alibis" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2652,6 +2933,7 @@
       }
     },
     "Your call comes in 30 seconds." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2662,6 +2944,7 @@
       }
     },
     "Your call comes in 5 minutes." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2672,6 +2955,7 @@
       }
     },
     "Your calls and texts will appear here." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2682,6 +2966,7 @@
       }
     },
     "Your calls will still work, they just won't mention your life." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2692,6 +2977,7 @@
       }
     },
     "Your changes are removed and the original alibi comes back." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2702,6 +2988,7 @@
       }
     },
     "Your name (optional)" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2712,6 +2999,7 @@
       }
     },
     "Your number, history, own alibis and remaining credits are deleted. Credits you bought are not refunded. This can't be undone." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2722,6 +3010,7 @@
       }
     },
     "Your payment went through. Your credits weren't added yet." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2732,6 +3021,7 @@
       }
     },
     "Your phone number" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2742,6 +3032,7 @@
       }
     },
     "Your phone rings" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2752,6 +3043,7 @@
       }
     },
     "Your phone rings at %@." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2762,6 +3054,7 @@
       }
     },
     "Your session expired. Please sign in again." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2772,6 +3065,7 @@
       }
     },
     "Your session has expired. Please sign in again." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2782,6 +3076,7 @@
       }
     },
     "Your text comes in 30 seconds." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2792,6 +3087,7 @@
       }
     },
     "Your text comes in 5 minutes." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2802,6 +3098,7 @@
       }
     },
     "Your verified number, %@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2812,6 +3109,7 @@
       }
     },
     "You’re going a little fast. Please wait a moment and try again." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2822,6 +3120,7 @@
       }
     },
     "You’re out of credits. Add more to keep sending." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2832,6 +3131,7 @@
       }
     },
     "You’re out of credits. Tap to add more." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2842,6 +3142,7 @@
       }
     },
     "You’ve reached the limit of queued jobs. Cancel one to schedule another." : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2852,6 +3153,7 @@
       }
     },
     "today at %@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2862,6 +3164,7 @@
       }
     },
     "tomorrow at %@" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2872,6 +3175,7 @@
       }
     },
     "· %llds" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
