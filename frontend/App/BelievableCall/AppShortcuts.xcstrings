@@ -9,8 +9,7 @@
             "state" : "new",
             "values" : [
               "Get me out with ${applicationName}",
-              "${applicationName}, call me",
-              "Start ${applicationName}"
+              "${applicationName}, call me"
             ]
           }
         },
@@ -19,8 +18,7 @@
             "state" : "translated",
             "values" : [
               "Hol mich raus mit ${applicationName}",
-              "${applicationName}, ruf mich an",
-              "${applicationName} starten"
+              "${applicationName}, ruf mich an"
             ]
           }
         }

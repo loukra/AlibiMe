@@ -53,7 +53,6 @@ struct AlibiShortcuts: AppShortcutsProvider {
             phrases: [
                 "Get me out with \(.applicationName)",
                 "\(.applicationName), call me",
-                "Start \(.applicationName)",
             ],
             shortTitle: "Get Me Out",
             systemImageName: "phone.arrow.down.left"
