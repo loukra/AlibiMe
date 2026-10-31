@@ -44,6 +44,15 @@ final class ScheduleSheetTests: XCTestCase {
             .hasPrefix("tomorrow at "))
     }
 
+    func testTheWheelFollowingAQuickPickIsNotAChoiceOfItsOwn() {
+        // A quick pick turns the wheel to its time; only a different time on
+        // the wheel switches to "at a time".
+        XCTAssertTrue(ScheduleSheet.sameClockTime(date(31, 1, 3).addingTimeInterval(42), date(31, 1, 3),
+                                                  calendar: calendar))
+        XCTAssertFalse(ScheduleSheet.sameClockTime(date(31, 1, 4), date(31, 1, 3), calendar: calendar))
+        XCTAssertFalse(ScheduleSheet.sameClockTime(date(31, 2, 3), date(31, 1, 3), calendar: calendar))
+    }
+
     func testQuickPickTitles() {
         XCTAssertEqual(ScheduleSheet.title(15), "In 15 min")
         XCTAssertEqual(ScheduleSheet.title(120), "In 2 h")

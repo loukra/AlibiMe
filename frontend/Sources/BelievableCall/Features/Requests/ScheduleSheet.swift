@@ -24,7 +24,7 @@ public struct ScheduleSheet: View {
         self.timezone = timezone
         self.onConfirm = onConfirm
         self.onCancel = onCancel
-        _wheelTime = State(initialValue: Date().addingTimeInterval(3600))
+        _wheelTime = State(initialValue: Date().addingTimeInterval(30 * 60))
     }
 
     public var body: some View {
@@ -50,7 +50,14 @@ public struct ScheduleSheet: View {
                                 .bcWheelStyle()
                                 .labelsHidden()
                                 .frame(maxWidth: .infinity)
-                                .onChange(of: wheelTime) { choice = .at }
+                                .onChange(of: wheelTime) { _, time in
+                                    // Turning to follow a quick pick is not a choice of its own.
+                                    if case .inMinutes(let minutes) = choice,
+                                       Self.sameClockTime(time, Date().addingTimeInterval(TimeInterval(minutes * 60))) {
+                                        return
+                                    }
+                                    choice = .at
+                                }
                         }
                         .overlay(
                             RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
@@ -71,6 +78,13 @@ public struct ScheduleSheet: View {
                 .padding(.bottom, Spacing.s)
             }
             .bcScreenBackground()
+            // The wheel shows the selected quick pick. Set it on opening: the
+            // value from init can be minutes old by the time the sheet appears.
+            .onAppear {
+                if case .inMinutes(let minutes) = choice {
+                    wheelTime = Date().addingTimeInterval(TimeInterval(minutes * 60))
+                }
+            }
             .navigationTitle("Schedule")
             .bcInlineNavTitle()
             .toolbar {
@@ -85,6 +99,7 @@ public struct ScheduleSheet: View {
         let selected = choice == .inMinutes(minutes)
         return Button {
             choice = .inMinutes(minutes)
+            wheelTime = Date().addingTimeInterval(TimeInterval(minutes * 60))
             Haptics.play(.impact)
         } label: {
             VStack(alignment: .leading, spacing: 2) {
@@ -133,6 +148,11 @@ extension ScheduleSheet {
         let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) ?? today
         // A time inside the next minute would land just past the 24-hour window.
         return min(tomorrow, now.addingTimeInterval(24 * 3600))
+    }
+
+    /// Whether two dates show the same hour and minute on the wheel.
+    static func sameClockTime(_ a: Date, _ b: Date, calendar: Calendar = .current) -> Bool {
+        calendar.dateComponents([.hour, .minute], from: a) == calendar.dateComponents([.hour, .minute], from: b)
     }
 
     /// "today at 18:30" or "tomorrow at 07:00".
