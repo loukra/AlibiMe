@@ -30,8 +30,10 @@ from app.db.models.otp_verification import OtpVerification
 from app.db.models.phone import PhoneNumber
 from app.db.models.user import User
 from app.db.models.user_session import UserSession
+from app.domain.billing import credits
 from app.domain.billing.entitlements import grant_free_test_allowance
 from app.domain.phone import assert_supported_line_type, normalize_phone
+from app.providers.factory import review_phone_e164
 from app.providers.otp.base import OtpProvider
 from app.providers.types import ProviderRejected, TransientProviderError
 
@@ -236,6 +238,8 @@ def confirm_phone_verification(
             device_token=device_check_token,
         )
 
+    _top_up_review_account(db, user.id, e164)
+
     verification.status = "confirmed"
     verification.confirmed_at = utcnow()
 
@@ -250,6 +254,16 @@ def confirm_phone_verification(
             "phone_number_masked": mask_phone(e164),
         },
     }
+
+
+def _top_up_review_account(db: Session, user_id: uuid.UUID, e164: str) -> None:
+    """App Review signs in again for every update, so its account starts each
+    review with enough credits to try a call and a text."""
+    if e164 != review_phone_e164():
+        return
+    missing = settings.review_credits - credits.current_balance(db, user_id)
+    if missing > 0:
+        credits.grant(db, user_id, missing, notes="app review top-up")
 
 
 def resolve_session(db: Session, token: str) -> tuple[User, UserSession]:

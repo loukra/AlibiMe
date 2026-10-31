@@ -216,6 +216,11 @@ All string enums live in `backend/app/db/models/enums.py` (`Channel`,
 - `resolve_session()` (`auth/service.py:236`): look up by token hash, enforce
   not-revoked / not-expired / active user. Raises `Unauthorized` or
   `SessionExpired`.
+- App Review sign-in: with `REVIEW_PHONE_NUMBER` and `REVIEW_OTP_CODE` set,
+  `get_otp_provider()` wraps the real provider in `ReviewOtpProvider`
+  (`providers/otp/review.py`), which confirms that one number with the fixed
+  code and sends no SMS. `_top_up_review_account()` tops its balance up to
+  `REVIEW_CREDITS` on every sign-in.
 
 Routes: `backend/app/api/routes/auth.py` — `POST /v1/auth/phone/start`
 (`auth.py:20`), `/confirm` (`auth.py:32`), `/logout` (`auth.py:44`).

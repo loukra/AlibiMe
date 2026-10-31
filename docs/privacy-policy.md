@@ -24,8 +24,7 @@ You sign in with your phone number and a code we send by SMS. We store:
 - your phone number, encrypted, plus a keyed hash of it so we can find your
   account without decrypting it
 - your display name, language and time zone, if you set them
-- a random ID for your device, the app and iOS version, and a push token if
-  you allow notifications
+- a random ID the app creates for your device
 - the sessions that keep you signed in (they expire after 30 days unused)
 
 Legal basis: carrying out our contract with you (Art. 6(1)(b) GDPR).
@@ -85,7 +84,7 @@ These companies process data for us on our instructions:
 | OpenAI (USA) | the AI model that writes the caller's words | call instructions, profile text, what is said on the call |
 | ElevenLabs (USA) | turning those words into a voice | the words the caller says |
 | Deepgram (USA) | transcribing what you say during the call | the call audio |
-| Apple Inc. | App Store purchases, DeviceCheck, push notifications | purchase records, device check token, push token |
+| Apple Inc. | App Store purchases, DeviceCheck | purchase records, device check token |
 | [Hosting provider, country] | running our server and database | everything listed above |
 
 [Confirm for each US provider how the transfer is covered: certification under

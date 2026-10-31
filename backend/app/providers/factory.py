@@ -11,6 +11,25 @@ from app.providers.voice.mock import MockVoiceCallProvider
 
 
 def get_otp_provider() -> OtpProvider:
+    provider = _base_otp_provider()
+    review_e164 = review_phone_e164()
+    if review_e164 and settings.review_otp_code:
+        from app.providers.otp.review import ReviewOtpProvider
+
+        return ReviewOtpProvider(provider, review_e164, settings.review_otp_code)
+    return provider
+
+
+def review_phone_e164() -> str | None:
+    """The App Review number in E.164, or None when the review sign-in is off."""
+    if not settings.review_phone_number:
+        return None
+    from app.domain.phone import normalize_phone
+
+    return normalize_phone(settings.review_phone_number).e164
+
+
+def _base_otp_provider() -> OtpProvider:
     if settings.otp_provider == "mock":
         return MockOtpProvider()
     if settings.otp_provider == "twilio_verify":

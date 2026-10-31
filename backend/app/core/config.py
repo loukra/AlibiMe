@@ -70,6 +70,13 @@ class Settings(BaseSettings):
     device_check_key_id: str | None = None
     device_check_private_key_path: str | None = None  # the .p8 key file
     device_check_environment: str = "development"  # or "production"
+    # Sign-in for Apple's App Review: this number signs in with this code,
+    # without an SMS, and its balance is topped up to review_credits on each
+    # sign-in. Calls and texts still go to the number, so use one you hold.
+    # Both empty (the default) turns it off.
+    review_phone_number: str | None = None
+    review_otp_code: str | None = None
+    review_credits: int = 10
     supported_countries: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["DE", "US", "GB", "AT", "CH"]
     )
@@ -165,6 +172,9 @@ def production_problems(s: Settings) -> list[str]:
         problems.append("APP_SECRET_KEY is the dev default or shorter than 32 characters")
     if not s.phone_encryption_key:
         problems.append("PHONE_ENCRYPTION_KEY is empty")
+    code = s.review_otp_code or ""
+    if s.review_phone_number and (not code.isdigit() or len(code) < 8):
+        problems.append("REVIEW_OTP_CODE must be at least 8 digits while REVIEW_PHONE_NUMBER is set")
     return problems
 
 

@@ -42,3 +42,12 @@ def test_configured_server_starts():
 
 def test_local_runs_with_mocks():
     assert_deployable(Settings(_env_file=None, app_env="local"))
+
+
+def test_review_sign_in_needs_a_long_code_on_a_server():
+    weak = Settings(_env_file=None, app_env="production", **_REAL,
+                    review_phone_number="+491709876543", review_otp_code="123456")
+    assert production_problems(weak) == [
+        "REVIEW_OTP_CODE must be at least 8 digits while REVIEW_PHONE_NUMBER is set"]
+    assert_deployable(Settings(_env_file=None, app_env="production", **_REAL,
+                               review_phone_number="+491709876543", review_otp_code="48151623"))

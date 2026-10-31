@@ -50,6 +50,12 @@ port, domain and database there; `deploy/README.md` has the steps.
   (`api.alibime.example`) for Release. Only Debug builds accept an override
   from the scheme or `defaults write`.
 
+- [x] **Sign-in for App Review.** With `REVIEW_PHONE_NUMBER` and
+  `REVIEW_OTP_CODE` set, that number signs in with the fixed code, without an
+  SMS or a paid carrier lookup, and every sign-in tops its balance up to
+  `REVIEW_CREDITS` (10). Every other number goes through Twilio as before. A
+  server refuses to start with a code shorter than 8 digits.
+
 ## 2. Still to test locally (simulator, StoreKit scheme)
 
 - [x] Backend stopped during a purchase, in the simulator with the StoreKit
@@ -157,8 +163,11 @@ Tests that need these accounts:
   transcript, no summary.
 - [ ] Privacy nutrition labels: phone number, purchases, call content
   (processed by Vapi), no tracking.
-- [ ] Review notes: a demo account the reviewer can sign in with, and how the
-  call works.
+- [ ] Review notes: the review sign-in (`REVIEW_PHONE_NUMBER` and
+  `REVIEW_OTP_CODE` in the server's `.env`, a number you hold, a code of at
+  least 8 digits), that its calls and texts ring that number, and how a call
+  works. A short screen recording of a real call helps, since the reviewer
+  can't hear it.
 - [ ] Export compliance (only standard HTTPS).
 
 ## 6. After launch
