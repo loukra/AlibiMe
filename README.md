@@ -1,5 +1,7 @@
 # AlibiMe
 
+[![CI](https://github.com/loukra/AlibiMe/actions/workflows/ci.yml/badge.svg)](https://github.com/loukra/AlibiMe/actions/workflows/ci.yml)
+
 AlibiMe is an iOS app that calls you when you need a reason to leave. The
 caller is an AI voice agent. You choose who it should be, say your best friend
 or your roommate, and why they are calling, and the agent phones you and plays
@@ -10,11 +12,21 @@ You pick an alibi on Home, choose call or text and when, and slide to send.
 The app, the calls and the texts come in English and German.
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="230" alt="Home screen">
+  <img src="docs/screenshots/home-running.png" width="230" alt="Home with a text on its way and the form for a new alibi">
   &nbsp;
   <img src="docs/screenshots/save-prompt.png" width="230" alt="Prompt to save the caller as a contact">
   &nbsp;
   <img src="docs/screenshots/contact.png" width="230" alt="Prefilled contact">
+</p>
+
+A new user starts with a short walkthrough that plans their first alibi for a
+real moment coming up, as a text, and saves its sender as a contact on the
+way. The free credit goes to real use instead of a throwaway test.
+
+<p align="center">
+  <img src="docs/screenshots/first-alibi.png" width="230" alt="Walkthrough: pick who gets you out">
+  &nbsp;
+  <img src="docs/screenshots/first-alibi-when.png" width="230" alt="Walkthrough: pick when, with a preview of the text">
 </p>
 
 ## The AI part
@@ -67,10 +79,7 @@ since a call that late no longer helps. Phone numbers are stored encrypted and
 never logged.
 
 Each persona calls and texts from the same number, so once the user saves it as
-a contact, both show up under that name. A new user starts with a short
-walkthrough that plans their first alibi as a text for a real moment coming up
-and saves its sender as a contact on the way, so the free credit goes to real
-use instead of a test. The Action Button (or Siri with "Get
+a contact, both show up under that name. The Action Button (or Siri with "Get
 me out with AlibiMe", or a Shortcut) can send a preset alibi without opening
 the app. Credits are bought as App Store in-app purchases, and the backend
 checks Apple's signed transaction before granting them. New numbers get free
@@ -94,7 +103,9 @@ flowchart LR
     App -->|signed purchase| API
 ```
 
-There are 249 backend tests, including the evals, and 168 iOS unit tests.
+There are about 250 backend tests, including the evals, and about 175 iOS unit
+tests. CI runs them on every push, together with the offline agent evals and a
+check that every text in the app has its German translation.
 
 ## Running it locally
 
@@ -116,3 +127,8 @@ project.
 
 More detail is in [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) and the
 specs in [`docs/specs/`](docs/specs/).
+
+## Copyright
+
+Copyright (c) 2026 Louis Krause. All rights reserved. The code is public so it
+can be read; it is not licensed for reuse. See [`LICENSE`](LICENSE).
