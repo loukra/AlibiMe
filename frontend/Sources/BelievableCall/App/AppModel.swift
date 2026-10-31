@@ -152,7 +152,7 @@ public final class AppModel {
     }
 
     public func makeProfileViewModel() -> ProfileViewModel {
-        let vm = ProfileViewModel(service: env.contextProfile, templates: env.templates)
+        let vm = ProfileViewModel(service: env.contextProfile, templates: env.templates, account: env.profile)
         vm.onSessionExpired = { [weak self] in self?.handleSessionExpired() }
         return vm
     }

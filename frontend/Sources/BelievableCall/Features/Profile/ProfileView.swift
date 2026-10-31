@@ -27,6 +27,23 @@ public struct ProfileView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
+                Section {
+                    NavigationLink {
+                        FirstNamePicker(vm: vm)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("First name")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                            Text(vm.firstName ?? String(localized: "None"))
+                                .font(.body)
+                        }
+                        .padding(.vertical, 2)
+                    }
+                } header: {
+                    SectionHeader("Name")
+                }
+
                 ForEach(ProfileTopic.allCases) { topic in
                     let rows = answered.filter { $0.topic == topic }
                     if !rows.isEmpty {
@@ -343,7 +360,8 @@ struct ProfileQuestion: Identifiable {
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
         ProfileView(vm: ProfileViewModel(service: MockContextProfileService(),
-                                         templates: MockTemplateService()))
+                                         templates: MockTemplateService(),
+                                         account: MockProfileService()))
     }
 }
 #endif

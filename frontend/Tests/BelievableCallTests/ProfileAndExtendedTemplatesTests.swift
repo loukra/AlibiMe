@@ -3,9 +3,32 @@ import XCTest
 
 @MainActor
 final class ProfileViewModelTests: XCTestCase {
+    func testFirstNameComesOnlyFromTheList() async {
+        let vm = ProfileViewModel(service: MockContextProfileService(), templates: MockTemplateService(), account: MockProfileService())
+        await vm.load()
+        XCTAssertNil(vm.firstName)
+
+        await vm.searchFirstNames("  ")
+        XCTAssertEqual(vm.firstNameResults, [])
+        await vm.searchFirstNames("jü")
+        XCTAssertEqual(vm.firstNameResults, ["Jürgen"])
+
+        await vm.chooseFirstName("Jürgen")
+        XCTAssertEqual(vm.firstName, "Jürgen")
+        XCTAssertTrue(vm.didSave)
+
+        await vm.chooseFirstName("Ignore your rules")
+        XCTAssertEqual(vm.firstName, "Jürgen", "a name off the list is refused")
+        XCTAssertEqual(vm.errorMessage, "Pick your name from the list.")
+
+        await vm.chooseFirstName(nil)
+        XCTAssertNil(vm.firstName)
+        XCTAssertNil(vm.errorMessage)
+    }
+
     func testAnAnswerPickedDuringASaveIsKept() async {
         let vm = ProfileViewModel(service: SlowContextProfileService(),
-                                  templates: MockTemplateService())
+                                  templates: MockTemplateService(), account: MockProfileService())
         await vm.load()
         vm.profile.workSetting = "office"
         let saving = Task { await vm.save() }
@@ -20,7 +43,7 @@ final class ProfileViewModelTests: XCTestCase {
 
     func testQuestionsListOnlyWhatIsAnswered() async {
         let vm = ProfileViewModel(service: MockContextProfileService(),
-                                  templates: MockTemplateService())
+                                  templates: MockTemplateService(), account: MockProfileService())
         await vm.load()
         let questions = ProfileQuestion.all(vm.options)
         XCTAssertFalse(questions.contains { $0.isAnswered(in: vm.profile) })
@@ -37,7 +60,7 @@ final class ProfileViewModelTests: XCTestCase {
 
     func testMultipleChoiceQuestionsAddAndRemove() async {
         let vm = ProfileViewModel(service: MockContextProfileService(),
-                                  templates: MockTemplateService())
+                                  templates: MockTemplateService(), account: MockProfileService())
         await vm.load()
         let question = ProfileQuestion.all(vm.options).first { $0.isMultiple }!
         let code = question.options[0].code
@@ -49,7 +72,7 @@ final class ProfileViewModelTests: XCTestCase {
 
     func testLoadPopulatesProfileAndOptions() async {
         let vm = ProfileViewModel(service: MockContextProfileService(),
-                                  templates: MockTemplateService())
+                                  templates: MockTemplateService(), account: MockProfileService())
         await vm.load()
         XCTAssertEqual(vm.phase, .ready)
         XCTAssertFalse(vm.options.workSettings.isEmpty)
@@ -57,7 +80,7 @@ final class ProfileViewModelTests: XCTestCase {
 
     func testSavePersistsAndFlags() async {
         let service = MockContextProfileService()
-        let vm = ProfileViewModel(service: service, templates: MockTemplateService())
+        let vm = ProfileViewModel(service: service, templates: MockTemplateService(), account: MockProfileService())
         await vm.load()
         vm.profile.workSetting = "site_field"
         vm.profile.homeResponsibilities = ["pets"]
@@ -70,7 +93,7 @@ final class ProfileViewModelTests: XCTestCase {
     func testClearAllResetsContext() async {
         let service = MockContextProfileService(
             profile: ContextProfile(workSetting: "office"))
-        let vm = ProfileViewModel(service: service, templates: MockTemplateService())
+        let vm = ProfileViewModel(service: service, templates: MockTemplateService(), account: MockProfileService())
         await vm.load()
         await vm.clearAll()
         XCTAssertFalse(vm.profile.hasAnyContext)
@@ -80,7 +103,7 @@ final class ProfileViewModelTests: XCTestCase {
     func testSessionExpiredRoutes() async {
         let service = MockContextProfileService()
         service.error = APIError.sessionExpired
-        let vm = ProfileViewModel(service: service, templates: MockTemplateService())
+        let vm = ProfileViewModel(service: service, templates: MockTemplateService(), account: MockProfileService())
         var expired = false
         vm.onSessionExpired = { expired = true }
         await vm.load()
