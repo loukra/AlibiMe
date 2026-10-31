@@ -218,6 +218,7 @@ struct PressScaleStyle: ButtonStyle {
 /// symmetrically flanked by two destinations on each side.
 struct FloatingTabBar: View {
     @Binding var selection: MainTabView.Tab
+    @Environment(\.colorScheme) private var colorScheme
 
     /// Vertical space the bar (plus the raised center button + margins) occupies;
     /// screens inset their scroll content by this much so nothing hides behind it.
@@ -262,7 +263,11 @@ struct FloatingTabBar: View {
             Image("AppLogo", bundle: .module)
                 .resizable()
                 .scaledToFit()
-                .padding(centerDiameter * 0.22)
+                // The logo's dark "A" disappears on dark glass: in dark mode it
+                // sits on a light disc, like an app icon.
+                .padding(colorScheme == .dark ? centerDiameter * 0.08 : 0)
+                .background(Circle().fill(Color.white.opacity(colorScheme == .dark ? 0.92 : 0)))
+                .padding(centerDiameter * (colorScheme == .dark ? 0.14 : 0.22))
                 .frame(width: centerDiameter, height: centerDiameter)
                 // Not the interactive glass: it grows on press on its own and
                 // leaves the selection ring behind. PressScaleStyle scales
@@ -297,12 +302,18 @@ struct FloatingTabBar: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
             }
+            // Like the system tab bar: the labels stop growing at large text
+            // sizes, and a long press shows them big instead.
+            .dynamicTypeSize(...DynamicTypeSize.large)
             .foregroundStyle(isSelected ? Theme.accent : Color.secondary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, Spacing.xs)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityShowsLargeContentViewer {
+            Label { Text(label) } icon: { Image(systemName: icon) }
+        }
         .accessibilityLabel(label)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }

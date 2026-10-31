@@ -107,7 +107,10 @@ public struct HomeView: View {
         Button { onOpenSettings?(focus) } label: {
             HStack(spacing: Spacing.xs + 2) {
                 Image(systemName: systemImage).foregroundStyle(tint)
+                // One line at any text size: a number broken in two is unreadable.
                 Text(text).foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
             }
             .font(.subheadline.weight(.medium))
             .padding(.horizontal, Spacing.m)

@@ -64,6 +64,7 @@ struct WelcomeView: View {
             }
         }
         .padding(Spacing.l)
+        .bcScrollsWhenTooTall()
     }
 }
 
@@ -117,6 +118,7 @@ struct PhoneEntryView: View {
             .opacity(vm.canSubmitPhone ? 1 : 0.5)
         }
         .padding(Spacing.l)
+        .bcScrollsWhenTooTall()
     }
 }
 
@@ -164,7 +166,21 @@ struct OTPView: View {
             .opacity(vm.canSubmitCode ? 1 : 0.5)
         }
         .padding(Spacing.l)
+        .bcScrollsWhenTooTall()
         .onReceive(timer) { _ in vm.tick() }
+    }
+}
+
+private extension View {
+    /// Keeps the screen's layout (spacers push the button down) when it fits,
+    /// and scrolls instead of cutting text off at large text sizes.
+    func bcScrollsWhenTooTall() -> some View {
+        GeometryReader { proxy in
+            ScrollView {
+                self.frame(minHeight: proxy.size.height)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        }
     }
 }
 
