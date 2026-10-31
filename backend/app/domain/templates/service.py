@@ -12,6 +12,7 @@ from app.db.models.request import Request
 from app.db.models.template import Template, TemplateVersion
 from app.domain.profile import context as profile_context
 from app.domain.templates import catalogs, compose, rendering
+from app.domain.users import first_names
 
 _DEFAULT_LOCALE = "en"
 
@@ -631,6 +632,7 @@ def build_call_variables(
     locale: str,
     timezone: str | None,
     rendered_opening_line: str | None,
+    first_name: str | None = None,
     context: dict | None = None,
 ) -> dict:
     """Flat string variables passed to the Vapi assistant so it can adapt the
@@ -680,7 +682,9 @@ def build_call_variables(
         # reusable user context (gated by the template's allowed modules)
         "user_context": _profile_summary(context, modules, loc),
         "detail_rule": _detail_rule(context, loc),
-        # misc
+        # misc. The name is checked against the list again here, in case the
+        # list changed since it was picked: no typed text reaches the call.
+        "name": first_names.canonical(first_name) or "" if first_name else "",
         "locale": loc,
         "local_time": local_time,
         "target_turn_count": _turn_count(version.call_max_duration_seconds),

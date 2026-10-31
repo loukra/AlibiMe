@@ -44,12 +44,13 @@ and turns that run too long, and an optional LLM judge scores how natural the
 call sounds. It runs offline with a mock model in the test suite, or against
 OpenAI or Anthropic with a key.
 
-Nothing a user types ever reaches the model. There is no name field, the
-Profile is picked from lists, and even their own alibis are put together from
-fixed options, with the backend composing the wording from approved building
-blocks. The agent can only ever call the number the user verified at sign-up,
-so it can't be turned into a tool for calling or misleading someone else. Calls
-are not recorded, and neither the backend nor Vapi keeps a transcript.
+Nothing a user types ever reaches the model. The optional first name a caller
+may say is picked from a fixed list of about 1,500 names, the Profile is picked
+from lists, and even their own alibis are put together from fixed options, with
+the backend composing the wording from approved building blocks. The agent can
+only ever call the number the user verified at sign-up, so it can't be turned
+into a tool for calling or misleading someone else. Calls are not recorded, and
+neither the backend nor Vapi keeps a transcript.
 
 <p align="center">
   <img src="docs/screenshots/alibis.png" width="230" alt="Alibi library">
@@ -90,7 +91,7 @@ flowchart LR
     App -->|signed purchase| API
 ```
 
-There are 246 backend tests, including the evals, and 167 iOS unit tests.
+There are 249 backend tests, including the evals, and 168 iOS unit tests.
 
 ## Running it locally
 

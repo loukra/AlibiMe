@@ -166,7 +166,7 @@ Key models (one file each under `db/models/`):
 
 | Model | File | Purpose |
 |---|---|---|
-| `User` | `user.py` | account; locale/timezone (no name: nothing typed reaches a call) |
+| `User` | `user.py` | account; locale/timezone/first name (only from `domain/users/first_names.txt`, never typed text) |
 | `PhoneNumber` | `phone.py` | encrypted E.164 + hash; one verified primary per user |
 | `OtpVerification` | `otp_verification.py` | in-flight OTP attempt |
 | `UserSession` | `user_session.py` | opaque session token (stored hashed) |

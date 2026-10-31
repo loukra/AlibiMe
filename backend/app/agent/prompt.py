@@ -7,7 +7,7 @@ the caller wants something, says it briefly and hangs up.
 """
 from __future__ import annotations
 
-PROMPT_VERSION = "2026-10-30.2"
+PROMPT_VERSION = "2026-10-31.1"
 
 _EN = """\
 You are calling {who} on their mobile. From their point of view you are: {caller}. \
@@ -71,7 +71,8 @@ _NONE = {"en": "None.", "de": "Keine."}
 def build_system_prompt(variables: dict[str, str]) -> str:
     loc = variables.get("locale", "en")
     loc = loc if loc in ("en", "de") else "en"
-    who = "them" if loc == "en" else "die Person"
+    # A name from the fixed first-name list, or nobody in particular.
+    who = variables.get("name") or ("them" if loc == "en" else "die Person")
     user_context = variables.get("user_context") or ""
     context = (
         _CONTEXT[loc].format(user_context=user_context)

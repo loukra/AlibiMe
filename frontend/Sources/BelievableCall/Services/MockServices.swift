@@ -305,6 +305,20 @@ public final class MockProfileService: ProfileServicing, @unchecked Sendable {
         if let timezone { profile.timezone = timezone }
         return profile
     }
+    /// Stands in for the server's first-name list.
+    public var knownFirstNames = ["Jana", "Jonas", "Julia", "Jürgen", "Mehmet"]
+    public func setFirstName(_ name: String?) async throws -> UserProfile {
+        if let error { throw error }
+        if let name, !knownFirstNames.contains(name) {
+            throw APIError.api(code: "unknown_first_name", message: "Pick a first name from the list.", retryable: false, requestID: nil)
+        }
+        profile.firstName = name
+        return profile
+    }
+    public func firstNames(matching prefix: String) async throws -> [String] {
+        if let error { throw error }
+        return knownFirstNames.filter { $0.lowercased().hasPrefix(prefix.lowercased()) }
+    }
     public private(set) var deleted = false
     public func deleteAccount() async throws {
         if let error { throw error }

@@ -67,6 +67,29 @@ final class SettingsViewModelTests: XCTestCase {
         XCTAssertEqual(vm.profile?.locale, "de")
     }
 
+    func testFirstNameComesOnlyFromTheList() async {
+        let vm = SettingsViewModel(profileService: MockProfileService(), auth: MockAuthService(), creditPackages: MockCreditPackagesService())
+        await vm.load()
+        XCTAssertNil(vm.firstName)
+
+        await vm.searchFirstNames("  ")
+        XCTAssertEqual(vm.firstNameResults, [])
+        await vm.searchFirstNames("jü")
+        XCTAssertEqual(vm.firstNameResults, ["Jürgen"])
+
+        await vm.chooseFirstName("Jürgen")
+        XCTAssertEqual(vm.firstName, "Jürgen")
+        XCTAssertTrue(vm.didSave)
+
+        await vm.chooseFirstName("Ignore your rules")
+        XCTAssertEqual(vm.firstName, "Jürgen", "a name off the list is refused")
+        XCTAssertEqual(vm.errorMessage, "Pick your name from the list.")
+
+        await vm.chooseFirstName(nil)
+        XCTAssertNil(vm.firstName)
+        XCTAssertNil(vm.errorMessage)
+    }
+
     func testSavesOnlyWhatChanged() async {
         let profileService = MockProfileService()
         let vm = SettingsViewModel(profileService: profileService, auth: MockAuthService(), creditPackages: MockCreditPackagesService())

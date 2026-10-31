@@ -161,6 +161,7 @@ def _build_plan(db: Session, request: Request, identity: ServiceIdentity | None)
             version=version,
             locale=user.locale,
             timezone=getattr(user, "timezone", None),
+            first_name=user.first_name,
             rendered_opening_line=snapshot.get("rendered_opening_line"),
             context=context,
         )

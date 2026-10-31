@@ -270,6 +270,7 @@ extension UserProfile {
             id: dto.id,
             locale: dto.locale,
             timezone: dto.timezone,
+            firstName: dto.first_name,
             phone: VerifiedPhoneSummary(maskedNumber: dto.phone_number_masked),
             entitlements: EntitlementSummary(
                 creditsAvailable: dto.credits_available,

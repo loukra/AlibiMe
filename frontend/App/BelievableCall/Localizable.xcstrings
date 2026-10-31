@@ -1078,6 +1078,17 @@
         }
       }
     },
+    "First name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorname"
+          }
+        }
+      }
+    },
     "Follow-up" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1441,6 +1452,17 @@
         }
       }
     },
+    "No name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Name"
+          }
+        }
+      }
+    },
     "No plan" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1470,6 +1492,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keine Eile"
+          }
+        }
+      }
+    },
+    "None" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keiner"
           }
         }
       }
@@ -1690,6 +1723,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wähle alles, was passt."
+          }
+        }
+      }
+    },
+    "Pick your name from the list." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle deinen Namen aus der Liste."
           }
         }
       }
@@ -2009,6 +2053,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Geplant"
+          }
+        }
+      }
+    },
+    "Search names" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namen suchen"
           }
         }
       }
@@ -2437,6 +2492,17 @@
         }
       }
     },
+    "This name isn't in our list yet. You can leave it empty." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Name ist noch nicht in unserer Liste. Dann lass ihn einfach weg."
+          }
+        }
+      }
+    },
     "This pack isn't available in the App Store right now." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2532,6 +2598,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Noch einmal versuchen"
+          }
+        }
+      }
+    },
+    "Type the first letters of your name. A caller may say it; without one, they don't use a name." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp die ersten Buchstaben deines Namens. Ein Anrufer darf ihn sagen; ohne Namen spricht er dich nicht mit Namen an."
           }
         }
       }

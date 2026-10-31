@@ -85,7 +85,7 @@ final class MappingTests: XCTestCase {
 
     func testProfileMappingIncludesActiveRequest() {
         let dto = MeResponseDTO(
-            id: "u1", locale: "en", timezone: "UTC",
+            id: "u1", locale: "en", timezone: "UTC", first_name: "Mehmet",
             phone_number_masked: "+14******123", credits_available: 2,
             active_entitlements: [.init(plan_code: "free", status: "active")],
             active_request: .init(request_id: "r1", channel: "call", status: "scheduled",
@@ -94,6 +94,7 @@ final class MappingTests: XCTestCase {
         )
         let profile = UserProfile(dto: dto)
         XCTAssertEqual(profile.creditCosts, CreditCosts(call: 2, text: 1))
+        XCTAssertEqual(profile.firstName, "Mehmet")
         XCTAssertEqual(profile.entitlements.creditsAvailable, 2)
         XCTAssertEqual(profile.activeRequest?.id, "r1")
         XCTAssertEqual(profile.activeRequest?.channel, .call)

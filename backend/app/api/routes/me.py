@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentContext, get_current_context, get_db
@@ -8,12 +8,14 @@ from app.core.config import settings
 from app.domain.billing.entitlements import entitlement_summary
 from app.domain.profile import context as profile_context
 from app.domain.requests.service import get_active_request
+from app.domain.users import first_names
 from app.domain.users.service import delete_account, masked_primary_number
 from app.schemas.context_profile import ContextProfileBody, ContextProfileOut
 from app.schemas.credit_packages import CreditCosts
 from app.schemas.me import (
     ActiveRequestSummary,
     EntitlementSummaryItem,
+    FirstNamesResponse,
     MeResponse,
     MeUpdate,
 )
@@ -36,6 +38,7 @@ def _build_me(db: Session, user) -> MeResponse:
         id=str(user.id),
         locale=user.locale,
         timezone=user.timezone,
+        first_name=user.first_name,
         phone_number_masked=masked_primary_number(db, user.id),
         credits_available=summary["credits_available"],
         active_entitlements=[EntitlementSummaryItem(**e) for e in summary["active_entitlements"]],
@@ -63,8 +66,18 @@ def patch_me(
         user.locale = body.locale
     if body.timezone is not None:
         user.timezone = body.timezone
+    if body.first_name is not None:
+        user.first_name = first_names.require(body.first_name) if body.first_name.strip() else None
     db.commit()
     return _build_me(db, user)
+
+
+@router.get("/first-names", response_model=FirstNamesResponse)
+def search_first_names(
+    q: str = Query(default="", max_length=40),
+    ctx: CurrentContext = Depends(get_current_context),
+) -> FirstNamesResponse:
+    return FirstNamesResponse(names=first_names.search(q))
 
 
 @router.delete("", status_code=204)

@@ -120,6 +120,13 @@ class InvalidVerificationCode(ValidationFailed):
     default_message = "The verification code is incorrect."
 
 
+class UnknownFirstName(ValidationFailed):
+    """Only names from the list: a typed name would reach the call prompt."""
+
+    code = "unknown_first_name"
+    default_message = "Pick a first name from the list."
+
+
 class VerificationExpired(ValidationFailed):
     """Expired, already used or out of attempts: a new code is needed."""
 

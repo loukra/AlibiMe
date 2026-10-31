@@ -7,6 +7,10 @@ import Observation
 public final class SettingsViewModel {
     public private(set) var profile: UserProfile?
     public var locale: String = "en"
+    /// From the server's list only; set through `chooseFirstName`.
+    public private(set) var firstName: String?
+    /// Search results for the first-name picker.
+    public private(set) var firstNameResults: [String] = []
     public var timezone: String = "UTC"
     public private(set) var isLoading = false
     public private(set) var isSaving = false
@@ -133,6 +137,38 @@ public final class SettingsViewModel {
         self.profile = profile
         locale = profile.locale
         timezone = profile.timezone
+        firstName = profile.firstName
+    }
+
+    /// Looks up names on the server's list. Empty input clears the results.
+    public func searchFirstNames(_ query: String) async {
+        let prefix = query.trimmingCharacters(in: .whitespaces)
+        guard !prefix.isEmpty else {
+            firstNameResults = []
+            return
+        }
+        do {
+            let names = try await profileService.firstNames(matching: prefix)
+            guard !Task.isCancelled else { return }
+            firstNameResults = names
+        } catch {
+            // A newer search replaced this one; its result doesn't matter.
+            if !Task.isCancelled { handle(error) }
+        }
+    }
+
+    /// Picks a name from the list, or removes it with nil.
+    public func chooseFirstName(_ name: String?) async {
+        errorMessage = nil
+        didSave = false
+        do {
+            let updated = try await profileService.setFirstName(name)
+            profile = updated
+            firstName = updated.firstName
+            didSave = true
+        } catch {
+            handle(error)
+        }
     }
 
     /// Whether the language differs from what the server has.

@@ -60,6 +60,10 @@ public protocol HistoryServicing: Sendable {
 public protocol ProfileServicing: Sendable {
     func me() async throws -> UserProfile
     func update(locale: String?, timezone: String?) async throws -> UserProfile
+    /// Sets the first name to an entry of the server's list, or removes it.
+    func setFirstName(_ name: String?) async throws -> UserProfile
+    /// Names from the server's list that start with `prefix`.
+    func firstNames(matching prefix: String) async throws -> [String]
     /// Deletes the account and all its data on the backend.
     func deleteAccount() async throws
 }
@@ -281,6 +285,17 @@ public struct LiveProfileService: ProfileServicing {
         let body = try BCCoding.encoder.encode(MeUpdateDTO(locale: locale, timezone: timezone))
         let dto = try await client.send(Endpoint(.PATCH, "v1/me", body: body), as: MeResponseDTO.self)
         return UserProfile(dto: dto)
+    }
+
+    public func setFirstName(_ name: String?) async throws -> UserProfile {
+        let body = try BCCoding.encoder.encode(MeUpdateDTO(first_name: name ?? ""))
+        let dto = try await client.send(Endpoint(.PATCH, "v1/me", body: body), as: MeResponseDTO.self)
+        return UserProfile(dto: dto)
+    }
+
+    public func firstNames(matching prefix: String) async throws -> [String] {
+        let endpoint = Endpoint(.GET, "v1/me/first-names", query: [URLQueryItem(name: "q", value: prefix)])
+        return try await client.send(endpoint, as: FirstNamesDTO.self).names
     }
 
     public func deleteAccount() async throws {

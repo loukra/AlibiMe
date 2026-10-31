@@ -28,3 +28,12 @@ in the same change:
   call wording) have a `"de"` table next to `"en"`; `tests/unit/test_german_labels.py`
   fails when a code has no German label.
 - German uses "du", "SMS" for a text message, "Credits", "Alibi".
+
+## Nothing a user types reaches the model
+
+No free text ever goes into a call prompt, a call variable or anything else the
+model sees, since it would open the door to prompt injection. Everything comes
+from fixed lists: alibi options from the catalogs, Profile answers from codes,
+the first name from `backend/app/domain/users/first_names.txt` (the server
+refuses anything else and checks it again before each call). A new input that
+should reach a call is a pick from a list, never a text field.

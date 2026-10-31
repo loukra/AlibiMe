@@ -17,6 +17,8 @@ class User(Base, TimestampMixin):
     id: Mapped[uuid.UUID] = uuid_pk()
     status: Mapped[str] = mapped_column(String(16), default=UserStatus.active.value, nullable=False)
     locale: Mapped[str] = mapped_column(String(8), default="en", nullable=False)
+    # Only ever an entry of app/domain/users/first_names.txt, never typed text.
+    first_name: Mapped[str | None] = mapped_column(String(40), nullable=True)
     timezone: Mapped[str] = mapped_column(String(64), default="UTC", nullable=False)
     last_login_at: Mapped[datetime | None] = mapped_column(nullable=True)
 

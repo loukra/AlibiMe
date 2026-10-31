@@ -7,6 +7,8 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
     public let id: String
     public var locale: String
     public var timezone: String
+    /// Always an entry of the server's first-name list, never typed text.
+    public var firstName: String?
     public var phone: VerifiedPhoneSummary
     public var entitlements: EntitlementSummary
     public var activeRequest: RequestSummary?
@@ -16,6 +18,7 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
     public init(id: String,
                 locale: String,
                 timezone: String,
+                firstName: String? = nil,
                 phone: VerifiedPhoneSummary,
                 entitlements: EntitlementSummary,
                 activeRequest: RequestSummary?,
@@ -23,6 +26,7 @@ public struct UserProfile: Equatable, Identifiable, Sendable {
         self.id = id
         self.locale = locale
         self.timezone = timezone
+        self.firstName = firstName
         self.phone = phone
         self.entitlements = entitlements
         self.activeRequest = activeRequest

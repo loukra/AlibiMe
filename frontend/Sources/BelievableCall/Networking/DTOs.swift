@@ -59,6 +59,7 @@ struct MeResponseDTO: Decodable {
     let id: String
     let locale: String
     let timezone: String
+    var first_name: String? = nil
     let phone_number_masked: String?
     let credits_available: Int
     let active_entitlements: [EntitlementSummaryItemDTO]
@@ -69,6 +70,12 @@ struct MeResponseDTO: Decodable {
 struct MeUpdateDTO: Encodable {
     var locale: String?
     var timezone: String?
+    /// A name from the list, or "" to remove it; nil leaves it as it is.
+    var first_name: String?
+}
+
+struct FirstNamesDTO: Decodable {
+    let names: [String]
 }
 
 // MARK: Devices

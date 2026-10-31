@@ -14,6 +14,16 @@ extension View {
         #endif
     }
 
+    /// A search field that stays under the title. iOS 26 otherwise puts it at
+    /// the bottom, where the floating tab bar covers it.
+    @ViewBuilder func bcSearchable(text: Binding<String>, prompt: Text) -> some View {
+        #if os(iOS)
+        self.searchable(text: text, placement: .navigationBarDrawer(displayMode: .always), prompt: prompt)
+        #else
+        self.searchable(text: text, prompt: prompt)
+        #endif
+    }
+
     /// Phone-pad keyboard for number entry on iOS.
     @ViewBuilder func bcPhoneKeyboard() -> some View {
         #if os(iOS)
