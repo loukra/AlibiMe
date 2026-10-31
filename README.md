@@ -6,10 +6,13 @@ or your roommate, and why they are calling, and the agent phones you and plays
 the part in a short, natural conversation. Texts work too and always come from
 the same number, so you can save it as "Mom" and the next one looks real.
 
+You pick an alibi on Home, choose call or text and when, and slide to send.
+The app, the calls and the texts come in English and German.
+
 <p align="center">
   <img src="docs/screenshots/home.png" width="230" alt="Home screen">
   &nbsp;
-  <img src="docs/screenshots/save-prompt.png" width="230" alt="Prompt to save the sender as a contact">
+  <img src="docs/screenshots/save-prompt.png" width="230" alt="Prompt to save the caller as a contact">
   &nbsp;
   <img src="docs/screenshots/contact.png" width="230" alt="Prefilled contact">
 </p>
@@ -29,7 +32,9 @@ service, gets their ask across and hangs up. Background noise is off, so it
 doesn't sound like an office. For every call the backend fills in who is
 calling and why, how urgent it is, the tone, the user's local time, which facts
 the caller may mention and which it must not, and roughly how many turns to
-take.
+take. The facts come from the optional Profile (work, home, family and so
+on, each picked from a list), and the user decides how much of it a caller may
+use.
 
 `backend/evals` tests the agent. It talks to the same prompt the real calls
 use, with a scripted person on the other end who asks who's calling, whether
@@ -39,39 +44,43 @@ and turns that run too long, and an optional LLM judge scores how natural the
 call sounds. It runs offline with a mock model in the test suite, or against
 OpenAI or Anthropic with a key.
 
-Nothing a user types ever reaches the model. Even custom templates are put
-together from fixed options, and the backend composes the wording from approved
-building blocks. That rules out prompt injection and means the agent can't be
-turned into a tool for calling or misleading someone else. It can only ever
-call the number the user verified at sign-up.
+Apart from an optional first name, nothing a user types reaches the model.
+Even their own alibis are put together from fixed options, and the backend
+composes the wording from approved building blocks. The agent can only ever
+call the number the user verified at sign-up, so it can't be turned into a
+tool for calling or misleading someone else. Calls are not recorded, and
+neither the backend nor Vapi keeps a transcript.
 
 <p align="center">
-  <img src="docs/screenshots/templates.png" width="230" alt="Template library">
+  <img src="docs/screenshots/alibis.png" width="230" alt="Alibi library">
   &nbsp;
-  <img src="docs/screenshots/builder.png" width="230" alt="Template builder with fixed options">
+  <img src="docs/screenshots/editor.png" width="230" alt="Alibi editor with fixed options">
 </p>
 
 ## How it's built
 
 The backend is Python with FastAPI, SQLAlchemy and Alembic, the app is SwiftUI.
 Texts and sign-in codes go through Twilio. A worker sends requests when they
-are due, and phone numbers are stored encrypted and never logged.
+are due and drops any that are more than ten minutes late, without charging,
+since a call that late no longer helps. Phone numbers are stored encrypted and
+never logged.
 
 Each persona calls and texts from the same number, so once the user saves it as
-a contact, both show up under that name. The Action Button (or Siri, or a
-Shortcut) can send a preset alibi without opening the app. Credits are bought
-as App Store in-app purchases, and the backend checks Apple's signed
-transaction before granting them. New numbers get free credits for one text and
-one call, the first purchase comes with a bonus, and accounts can be deleted
-from Settings. How the prices were worked out
-is in [`docs/pricing.md`](docs/pricing.md). Free credits go once per phone
-number and once per iPhone (Apple's DeviceCheck), not to virtual numbers, and
-the server refuses to start while any provider is still a mock. Running it on a
-server, and everything still open before launch, is in [`deploy/`](deploy/).
+a contact, both show up under that name. The Action Button (or Siri with "Get
+me out with AlibiMe", or a Shortcut) can send a preset alibi without opening
+the app. Credits are bought as App Store in-app purchases, and the backend
+checks Apple's signed transaction before granting them. New numbers get free
+credits for one text and one call, the first purchase comes with a bonus, and
+accounts can be deleted from Settings, which also links the help and privacy
+pages the API serves in both languages. How the prices were worked out is in
+[`docs/pricing.md`](docs/pricing.md). Free credits go once per phone number and
+once per iPhone (Apple's DeviceCheck), not to virtual numbers, and the server
+refuses to start while any provider is still a mock. Running it on a server,
+and everything still open before launch, is in [`deploy/`](deploy/).
 
 ```mermaid
 flowchart LR
-    App[iOS app] -->|template, channel, time| API[FastAPI]
+    App[iOS app] -->|alibi, channel, time| API[FastAPI]
     API --> DB[(Database)]
     Worker --> DB
     Worker -->|agent from app/agent| Vapi[Vapi voice agent]
@@ -81,7 +90,7 @@ flowchart LR
     App -->|signed purchase| API
 ```
 
-There are 185 backend tests, including the evals, and 120 iOS unit tests.
+There are 244 backend tests, including the evals, and 167 iOS unit tests.
 
 ## Running it locally
 
@@ -96,7 +105,9 @@ make eval        # agent evals, offline
 Then open `frontend/App/BelievableCall.xcodeproj` in Xcode and run it on a
 simulator. With the mock providers the sign-in code is always `123456`, and
 purchases go through a mock store so nothing is charged.
-BelievableCall was the working title and is still the name of the Xcode
+Every text a user sees needs its German translation in the same change;
+[`CLAUDE.md`](CLAUDE.md) explains how, and `frontend/scripts/strings.sh --check`
+checks it. BelievableCall was the working title and is still the name of the Xcode
 project.
 
 More detail is in [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) and the
