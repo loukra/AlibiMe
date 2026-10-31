@@ -134,7 +134,7 @@ struct ChannelGlyphs: View {
         .font(.caption)
         .foregroundStyle(.secondary)
         .accessibilityElement()
-        .accessibilityLabel(Channel.allCases.filter(channels.contains).map(\.title).joined(separator: " and "))
+        .accessibilityLabel(Channel.allCases.filter(channels.contains).map(\.title).formatted(.list(type: .and)))
     }
 }
 

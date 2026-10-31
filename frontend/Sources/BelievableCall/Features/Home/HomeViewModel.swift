@@ -77,20 +77,26 @@ public final class HomeViewModel {
     /// CTA copy that adapts to channel + timing, e.g. "Call me now",
     /// "Text me in 30 seconds", "Schedule call".
     public var primaryCTATitle: String {
-        let verb = channel == .call ? "Call" : "Text"
-        switch timing {
-        case .now: return "\(verb) me now"
-        case .in30Seconds: return "\(verb) me in 30 seconds"
-        case .in5Minutes: return "\(verb) me in 5 minutes"
-        case .schedule: return "Schedule \(channel == .call ? "call" : "text")"
+        // Whole sentences per channel: other languages don't build them
+        // from one verb.
+        switch (channel, timing) {
+        case (.call, .now): return String(localized: "Call me now")
+        case (.call, .in30Seconds): return String(localized: "Call me in 30 seconds")
+        case (.call, .in5Minutes): return String(localized: "Call me in 5 minutes")
+        case (.call, .schedule): return String(localized: "Schedule call")
+        case (.text, .now): return String(localized: "Text me now")
+        case (.text, .in30Seconds): return String(localized: "Text me in 30 seconds")
+        case (.text, .in5Minutes): return String(localized: "Text me in 5 minutes")
+        case (.text, .schedule): return String(localized: "Schedule text")
         }
     }
 
     /// What sending costs, under the send slider: "Slide to send · 2 credits".
     public var sendCostNote: String {
-        guard let costs = profile?.creditCosts else { return "Slide to send" }
+        guard let costs = profile?.creditCosts else { return String(localized: "Slide to send") }
         let cost = channel == .call ? costs.call : costs.text
-        return cost == 1 ? "Slide to send · 1 credit" : "Slide to send · \(cost) credits"
+        return cost == 1 ? String(localized: "Slide to send · 1 credit")
+            : String(localized: "Slide to send · \(cost) credits")
     }
 
     public var canSend: Bool {

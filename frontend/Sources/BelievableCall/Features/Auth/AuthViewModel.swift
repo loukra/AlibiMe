@@ -20,7 +20,9 @@ public final class AuthViewModel {
     /// What the user typed: the national number, or a full one starting with +.
     public var phoneNumber: String = ""
     public var code: String = ""
-    public var locale: String = "en"
+    /// The account language (calls, texts, alibi wording); a new account
+    /// starts in the language the app is shown in.
+    public var locale: String = AppLanguage.current
     public private(set) var isLoading = false
     public private(set) var errorMessage: String?
     public private(set) var verificationID: String?
@@ -100,7 +102,7 @@ public final class AuthViewModel {
 
     public func requestCode() async {
         guard let normalized = fullNumber else {
-            errorMessage = "Enter your phone number."
+            errorMessage = String(localized: "Enter your phone number.")
             return
         }
         isLoading = true
@@ -119,7 +121,7 @@ public final class AuthViewModel {
 
     public func confirmCode() async {
         guard let verificationID else {
-            errorMessage = "Request a code first."
+            errorMessage = String(localized: "Request a code first.")
             return
         }
         isLoading = true
@@ -162,8 +164,9 @@ public final class AuthViewModel {
 /// default; a number typed with + overrides the menu.
 public struct PhoneCountry: Identifiable, Hashable, Sendable {
     public let regionCode: String
-    public let name: String
     public let dialCode: String
+    /// The country's name in the language iOS shows the app in.
+    public var name: String { Locale.current.localizedString(forRegionCode: regionCode) ?? regionCode }
     public var id: String { regionCode }
 
     /// The region's flag, built from its two letters.
@@ -174,26 +177,26 @@ public struct PhoneCountry: Identifiable, Hashable, Sendable {
             .joined()
     }
 
-    public static let `default` = PhoneCountry(regionCode: "DE", name: "Germany", dialCode: "49")
+    public static let `default` = PhoneCountry(regionCode: "DE", dialCode: "49")
 
     public static let all: [PhoneCountry] = [
         .default,
-        PhoneCountry(regionCode: "AT", name: "Austria", dialCode: "43"),
-        PhoneCountry(regionCode: "CH", name: "Switzerland", dialCode: "41"),
-        PhoneCountry(regionCode: "NL", name: "Netherlands", dialCode: "31"),
-        PhoneCountry(regionCode: "BE", name: "Belgium", dialCode: "32"),
-        PhoneCountry(regionCode: "LU", name: "Luxembourg", dialCode: "352"),
-        PhoneCountry(regionCode: "FR", name: "France", dialCode: "33"),
-        PhoneCountry(regionCode: "DK", name: "Denmark", dialCode: "45"),
-        PhoneCountry(regionCode: "PL", name: "Poland", dialCode: "48"),
-        PhoneCountry(regionCode: "CZ", name: "Czechia", dialCode: "420"),
-        PhoneCountry(regionCode: "IT", name: "Italy", dialCode: "39"),
-        PhoneCountry(regionCode: "ES", name: "Spain", dialCode: "34"),
-        PhoneCountry(regionCode: "GB", name: "United Kingdom", dialCode: "44"),
-        PhoneCountry(regionCode: "IE", name: "Ireland", dialCode: "353"),
-        PhoneCountry(regionCode: "SE", name: "Sweden", dialCode: "46"),
-        PhoneCountry(regionCode: "NO", name: "Norway", dialCode: "47"),
-        PhoneCountry(regionCode: "US", name: "United States", dialCode: "1"),
-        PhoneCountry(regionCode: "CA", name: "Canada", dialCode: "1"),
+        PhoneCountry(regionCode: "AT", dialCode: "43"),
+        PhoneCountry(regionCode: "CH", dialCode: "41"),
+        PhoneCountry(regionCode: "NL", dialCode: "31"),
+        PhoneCountry(regionCode: "BE", dialCode: "32"),
+        PhoneCountry(regionCode: "LU", dialCode: "352"),
+        PhoneCountry(regionCode: "FR", dialCode: "33"),
+        PhoneCountry(regionCode: "DK", dialCode: "45"),
+        PhoneCountry(regionCode: "PL", dialCode: "48"),
+        PhoneCountry(regionCode: "CZ", dialCode: "420"),
+        PhoneCountry(regionCode: "IT", dialCode: "39"),
+        PhoneCountry(regionCode: "ES", dialCode: "34"),
+        PhoneCountry(regionCode: "GB", dialCode: "44"),
+        PhoneCountry(regionCode: "IE", dialCode: "353"),
+        PhoneCountry(regionCode: "SE", dialCode: "46"),
+        PhoneCountry(regionCode: "NO", dialCode: "47"),
+        PhoneCountry(regionCode: "US", dialCode: "1"),
+        PhoneCountry(regionCode: "CA", dialCode: "1"),
     ]
 }

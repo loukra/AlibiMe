@@ -130,8 +130,10 @@ def _upsert_template(db: Session, data: dict) -> Template:
     tmpl.category = data["category"]
     tmpl.caller_persona = data["caller_persona"]
     tmpl.reason_code = data["reason_code"]
-    tmpl.display_name = data["display_name"]
-    tmpl.description = data.get("description")
+    # The template keeps the English name; each locale's version has its own.
+    if data["locale"] == "en" or tmpl.display_name is None:
+        tmpl.display_name = data["display_name"]
+        tmpl.description = data.get("description")
     # Sender persona drives stable sender bindings. Default from caller_persona
     # (and a humanized label) so existing templates work without YAML edits.
     tmpl.sender_persona_key = data.get("sender_persona_key", data["caller_persona"])
@@ -159,6 +161,8 @@ def _upsert_version(db: Session, tmpl: Template, data: dict) -> None:
         db.add(version)
     version.supports_call = data.get("supports_call", False)
     version.supports_sms = data.get("supports_sms", False)
+    version.display_name = data.get("display_name")
+    version.description = data.get("description")
     version.call_system_prompt_template = data.get("call_system_prompt_template")
     version.call_opening_line_template = data.get("call_opening_line_template")
     version.call_followup_facts_json = data.get("call_followup_facts")

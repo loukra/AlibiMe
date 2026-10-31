@@ -184,7 +184,7 @@ struct ProfileChoiceView: View {
                     .buttonStyle(.plain)
                 }
             } footer: {
-                Text(question.isMultiple ? "Pick all that apply." : question.topic.footer)
+                Text(question.isMultiple ? String(localized: "Pick all that apply.") : question.topic.footer)
             }
         }
         .bcClearScrollBackground()
@@ -212,24 +212,24 @@ enum ProfileTopic: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .work: return "Work"
-        case .home: return "Home"
-        case .family: return "Family"
-        case .partner: return "Partner"
-        case .changes: return "Recent changes"
-        case .details: return "On the call"
+        case .work: return String(localized: "Work")
+        case .home: return String(localized: "Home")
+        case .family: return String(localized: "Family")
+        case .partner: return String(localized: "Partner")
+        case .changes: return String(localized: "Recent changes")
+        case .details: return String(localized: "On the call")
         }
     }
 
     /// What the caller does with the answers.
     var footer: String {
         switch self {
-        case .work: return "So a caller can say your shift moved or a client needs you."
-        case .home: return "For reasons like the landlord coming by or the dog sitter canceling."
-        case .family: return "For a relative who suddenly needs you."
-        case .partner: return "Tells the caller whether mentioning your partner is fine."
-        case .changes: return "Something new, like a job or a move, makes a sudden call easy to believe."
-        case .details: return "How much the caller may say about your life, in case others hear the call. \"Keep it vague\" leaves out everything else in your profile."
+        case .work: return String(localized: "So a caller can say your shift moved or a client needs you.")
+        case .home: return String(localized: "For reasons like the landlord coming by or the dog sitter canceling.")
+        case .family: return String(localized: "For a relative who suddenly needs you.")
+        case .partner: return String(localized: "Tells the caller whether mentioning your partner is fine.")
+        case .changes: return String(localized: "Something new, like a job or a move, makes a sudden call easy to believe.")
+        case .details: return String(localized: "How much the caller may say about your life, in case others hear the call. \"Keep it vague\" leaves out everything else in your profile.")
         }
     }
 }
@@ -295,35 +295,35 @@ struct ProfileQuestion: Identifiable {
 
     static func all(_ o: ProfileOptions) -> [ProfileQuestion] {
         [
-            .init(id: "industry", topic: .work, title: "What field do you work in?",
+            .init(id: "industry", topic: .work, title: String(localized: "What field do you work in?"),
                   answer: .single(\.workIndustry), options: o.workIndustries),
-            .init(id: "role", topic: .work, title: "What's your position?",
+            .init(id: "role", topic: .work, title: String(localized: "What's your position?"),
                   answer: .single(\.workRoleLevel), options: o.workRoleLevels),
-            .init(id: "setting", topic: .work, title: "Where do you work?",
+            .init(id: "setting", topic: .work, title: String(localized: "Where do you work?"),
                   answer: .single(\.workSetting), options: o.workSettings),
-            .init(id: "schedule", topic: .work, title: "When do you work?",
+            .init(id: "schedule", topic: .work, title: String(localized: "When do you work?"),
                   answer: .single(\.workSchedule), options: o.workSchedules),
-            .init(id: "travel", topic: .work, title: "Do you travel for work?",
+            .init(id: "travel", topic: .work, title: String(localized: "Do you travel for work?"),
                   answer: .single(\.workTravelScope), options: o.workTravelScopes),
-            .init(id: "living", topic: .home, title: "Who do you live with?",
+            .init(id: "living", topic: .home, title: String(localized: "Who do you live with?"),
                   answer: .single(\.livingSetup), options: o.livingSetups),
-            .init(id: "responsibilities", topic: .home, title: "What do you look after?",
+            .init(id: "responsibilities", topic: .home, title: String(localized: "What do you look after?"),
                   answer: .multiple(\.homeResponsibilities), options: o.homeResponsibilities),
-            .init(id: "dependents", topic: .home, title: "Who depends on you?",
+            .init(id: "dependents", topic: .home, title: String(localized: "Who depends on you?"),
                   answer: .multiple(\.dependentContexts), options: o.dependentContexts),
-            .init(id: "familySupport", topic: .family, title: "Do you help your family?",
+            .init(id: "familySupport", topic: .family, title: String(localized: "Do you help your family?"),
                   answer: .single(\.familySupportLevel), options: o.familySupportLevels),
-            .init(id: "familyProximity", topic: .family, title: "Where does your family live?",
+            .init(id: "familyProximity", topic: .family, title: String(localized: "Where does your family live?"),
                   answer: .single(\.familyProximity), options: o.familyProximities),
-            .init(id: "relationshipVisibility", topic: .partner, title: "Who knows you're together?",
+            .init(id: "relationshipVisibility", topic: .partner, title: String(localized: "Who knows you're together?"),
                   answer: .single(\.relationshipVisibility), options: o.relationshipVisibilities),
-            .init(id: "relationshipStage", topic: .partner, title: "How long have you been together?",
+            .init(id: "relationshipStage", topic: .partner, title: String(localized: "How long have you been together?"),
                   answer: .single(\.relationshipStage), options: o.relationshipStages),
-            .init(id: "transition", topic: .changes, title: "Anything new in your life?",
+            .init(id: "transition", topic: .changes, title: String(localized: "Anything new in your life?"),
                   answer: .single(\.transitionState), options: o.transitionStates),
-            .init(id: "transitionHorizon", topic: .changes, title: "For how long?",
+            .init(id: "transitionHorizon", topic: .changes, title: String(localized: "For how long?"),
                   answer: .single(\.transitionHorizon), options: o.transitionHorizons),
-            .init(id: "privacy", topic: .details, title: "How much about you?",
+            .init(id: "privacy", topic: .details, title: String(localized: "How much about you?"),
                   answer: .single(\.privacyPreference), options: o.privacyPreferences),
         ]
         .filter { !$0.options.isEmpty }

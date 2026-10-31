@@ -137,10 +137,10 @@ extension HistoryEntry {
     func fallbackDetail(upcoming: Bool) -> String {
         let time = (upcoming ? executeAt : requestedAt).formatted(date: .omitted, time: .shortened)
         switch (channel, upcoming) {
-        case (.call, true): return "Your phone rings at \(time)."
-        case (.text, true): return "The text arrives at \(time)."
-        case (.call, false): return "Call at \(time)."
-        case (.text, false): return "Text at \(time)."
+        case (.call, true): return String(localized: "Your phone rings at \(time).")
+        case (.text, true): return String(localized: "The text arrives at \(time).")
+        case (.call, false): return String(localized: "Call at \(time).")
+        case (.text, false): return String(localized: "Text at \(time).")
         }
     }
 }

@@ -51,7 +51,7 @@ struct WelcomeView: View {
             }
             .frame(maxWidth: .infinity)
             if sessionExpiredNotice {
-                ErrorBanner("Your session expired. Please sign in again.")
+                ErrorBanner(String(localized: "Your session expired. Please sign in again."))
             }
             Spacer()
             VStack(spacing: Spacing.s) {

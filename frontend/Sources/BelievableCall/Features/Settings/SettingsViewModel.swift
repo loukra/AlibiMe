@@ -66,7 +66,7 @@ public final class SettingsViewModel {
     /// Called after the sheet grants credits: refresh the authoritative balance
     /// from the backend and surface a brief success note.
     public func didAcquireCredits(_ result: CreditAcquisition) async {
-        creditSuccessMessage = "\(result.grantedCredits) credits added"
+        creditSuccessMessage = String(localized: "\(result.grantedCredits) credits added")
         await load()
     }
 

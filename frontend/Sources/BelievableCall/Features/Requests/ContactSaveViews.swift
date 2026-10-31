@@ -76,7 +76,11 @@ private struct SaveContactFlowModifier: ViewModifier {
                 Button("Save Contact") { Task { await vm.beginSaveContact(for: sender) } }
                 Button("Not now", role: .cancel) { vm.markPromptSkipped(for: sender) }
             } message: { sender in
-                Text("Calls and texts from \(sender.displayName ?? "this sender") always come from this number. Save it and your phone shows the name instead.")
+                if let name = sender.displayName {
+                    Text("Calls and texts from \(name) always come from this number. Save it and your phone shows the name instead.")
+                } else {
+                    Text("Calls and texts from this sender always come from this number. Save it and your phone shows the name instead.")
+                }
             }
             // 2. Prefilled contact sheet (presented only after permission).
             .sheet(item: $vm.contactSheetSender) { sender in
@@ -106,7 +110,7 @@ private struct SaveContactFlowModifier: ViewModifier {
     private func contactSheet(for sender: SenderIdentity) -> some View {
         #if canImport(ContactsUI) && canImport(UIKit)
         NewContactSheet(
-            displayName: sender.displayName ?? "Contact",
+            displayName: sender.displayName ?? String(localized: "Contact"),
             phoneE164: sender.phoneE164 ?? ""
         ) { identifier in
             vm.contactSheetFinished(savedIdentifier: identifier)

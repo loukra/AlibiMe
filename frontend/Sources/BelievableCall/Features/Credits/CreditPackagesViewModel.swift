@@ -55,13 +55,13 @@ public final class CreditPackagesViewModel: Identifiable {
     /// "A call uses 2 credits, a text 1."
     public var costsNote: String? {
         guard let costs else { return nil }
-        return "A call uses \(costs.call) credits, a text \(costs.text)."
+        return String(localized: "A call uses \(costs.call) credits, a text \(costs.text).")
     }
 
     /// "+3 bonus credits on your first purchase", while it still applies.
     public var bonusNote: String? {
         guard firstPurchaseBonus > 0, packages.contains(where: \.isStorePurchase) else { return nil }
-        return "+\(firstPurchaseBonus) bonus credits on your first purchase"
+        return String(localized: "+\(firstPurchaseBonus) bonus credits on your first purchase")
     }
 
     public var selectedPackage: CreditPackage? {
@@ -81,15 +81,17 @@ public final class CreditPackagesViewModel: Identifiable {
     public var isEmptyCatalog: Bool { phase == .ready && packages.isEmpty }
 
     public var unredeemedNotice: String? {
-        unredeemed == nil ? nil : "Your payment went through. Your credits weren't added yet."
+        unredeemed == nil ? nil : String(localized: "Your payment went through. Your credits weren't added yet.")
     }
 
     public var primaryButtonTitle: String {
-        if unredeemed != nil { return "Add my credits" }
+        if unredeemed != nil { return String(localized: "Add my credits") }
         if let pkg = selectedPackage {
-            return pkg.isStorePurchase ? "Buy \(pkg.credits) Credits for \(price(for: pkg))" : "Add \(pkg.credits) Credits"
+            return pkg.isStorePurchase
+                ? String(localized: "Buy \(pkg.credits) Credits for \(price(for: pkg))")
+                : String(localized: "Add \(pkg.credits) Credits")
         }
-        return "Add Credits"
+        return String(localized: "Add Credits")
     }
 
     public func load() async {
@@ -144,7 +146,7 @@ public final class CreditPackagesViewModel: Identifiable {
                     phase = .ready
                     return false
                 case .pending:
-                    pendingNotice = "Waiting for approval. The credits arrive once it's approved."
+                    pendingNotice = String(localized: "Waiting for approval. The credits arrive once it's approved.")
                     phase = .ready
                     return false
                 }
@@ -155,11 +157,11 @@ public final class CreditPackagesViewModel: Identifiable {
             phase = .success
             return true
         } catch PurchaseError.productUnavailable {
-            errorMessage = "This pack isn't available in the App Store right now."
+            errorMessage = String(localized: "This pack isn't available in the App Store right now.")
             phase = .failure
             return false
         } catch PurchaseError.storeFailed, PurchaseError.unverified {
-            errorMessage = "The App Store couldn't complete the purchase. Check your connection and try again."
+            errorMessage = String(localized: "The App Store couldn't complete the purchase. Check your connection and try again.")
             phase = .failure
             return false
         } catch {

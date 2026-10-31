@@ -17,7 +17,7 @@ public struct TemplatePickerView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.l) {
                     if !vm.customTemplates.isEmpty {
-                        group("Your alibis", vm.customTemplates)
+                        group(String(localized: "Your alibis"), vm.customTemplates)
                     }
                     ForEach(vm.templatesByCategory, id: \.category) { group in
                         self.group(group.category.title, group.templates)

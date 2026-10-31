@@ -119,7 +119,7 @@ public struct ScheduleSheet: View {
 
 extension ScheduleSheet {
     static func title(_ minutes: Int) -> String {
-        minutes < 60 ? "In \(minutes) min" : "In \(minutes / 60) h"
+        minutes < 60 ? String(localized: "In \(minutes) min") : String(localized: "In \(minutes / 60) h")
     }
 
     /// The wheel's hour and minute, today if still ahead (by more than a
@@ -137,8 +137,9 @@ extension ScheduleSheet {
 
     /// "today at 18:30" or "tomorrow at 07:00".
     static func describe(_ date: Date, now: Date = Date(), calendar: Calendar = .current) -> String {
-        let day = calendar.isDate(date, inSameDayAs: now) ? "today" : "tomorrow"
-        return "\(day) at \(clockTime(date))"
+        let time = clockTime(date)
+        return calendar.isDate(date, inSameDayAs: now)
+            ? String(localized: "today at \(time)") : String(localized: "tomorrow at \(time)")
     }
 
     static func clockTime(_ date: Date) -> String {

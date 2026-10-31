@@ -114,6 +114,7 @@ extension TemplateOptions {
         o.callSecondsMin = dto.call_seconds_min
         o.callSecondsMax = dto.call_seconds_max
         o.callSecondsDefault = dto.call_seconds_default
+        o.labels = dto.labels ?? [:]
         o.profile = ProfileOptions(dto: dto.profile)
         self = o
     }

@@ -283,7 +283,7 @@ struct FloatingTabBar: View {
     }
 
     @ViewBuilder
-    private func sideItem(_ tab: MainTabView.Tab, icon: String, label: String) -> some View {
+    private func sideItem(_ tab: MainTabView.Tab, icon: String, label: LocalizedStringResource) -> some View {
         let isSelected = selection == tab
         Button {
             Haptics.play(.impact)
@@ -291,7 +291,10 @@ struct FloatingTabBar: View {
         } label: {
             VStack(spacing: 2) {
                 Image(systemName: icon).font(.body)
+                // One line: "Einstellungen" shrinks a little instead of wrapping.
                 Text(label).font(.caption2.weight(.medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
             .foregroundStyle(isSelected ? Theme.accent : Color.secondary)
             .frame(maxWidth: .infinity)

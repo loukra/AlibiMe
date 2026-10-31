@@ -78,6 +78,10 @@ class TemplateVersion(Base):
     locale: Mapped[str] = mapped_column(String(8), nullable=False)
     supports_call: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     supports_sms: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # A built-in's name and description in this locale. Empty for own alibis,
+    # which use the template's own (user-given) name.
+    display_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    description: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     # Call content
     call_system_prompt_template: Mapped[str | None] = mapped_column(String(2000), nullable=True)

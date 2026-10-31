@@ -51,7 +51,7 @@ public struct EntitlementSummary: Equatable, Sendable {
     public var hasCredits: Bool { creditsAvailable > 0 }
     /// A friendly plan label, e.g. "Free" or "Credits 5".
     public var planLabel: String {
-        guard let code = planCodes.first else { return "No plan" }
+        guard let code = planCodes.first else { return String(localized: "No plan") }
         return code.replacingOccurrences(of: "_", with: " ").capitalized
     }
 }
@@ -61,11 +61,11 @@ public enum TemplateCategory: String, CaseIterable, Sendable {
 
     public var title: String {
         switch self {
-        case .work: return "Work"
-        case .family: return "Family"
-        case .social: return "Social"
-        case .logistics: return "Logistics"
-        case .safety: return "Safety"
+        case .work: return String(localized: "Work")
+        case .family: return String(localized: "Family")
+        case .social: return String(localized: "Social")
+        case .logistics: return String(localized: "Logistics")
+        case .safety: return String(localized: "Safety")
         }
     }
 
@@ -227,6 +227,8 @@ public struct TemplateOptions: Equatable, Sendable {
     public var callSecondsMin: Int = 30
     public var callSecondsMax: Int = 120
     public var callSecondsDefault: Int = 60
+    /// Labels, in the account language, for the options sent as bare codes.
+    public var labels: [String: String] = [:]
     public var profile = ProfileOptions()
     public init() {}
 }
@@ -333,8 +335,8 @@ public enum Channel: String, CaseIterable, Identifiable, Sendable {
 
     public var title: String {
         switch self {
-        case .call: return "Call"
-        case .text: return "Text"
+        case .call: return String(localized: "Call")
+        case .text: return String(localized: "Text")
         }
     }
 
@@ -368,10 +370,10 @@ public enum TimingOption: Equatable, Identifiable, Sendable {
 
     public var shortTitle: String {
         switch self {
-        case .now: return "Now"
-        case .in30Seconds: return "30 sec"
-        case .in5Minutes: return "5 min"
-        case .schedule: return "Schedule"
+        case .now: return String(localized: "Now")
+        case .in30Seconds: return String(localized: "30 sec")
+        case .in5Minutes: return String(localized: "5 min")
+        case .schedule: return String(localized: "Schedule")
         }
     }
 
@@ -436,16 +438,16 @@ public enum RequestStatus: String, Sendable {
     /// a one-line badge; the channel icon next to it says call or text.
     public func displayText(for channel: Channel) -> String {
         switch self {
-        case .scheduled: return "Scheduled"
-        case .dispatching: return "Starting"
-        case .providerAccepted: return channel == .call ? "Calling" : "Sending"
-        case .active: return "On the call"
-        case .completed: return "Completed"
-        case .noAnswer: return "No answer"
-        case .canceled: return "Canceled"
-        case .failed: return "Failed"
-        case .expired: return "Expired"
-        case .unknown: return "Updating"
+        case .scheduled: return String(localized: "Scheduled")
+        case .dispatching: return String(localized: "Starting")
+        case .providerAccepted: return channel == .call ? String(localized: "Calling") : String(localized: "Sending")
+        case .active: return String(localized: "On the call")
+        case .completed: return String(localized: "Completed")
+        case .noAnswer: return String(localized: "No answer")
+        case .canceled: return String(localized: "Canceled")
+        case .failed: return String(localized: "Failed")
+        case .expired: return String(localized: "Expired")
+        case .unknown: return String(localized: "Updating")
         }
     }
 }

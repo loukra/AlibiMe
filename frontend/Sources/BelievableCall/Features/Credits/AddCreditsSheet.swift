@@ -127,7 +127,7 @@ public struct AddCreditsSheet: View {
         VStack(spacing: Spacing.m) {
             Spacer()
             if let error = vm.errorMessage { ErrorBanner(error) }
-            PrimaryButton("Try again") { Task { await vm.load() } }
+            PrimaryButton(String(localized: "Try again")) { Task { await vm.load() } }
             Spacer()
         }
         .padding(Spacing.l)

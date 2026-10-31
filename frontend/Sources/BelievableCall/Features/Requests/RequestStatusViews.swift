@@ -50,7 +50,7 @@ public struct ActiveRequestCard: View {
         let minutes = remaining / 60
         let seconds = remaining % 60
         return VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text("\(request.channel == .call ? "Call" : "Text") scheduled in")
+            Text(request.channel == .call ? "Call scheduled in" : "Text scheduled in")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Text(String(format: "%02d:%02d", minutes, seconds))
@@ -62,8 +62,8 @@ public struct ActiveRequestCard: View {
 
     private var summaryLine: String {
         switch request.channel {
-        case .call: return "We’ll call your verified number when the timer ends."
-        case .text: return "We’ll text your verified number when the timer ends."
+        case .call: return String(localized: "We’ll call your verified number when the timer ends.")
+        case .text: return String(localized: "We’ll text your verified number when the timer ends.")
         }
     }
 }
@@ -170,16 +170,16 @@ public struct NextJobChip: View {
         return request.channel.outlineSymbol
     }
     private var captionText: String {
-        guard let request else { return "Upcoming" }
-        return "Next \(request.channel == .call ? "call" : "text")"
+        guard let request else { return String(localized: "Upcoming") }
+        return request.channel == .call ? String(localized: "Next call") : String(localized: "Next text")
     }
     private var mainText: String {
-        guard let request else { return "Nothing scheduled" }
+        guard let request else { return String(localized: "Nothing scheduled") }
         let remaining = request.secondsRemaining(now: now)
         // Due or already handed to the provider: say what's happening instead
         // of a countdown frozen at 00:00.
         if remaining == 0 || request.status != .scheduled {
-            return request.channel == .call ? "Calling you…" : "Texting you…"
+            return request.channel == .call ? String(localized: "Calling you…") : String(localized: "Texting you…")
         }
         return Self.countdown(remaining)
     }

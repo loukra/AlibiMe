@@ -1,0 +1,2876 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "%@ %@ +%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ +%3$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ %@ +%@"
+          }
+        }
+      }
+    },
+    "%@ +%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ +%2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ +%@"
+          }
+        }
+      }
+    },
+    "%@ calls about %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ calls about %2$@."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ruft an: %@."
+          }
+        }
+      }
+    },
+    "%@ texts about %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ texts about %2$@."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ schreibt: %@."
+          }
+        }
+      }
+    },
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, %@"
+          }
+        }
+      }
+    },
+    "%lld credits" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Credits"
+          }
+        }
+      }
+    },
+    "%lld credits added" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Credits hinzugefügt"
+          }
+        }
+      }
+    },
+    "%lld credits available" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Credits verfügbar"
+          }
+        }
+      }
+    },
+    "%lld minutes %lld seconds remaining" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld minutes %2$lld seconds remaining"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch %lld Minuten %lld Sekunden"
+          }
+        }
+      }
+    },
+    "+%lld bonus credits on your first purchase" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%lld Bonus-Credits beim ersten Kauf"
+          }
+        }
+      }
+    },
+    "1 credit" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Credit"
+          }
+        }
+      }
+    },
+    "123456" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "123456"
+          }
+        }
+      }
+    },
+    "151 23456789" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "151 23456789"
+          }
+        }
+      }
+    },
+    "30 sec" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 Sek."
+          }
+        }
+      }
+    },
+    "5 min" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 Min."
+          }
+        }
+      }
+    },
+    "A call uses %lld credits, a text %lld." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A call uses %1$lld credits, a text %2$lld."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Anruf kostet %lld Credits, eine SMS %lld."
+          }
+        }
+      }
+    },
+    "A call uses more credits than a text. Add Credits shows how many." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Anruf kostet mehr Credits als eine SMS. Unter „Credits hinzufügen“ siehst du, wie viele."
+          }
+        }
+      }
+    },
+    "A message arrives" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine SMS kommt an"
+          }
+        }
+      }
+    },
+    "About" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        }
+      }
+    },
+    "Account" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto"
+          }
+        }
+      }
+    },
+    "Action Button" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktionstaste"
+          }
+        }
+      }
+    },
+    "Add %lld Credits" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Credits hinzufügen"
+          }
+        }
+      }
+    },
+    "Add Credits" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Credits hinzufügen"
+          }
+        }
+      }
+    },
+    "Add my credits" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meine Credits hinzufügen"
+          }
+        }
+      }
+    },
+    "Add something about you" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erzähl etwas über dich"
+          }
+        }
+      }
+    },
+    "Add to your profile" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu deinem Profil hinzufügen"
+          }
+        }
+      }
+    },
+    "Alibi" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alibi"
+          }
+        }
+      }
+    },
+    "Alibi name" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name des Alibis"
+          }
+        }
+      }
+    },
+    "AlibiMe" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AlibiMe"
+          }
+        }
+      }
+    },
+    "Alibis" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alibis"
+          }
+        }
+      }
+    },
+    "Anything new in your life?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gibt es etwas Neues in deinem Leben?"
+          }
+        }
+      }
+    },
+    "Back" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück"
+          }
+        }
+      }
+    },
+    "Buy %lld Credits for %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Buy %1$lld Credits for %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Credits für %@ kaufen"
+          }
+        }
+      }
+    },
+    "Call" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anruf"
+          }
+        }
+      }
+    },
+    "Call at %@." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anruf um %@."
+          }
+        }
+      }
+    },
+    "Call language" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprache der Anrufe"
+          }
+        }
+      }
+    },
+    "Call length: %lld s" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anruflänge: %lld s"
+          }
+        }
+      }
+    },
+    "Call me in 30 seconds" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruf mich in 30 Sekunden an"
+          }
+        }
+      }
+    },
+    "Call me in 5 minutes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruf mich in 5 Minuten an"
+          }
+        }
+      }
+    },
+    "Call me now" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruf mich jetzt an"
+          }
+        }
+      }
+    },
+    "Call or text?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anruf oder SMS?"
+          }
+        }
+      }
+    },
+    "Call scheduled in" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anruf geplant in"
+          }
+        }
+      }
+    },
+    "Calling" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruft an"
+          }
+        }
+      }
+    },
+    "Calling you now." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du wirst jetzt angerufen."
+          }
+        }
+      }
+    },
+    "Calling you…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruft dich an…"
+          }
+        }
+      }
+    },
+    "Calls and texts come to this number. They, and your alibis, use the language you pick here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anrufe und SMS kommen an diese Nummer. Sie und deine Alibis sind in der Sprache, die du hier wählst."
+          }
+        }
+      }
+    },
+    "Calls and texts from %@ always come from this number. Save it and your phone shows the name instead." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anrufe und SMS von %@ kommen immer von dieser Nummer. Speicher sie, dann zeigt dein iPhone stattdessen den Namen."
+          }
+        }
+      }
+    },
+    "Calls and texts from this sender always come from this number. Save it and your phone shows the name instead." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anrufe und SMS von diesem Absender kommen immer von dieser Nummer. Speicher sie, dann zeigt dein iPhone stattdessen den Namen."
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        }
+      }
+    },
+    "Cancel next job" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächsten Auftrag abbrechen"
+          }
+        }
+      }
+    },
+    "Cancel request" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        }
+      }
+    },
+    "Canceled" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgebrochen"
+          }
+        }
+      }
+    },
+    "Change" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändern"
+          }
+        }
+      }
+    },
+    "Choose a package" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle ein Paket"
+          }
+        }
+      }
+    },
+    "Choose an alibi" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle ein Alibi"
+          }
+        }
+      }
+    },
+    "Clear" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        }
+      }
+    },
+    "Clear all your answers?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Antworten löschen?"
+          }
+        }
+      }
+    },
+    "Clear my answers" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meine Antworten löschen"
+          }
+        }
+      }
+    },
+    "Close" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        }
+      }
+    },
+    "Completed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erledigt"
+          }
+        }
+      }
+    },
+    "Contact" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakt"
+          }
+        }
+      }
+    },
+    "Contacts access is optional. You can still use this sender without saving a contact." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zugriff auf Kontakte ist freiwillig. Du kannst diesen Absender auch ohne gespeicherten Kontakt nutzen."
+          }
+        }
+      }
+    },
+    "Continuity" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortsetzung"
+          }
+        }
+      }
+    },
+    "Country" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Land"
+          }
+        }
+      }
+    },
+    "Country code +%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Country code +%1$@, %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ländervorwahl +%@, %@"
+          }
+        }
+      }
+    },
+    "Credits" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Credits"
+          }
+        }
+      }
+    },
+    "Credits available" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verfügbare Credits"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        }
+      }
+    },
+    "Delete account" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto löschen"
+          }
+        }
+      }
+    },
+    "Delete alibi" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alibi löschen"
+          }
+        }
+      }
+    },
+    "Delete this alibi?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Alibi löschen?"
+          }
+        }
+      }
+    },
+    "Delete your account?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto löschen?"
+          }
+        }
+      }
+    },
+    "Deleting removes your number, history, own alibis and any credits left." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Löschen werden deine Nummer, dein Verlauf, deine eigenen Alibis und übrige Credits entfernt."
+          }
+        }
+      }
+    },
+    "Detail" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details"
+          }
+        }
+      }
+    },
+    "Deutsch" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deutsch"
+          }
+        }
+      }
+    },
+    "Discretion" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diskretion"
+          }
+        }
+      }
+    },
+    "Do you help your family?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfst du deiner Familie?"
+          }
+        }
+      }
+    },
+    "Do you travel for work?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reist du beruflich?"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        }
+      }
+    },
+    "Drop everything" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles stehen und liegen lassen"
+          }
+        }
+      }
+    },
+    "Edit" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearbeiten"
+          }
+        }
+      }
+    },
+    "Edit alibi" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alibi bearbeiten"
+          }
+        }
+      }
+    },
+    "Edited" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearbeitet"
+          }
+        }
+      }
+    },
+    "English" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
+          }
+        }
+      }
+    },
+    "Enter the code" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code eingeben"
+          }
+        }
+      }
+    },
+    "Enter your phone number." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib deine Handynummer ein."
+          }
+        }
+      }
+    },
+    "Expected reply" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erwartete Antwort"
+          }
+        }
+      }
+    },
+    "Expired" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgelaufen"
+          }
+        }
+      }
+    },
+    "Failed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehlgeschlagen"
+          }
+        }
+      }
+    },
+    "Family" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Familie"
+          }
+        }
+      }
+    },
+    "Fill in your Profile so your alibis fit your life." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füll dein Profil aus, damit deine Alibis zu deinem Leben passen."
+          }
+        }
+      }
+    },
+    "Follow-up" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachfassen"
+          }
+        }
+      }
+    },
+    "For a relative who suddenly needs you." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für Angehörige, die dich plötzlich brauchen."
+          }
+        }
+      }
+    },
+    "For how long?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für wie lange?"
+          }
+        }
+      }
+    },
+    "For reasons like the landlord coming by or the dog sitter canceling." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für Gründe wie den Vermieter, der vorbeikommt, oder die Hundesitterin, die absagt."
+          }
+        }
+      }
+    },
+    "Formality" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Förmlichkeit"
+          }
+        }
+      }
+    },
+    "Friends" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freunde"
+          }
+        }
+      }
+    },
+    "Get Me Out" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hol mich raus"
+          }
+        }
+      }
+    },
+    "Get a call or text when you need a reason to leave." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekomm einen Anruf oder eine SMS, wenn du einen Grund zum Gehen brauchst."
+          }
+        }
+      }
+    },
+    "Get started" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los geht’s"
+          }
+        }
+      }
+    },
+    "Help & support" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfe & Support"
+          }
+        }
+      }
+    },
+    "History" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf"
+          }
+        }
+      }
+    },
+    "Home" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuhause"
+          }
+        }
+      }
+    },
+    "How hard it pulls you out." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie dringend es dich da rausholt."
+          }
+        }
+      }
+    },
+    "How long have you been together?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie lange seid ihr schon zusammen?"
+          }
+        }
+      }
+    },
+    "How much about you?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie viel über dich?"
+          }
+        }
+      }
+    },
+    "How much the caller may say about your life, in case others hear the call. \"Keep it vague\" leaves out everything else in your profile." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie viel der Anrufer über dein Leben sagen darf, falls andere mithören. Bei „Lieber vage“ bleibt alles andere aus deinem Profil weg."
+          }
+        }
+      }
+    },
+    "How urgent?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie dringend?"
+          }
+        }
+      }
+    },
+    "In %lld h" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %lld Std."
+          }
+        }
+      }
+    },
+    "In %lld min" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %lld Min."
+          }
+        }
+      }
+    },
+    "In 30 seconds" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In 30 Sekunden"
+          }
+        }
+      }
+    },
+    "In 5 minutes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In 5 Minuten"
+          }
+        }
+      }
+    },
+    "In the next minutes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den nächsten Minuten"
+          }
+        }
+      }
+    },
+    "Life changes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veränderungen"
+          }
+        }
+      }
+    },
+    "Logistics" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organisatorisches"
+          }
+        }
+      }
+    },
+    "More options" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Optionen"
+          }
+        }
+      }
+    },
+    "Name" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "Needs you soon" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Braucht dich bald"
+          }
+        }
+      }
+    },
+    "New alibi" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Alibi"
+          }
+        }
+      }
+    },
+    "Next call" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächster Anruf"
+          }
+        }
+      }
+    },
+    "Next text" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächste SMS"
+          }
+        }
+      }
+    },
+    "No answer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht angenommen"
+          }
+        }
+      }
+    },
+    "No credit packages are available right now." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerade gibt es keine Credit-Pakete."
+          }
+        }
+      }
+    },
+    "No plan" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Paket"
+          }
+        }
+      }
+    },
+    "No requests yet" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch nichts gesendet"
+          }
+        }
+      }
+    },
+    "No rush" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Eile"
+          }
+        }
+      }
+    },
+    "Not now" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht jetzt"
+          }
+        }
+      }
+    },
+    "Not verified" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht bestätigt"
+          }
+        }
+      }
+    },
+    "Nothing scheduled" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nichts geplant"
+          }
+        }
+      }
+    },
+    "Now" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt"
+          }
+        }
+      }
+    },
+    "Number" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nummer"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "Off" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        }
+      }
+    },
+    "On the call" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Gespräch"
+          }
+        }
+      }
+    },
+    "Open AlibiMe and sign in first." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne zuerst AlibiMe und melde dich an."
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen öffnen"
+          }
+        }
+      }
+    },
+    "Opens History" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet den Verlauf"
+          }
+        }
+      }
+    },
+    "Opens History to see all pending jobs" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet den Verlauf mit allen ausstehenden Aufträgen"
+          }
+        }
+      }
+    },
+    "Opens Settings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet die Einstellungen"
+          }
+        }
+      }
+    },
+    "Or at a time" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oder zu einer Uhrzeit"
+          }
+        }
+      }
+    },
+    "Outcome" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergebnis"
+          }
+        }
+      }
+    },
+    "Overrides the timing from Settings." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersetzt den Zeitpunkt aus den Einstellungen."
+          }
+        }
+      }
+    },
+    "Partner" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partner"
+          }
+        }
+      }
+    },
+    "Pending" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausstehend"
+          }
+        }
+      }
+    },
+    "Pick a time within the next 24 hours." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle eine Zeit innerhalb der nächsten 24 Stunden."
+          }
+        }
+      }
+    },
+    "Pick all that apply." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle alles, was passt."
+          }
+        }
+      }
+    },
+    "Pick your quick alibi in AlibiMe's settings first." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle zuerst dein Schnell-Alibi in den Einstellungen von AlibiMe."
+          }
+        }
+      }
+    },
+    "Please sign in to continue." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte melde dich an, um weiterzumachen."
+          }
+        }
+      }
+    },
+    "Press the Action Button and AlibiMe calls or texts you, without opening the app. Choose what it sends." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drück die Aktionstaste, und AlibiMe ruft dich an oder schreibt dir, ohne dass du die App öffnest. Wähle, was gesendet wird."
+          }
+        }
+      }
+    },
+    "Privacy policy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutzerklärung"
+          }
+        }
+      }
+    },
+    "Profile" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil"
+          }
+        }
+      }
+    },
+    "Quick pick" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schnellauswahl"
+          }
+        }
+      }
+    },
+    "Recent" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt"
+          }
+        }
+      }
+    },
+    "Recent changes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veränderungen"
+          }
+        }
+      }
+    },
+    "Remove" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
+          }
+        }
+      }
+    },
+    "Request a code first." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fordere zuerst einen Code an."
+          }
+        }
+      }
+    },
+    "Resend code" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code erneut senden"
+          }
+        }
+      }
+    },
+    "Resend code in %llds" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code erneut senden in %lld s"
+          }
+        }
+      }
+    },
+    "Reset" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurücksetzen"
+          }
+        }
+      }
+    },
+    "Reset to original" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf Original zurücksetzen"
+          }
+        }
+      }
+    },
+    "Reset to the original?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf das Original zurücksetzen?"
+          }
+        }
+      }
+    },
+    "Right now" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sofort"
+          }
+        }
+      }
+    },
+    "Safety" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicherheit"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichern"
+          }
+        }
+      }
+    },
+    "Save Contact" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakt sichern"
+          }
+        }
+      }
+    },
+    "Save this number as a contact?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Nummer als Kontakt sichern?"
+          }
+        }
+      }
+    },
+    "Saved" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesichert"
+          }
+        }
+      }
+    },
+    "Saving contacts is optional" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakte zu sichern ist freiwillig"
+          }
+        }
+      }
+    },
+    "Scenario" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szenario"
+          }
+        }
+      }
+    },
+    "Schedule" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planen"
+          }
+        }
+      }
+    },
+    "Schedule %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für %@ planen"
+          }
+        }
+      }
+    },
+    "Schedule call" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anruf planen"
+          }
+        }
+      }
+    },
+    "Schedule text" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMS planen"
+          }
+        }
+      }
+    },
+    "Scheduled" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geplant"
+          }
+        }
+      }
+    },
+    "Send as" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senden als"
+          }
+        }
+      }
+    },
+    "Send code" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code senden"
+          }
+        }
+      }
+    },
+    "Sending" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird gesendet"
+          }
+        }
+      }
+    },
+    "Sends your quick alibi: a call or text from the contact you picked." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendet dein Schnell-Alibi: einen Anruf oder eine SMS vom gewählten Kontakt."
+          }
+        }
+      }
+    },
+    "Setting" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Situation"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen"
+          }
+        }
+      }
+    },
+    "Sign out" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abmelden"
+          }
+        }
+      }
+    },
+    "Slide to send" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Senden schieben"
+          }
+        }
+      }
+    },
+    "Slide to send · %lld credits" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Senden schieben · %lld Credits"
+          }
+        }
+      }
+    },
+    "Slide to send · 1 credit" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Senden schieben · 1 Credit"
+          }
+        }
+      }
+    },
+    "So a caller can say your shift moved or a client needs you." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit ein Anrufer sagen kann, dass sich deine Schicht verschoben hat oder ein Kunde dich braucht."
+          }
+        }
+      }
+    },
+    "Social" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freizeit"
+          }
+        }
+      }
+    },
+    "Some details weren’t accepted. Please review and try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Angaben wurden nicht angenommen. Bitte prüf sie und versuch es noch einmal."
+          }
+        }
+      }
+    },
+    "Something new, like a job or a move, makes a sudden call easy to believe." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etwas Neues, wie ein Job oder ein Umzug, macht einen plötzlichen Anruf glaubwürdig."
+          }
+        }
+      }
+    },
+    "Something went wrong. Please try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etwas ist schiefgelaufen. Bitte versuch es noch einmal."
+          }
+        }
+      }
+    },
+    "Soon" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bald"
+          }
+        }
+      }
+    },
+    "Starting" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startet"
+          }
+        }
+      }
+    },
+    "Step %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Step %1$lld of %2$lld"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt %lld von %lld"
+          }
+        }
+      }
+    },
+    "Swipe left to cancel" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Abbrechen nach links wischen"
+          }
+        }
+      }
+    },
+    "Tells the caller whether mentioning your partner is fine." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sagt dem Anrufer, ob er deinen Partner erwähnen darf."
+          }
+        }
+      }
+    },
+    "Text" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMS"
+          }
+        }
+      }
+    },
+    "Text at %@." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMS um %@."
+          }
+        }
+      }
+    },
+    "Text me in 30 seconds" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreib mir in 30 Sekunden"
+          }
+        }
+      }
+    },
+    "Text me in 5 minutes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreib mir in 5 Minuten"
+          }
+        }
+      }
+    },
+    "Text me now" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreib mir jetzt"
+          }
+        }
+      }
+    },
+    "Text scheduled in" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMS geplant in"
+          }
+        }
+      }
+    },
+    "Texting you now." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du bekommst jetzt eine SMS."
+          }
+        }
+      }
+    },
+    "Texting you…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreibt dir…"
+          }
+        }
+      }
+    },
+    "That phone number doesn’t look right. Please check it and try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Nummer sieht nicht richtig aus. Bitte prüf sie und versuch es noch einmal."
+          }
+        }
+      }
+    },
+    "The App Store couldn't complete the purchase. Check your connection and try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der App Store konnte den Kauf nicht abschließen. Prüf deine Verbindung und versuch es noch einmal."
+          }
+        }
+      }
+    },
+    "The person your phone shows." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Person, die dein iPhone anzeigt."
+          }
+        }
+      }
+    },
+    "The service is briefly unavailable. Please try again shortly." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Dienst ist kurz nicht erreichbar. Bitte versuch es gleich noch einmal."
+          }
+        }
+      }
+    },
+    "The text arrives at %@." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die SMS kommt um %@."
+          }
+        }
+      }
+    },
+    "The wording is written from your choices. You can't type the call or text yourself." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Wortlaut entsteht aus deiner Auswahl. Den Anruf oder die SMS selbst schreiben kannst du nicht."
+          }
+        }
+      }
+    },
+    "This alibi can’t be sent that way." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Alibi lässt sich so nicht senden."
+          }
+        }
+      }
+    },
+    "This alibi is removed. Past calls and texts stay in History." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Alibi wird gelöscht. Frühere Anrufe und SMS bleiben im Verlauf."
+          }
+        }
+      }
+    },
+    "This pack isn't available in the App Store right now." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Paket ist im App Store gerade nicht verfügbar."
+          }
+        }
+      }
+    },
+    "This request can no longer be canceled." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das lässt sich nicht mehr abbrechen."
+          }
+        }
+      }
+    },
+    "Time" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uhrzeit"
+          }
+        }
+      }
+    },
+    "Times shown in %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeiten in %@"
+          }
+        }
+      }
+    },
+    "Timezone" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitzone"
+          }
+        }
+      }
+    },
+    "Timing" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitpunkt"
+          }
+        }
+      }
+    },
+    "To set it up: iPhone Settings › Action Button › Shortcut › AlibiMe › Get Me Out. Siri and the Shortcuts app can run it too." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So richtest du es ein: Einstellungen › Aktionstaste › Kurzbefehl › AlibiMe › Hol mich raus. Siri und die Kurzbefehle-App können es auch starten."
+          }
+        }
+      }
+    },
+    "Tone" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tonfall"
+          }
+        }
+      }
+    },
+    "Try again" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch einmal versuchen"
+          }
+        }
+      }
+    },
+    "Upcoming" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als Nächstes"
+          }
+        }
+      }
+    },
+    "Updating" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird aktualisiert"
+          }
+        }
+      }
+    },
+    "Urgent" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dringend"
+          }
+        }
+      }
+    },
+    "Use a different number" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere Nummer verwenden"
+          }
+        }
+      }
+    },
+    "Use details from my Profile" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angaben aus meinem Profil nutzen"
+          }
+        }
+      }
+    },
+    "Verify" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestätigen"
+          }
+        }
+      }
+    },
+    "Verify your phone number before sending a request." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestätige deine Nummer, bevor du etwas sendest."
+          }
+        }
+      }
+    },
+    "Version" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        }
+      }
+    },
+    "Voice" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stimme"
+          }
+        }
+      }
+    },
+    "Waiting for approval. The credits arrive once it's approved." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wartet auf Freigabe. Die Credits kommen, sobald der Kauf freigegeben ist."
+          }
+        }
+      }
+    },
+    "We can’t use this type of phone line. Try a mobile number." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Art von Anschluss können wir nicht nutzen. Versuch es mit einer Handynummer."
+          }
+        }
+      }
+    },
+    "We couldn’t find that. Please try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das haben wir nicht gefunden. Bitte versuch es noch einmal."
+          }
+        }
+      }
+    },
+    "We couldn’t reach the network. Check your connection and try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Verbindung. Prüf deine Internetverbindung und versuch es noch einmal."
+          }
+        }
+      }
+    },
+    "We only ever contact your own verified number." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wir kontaktieren immer nur deine eigene bestätigte Nummer."
+          }
+        }
+      }
+    },
+    "We sent a 6-digit code to %@." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wir haben einen 6-stelligen Code an %@ geschickt."
+          }
+        }
+      }
+    },
+    "We’ll call your verified number when the timer ends." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn der Countdown abläuft, rufen wir deine bestätigte Nummer an."
+          }
+        }
+      }
+    },
+    "We’ll send a verification code. The app only ever contacts this verified number." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wir schicken dir einen Bestätigungscode. Die App kontaktiert immer nur diese bestätigte Nummer."
+          }
+        }
+      }
+    },
+    "We’ll text your verified number when the timer ends." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn der Countdown abläuft, schicken wir eine SMS an deine bestätigte Nummer."
+          }
+        }
+      }
+    },
+    "What %@ needs from you." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was %@ von dir braucht."
+          }
+        }
+      }
+    },
+    "What do you look after?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Worum kümmerst du dich?"
+          }
+        }
+      }
+    },
+    "What field do you work in?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In welchem Bereich arbeitest du?"
+          }
+        }
+      }
+    },
+    "What's your position?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was ist deine Position?"
+          }
+        }
+      }
+    },
+    "When" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wann"
+          }
+        }
+      }
+    },
+    "When do you work?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wann arbeitest du?"
+          }
+        }
+      }
+    },
+    "When you write your own call, the caller can mention your job, your home or your family, so the reason sounds like it's really about you. Add only what you like." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei deinen eigenen Alibis kann der Anrufer deinen Job, dein Zuhause oder deine Familie erwähnen, damit der Grund wirklich nach dir klingt. Gib nur an, was du möchtest."
+          }
+        }
+      }
+    },
+    "When?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wann?"
+          }
+        }
+      }
+    },
+    "Whenever you can" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du Zeit hast"
+          }
+        }
+      }
+    },
+    "Where do you work?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wo arbeitest du?"
+          }
+        }
+      }
+    },
+    "Where does your family live?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wo wohnt deine Familie?"
+          }
+        }
+      }
+    },
+    "Which alibi?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welches Alibi?"
+          }
+        }
+      }
+    },
+    "Who calls?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wer ruft an?"
+          }
+        }
+      }
+    },
+    "Who depends on you?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wer ist auf dich angewiesen?"
+          }
+        }
+      }
+    },
+    "Who do you live with?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit wem wohnst du?"
+          }
+        }
+      }
+    },
+    "Who knows you're together?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wer weiß, dass ihr zusammen seid?"
+          }
+        }
+      }
+    },
+    "Why?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warum?"
+          }
+        }
+      }
+    },
+    "Work" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arbeit"
+          }
+        }
+      }
+    },
+    "Works as" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geht als"
+          }
+        }
+      }
+    },
+    "Your alibis" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Alibis"
+          }
+        }
+      }
+    },
+    "Your call comes in 30 seconds." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Anruf kommt in 30 Sekunden."
+          }
+        }
+      }
+    },
+    "Your call comes in 5 minutes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Anruf kommt in 5 Minuten."
+          }
+        }
+      }
+    },
+    "Your calls and texts will appear here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Anrufe und SMS erscheinen hier."
+          }
+        }
+      }
+    },
+    "Your calls will still work, they just won't mention your life." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Anrufe funktionieren trotzdem, sie erwähnen nur nichts aus deinem Leben."
+          }
+        }
+      }
+    },
+    "Your changes are removed and the original alibi comes back." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Änderungen werden verworfen und das ursprüngliche Alibi kommt zurück."
+          }
+        }
+      }
+    },
+    "Your name (optional)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Name (optional)"
+          }
+        }
+      }
+    },
+    "Your number, history, own alibis and remaining credits are deleted. Credits you bought are not refunded. This can't be undone." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Nummer, dein Verlauf, deine eigenen Alibis und übrige Credits werden gelöscht. Gekaufte Credits werden nicht erstattet. Das lässt sich nicht rückgängig machen."
+          }
+        }
+      }
+    },
+    "Your payment went through. Your credits weren't added yet." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Zahlung ist durchgegangen. Deine Credits wurden noch nicht hinzugefügt."
+          }
+        }
+      }
+    },
+    "Your phone number" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Handynummer"
+          }
+        }
+      }
+    },
+    "Your phone rings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein iPhone klingelt"
+          }
+        }
+      }
+    },
+    "Your phone rings at %@." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein iPhone klingelt um %@."
+          }
+        }
+      }
+    },
+    "Your session expired. Please sign in again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
+          }
+        }
+      }
+    },
+    "Your session has expired. Please sign in again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
+          }
+        }
+      }
+    },
+    "Your text comes in 30 seconds." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine SMS kommt in 30 Sekunden."
+          }
+        }
+      }
+    },
+    "Your text comes in 5 minutes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine SMS kommt in 5 Minuten."
+          }
+        }
+      }
+    },
+    "Your verified number, %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine bestätigte Nummer, %@"
+          }
+        }
+      }
+    },
+    "You’re going a little fast. Please wait a moment and try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ging etwas schnell. Bitte warte kurz und versuch es dann noch einmal."
+          }
+        }
+      }
+    },
+    "You’re out of credits. Add more to keep sending." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Credits sind aufgebraucht. Füg neue hinzu, um weiter zu senden."
+          }
+        }
+      }
+    },
+    "You’re out of credits. Tap to add more." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Credits sind aufgebraucht. Tippe, um neue hinzuzufügen."
+          }
+        }
+      }
+    },
+    "You’ve reached the limit of queued jobs. Cancel one to schedule another." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast die Grenze für geplante Aufträge erreicht. Brich einen ab, um einen neuen zu planen."
+          }
+        }
+      }
+    },
+    "today at %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "heute um %@"
+          }
+        }
+      }
+    },
+    "tomorrow at %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "morgen um %@"
+          }
+        }
+      }
+    },
+    "· %llds" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· %lld s"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -33,6 +33,15 @@ def resolve_version(db: Session, template_id: uuid.UUID, locale: str) -> Templat
     raise NotFound("No active template version found for this template.")
 
 
+def display_name(db: Session, tmpl: Template, locale: str) -> str:
+    """The template's name in the locale: a built-in's translated name, or
+    the user's own name for their alibis."""
+    try:
+        return resolve_version(db, tmpl.id, locale).display_name or tmpl.display_name
+    except NotFound:
+        return tmpl.display_name
+
+
 def supported_channels(version: TemplateVersion) -> list[str]:
     channels = []
     if version.supports_call:
@@ -60,8 +69,8 @@ def _catalog_item(db: Session, tmpl: Template, locale: str) -> dict | None:
     return {
         "id": str(tmpl.id),
         "code": tmpl.code,
-        "display_name": tmpl.display_name,
-        "description": tmpl.description,
+        "display_name": version.display_name or tmpl.display_name,
+        "description": version.description or tmpl.description,
         "category": tmpl.category,
         "caller_persona": tmpl.caller_persona,
         "reason_code": tmpl.reason_code,
@@ -175,8 +184,8 @@ def _choices(tmpl: Template, version: TemplateVersion) -> dict:
     channels = supported_channels(version)
     voice = (version.call_voice_profile_code or "neutral").split("_")[0]
     common = {
-        "display_name": tmpl.display_name,
-        "description": tmpl.description,
+        "display_name": version.display_name or tmpl.display_name,
+        "description": version.description or tmpl.description,
         "channels": channels,
         "voice_style": voice if voice in compose.VOICE_STYLES else "neutral",
         "call_max_seconds": version.call_max_duration_seconds if version.supports_call else None,

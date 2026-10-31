@@ -137,6 +137,18 @@ public struct PrimaryButton: View {
 
     public enum Role { case primary, destructive }
 
+    /// A literal title is a translatable text (see scripts/strings.sh).
+    public init(_ title: LocalizedStringResource,
+                systemImage: String? = nil,
+                isLoading: Bool = false,
+                role: Role = .primary,
+                action: @escaping () -> Void) {
+        self.init(String(localized: title), systemImage: systemImage, isLoading: isLoading,
+                  role: role, action: action)
+    }
+
+    /// An already translated title, e.g. from a view model.
+    @_disfavoredOverload
     public init(_ title: String,
                 systemImage: String? = nil,
                 isLoading: Bool = false,
@@ -185,6 +197,12 @@ public struct SelectablePill: View {
     let isSelected: Bool
     let action: () -> Void
 
+    public init(_ title: LocalizedStringResource, systemImage: String? = nil, isSelected: Bool,
+                action: @escaping () -> Void) {
+        self.init(String(localized: title), systemImage: systemImage, isSelected: isSelected, action: action)
+    }
+
+    @_disfavoredOverload
     public init(_ title: String, systemImage: String? = nil, isSelected: Bool, action: @escaping () -> Void) {
         self.title = title
         self.systemImage = systemImage
@@ -281,6 +299,9 @@ public struct SegmentedSelector: View {
 /// Section header in the calm, serious tone.
 public struct SectionHeader: View {
     let title: String
+    /// A literal title is a translatable text (see scripts/strings.sh).
+    public init(_ title: LocalizedStringResource) { self.title = String(localized: title) }
+    @_disfavoredOverload
     public init(_ title: String) { self.title = title }
     public var body: some View {
         Text(title.uppercased())

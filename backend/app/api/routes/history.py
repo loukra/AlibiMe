@@ -11,6 +11,7 @@ from app.db.models.request import Request
 from app.db.models.template import Template
 from app.domain.requests import service as requests_service
 from app.domain.requests import state
+from app.domain.templates import service as templates_service
 from app.schemas.history import HistoryItem, HistoryResponse
 
 router = APIRouter(prefix="/v1/history", tags=["history"])
@@ -24,7 +25,7 @@ def get_history(
     offset: int = Query(default=0, ge=0),
 ) -> HistoryResponse:
     rows = db.execute(
-        select(Request, Template.display_name)
+        select(Request, Template)
         .join(Template, Template.id == Request.template_id)
         .where(Request.user_id == ctx.user.id)
         .order_by(Request.created_at.desc())
@@ -36,7 +37,8 @@ def get_history(
     rows = rows[:limit]
 
     items: list[HistoryItem] = []
-    for req, template_label in rows:
+    for req, template in rows:
+        template_label = templates_service.display_name(db, template, ctx.user.locale)
         duration = None
         if req.channel == Channel.call.value:
             attempt = requests_service.latest_call_attempt(db, req.id)

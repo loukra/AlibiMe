@@ -182,6 +182,7 @@ struct TemplateOptionsResponseDTO: Decodable {
     let call_seconds_min: Int
     let call_seconds_max: Int
     let call_seconds_default: Int
+    let labels: [String: String]?
     let profile: ProfileOptionsDTO
 }
 

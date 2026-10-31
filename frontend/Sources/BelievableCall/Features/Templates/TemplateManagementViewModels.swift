@@ -207,12 +207,16 @@ public final class CustomTemplateEditorViewModel: Identifiable {
         guard !draft.persona.isEmpty, !draft.reason.isEmpty else { return "" }
         let who = personaPhrase
         let why = options?.reasons.first { $0.code == draft.reason }?.label ?? draft.reason
-        let verb = draft.channels == [.text] ? "texts" : "calls"
-        return "\(Self.capitalizedFirst(who)) \(verb) about \(why)."
+        let person = Self.capitalizedFirst(who)
+        return draft.channels == [.text]
+            ? String(localized: "\(person) texts about \(why).")
+            : String(localized: "\(person) calls about \(why).")
     }
 
     private var suggestedName: String {
-        String("\(personaLabel(draft.persona)): \(reasonLabel(draft.reason).lowercased())".prefix(120))
+        // Only the first letter: German nouns keep their capital.
+        let reason = reasonLabel(draft.reason)
+        return String("\(personaLabel(draft.persona)): \(reason.prefix(1).lowercased())\(reason.dropFirst())".prefix(120))
     }
 
     /// Personas grouped for the tiles, the group of the current reason first.
@@ -280,6 +284,19 @@ extension CustomTemplateEditorViewModel {
     /// Group titles, in tile order. Reason codes start with their group.
     static let groupOrder = ["Work", "Home", "Family", "Friends", "Partner", "Life changes", "Safety"]
 
+    /// A group's title as shown; the English titles above stay the ids.
+    static func groupTitle(_ group: String) -> String {
+        switch group {
+        case "Work": return String(localized: "Work")
+        case "Home": return String(localized: "Home")
+        case "Family": return String(localized: "Family")
+        case "Friends": return String(localized: "Friends")
+        case "Partner": return String(localized: "Partner")
+        case "Life changes": return String(localized: "Life changes")
+        default: return String(localized: "Safety")
+        }
+    }
+
     static func group(forReason code: String) -> String {
         switch code.split(separator: "_").first {
         case "work": return "Work"
@@ -335,7 +352,8 @@ extension CustomTemplateEditorViewModel {
     /// "your manager" → "Manager", "someone you're seeing" → "Someone you're seeing".
     static func tileLabel(_ label: String) -> String {
         var text = label
-        for article in ["your ", "the ", "a "] where text.hasPrefix(article) {
+        for article in ["your ", "the ", "a ", "dein ", "deine ", "die ", "der ", "das ", "ein ", "eine "]
+        where text.hasPrefix(article) {
             text = String(text.dropFirst(article.count))
             break
         }

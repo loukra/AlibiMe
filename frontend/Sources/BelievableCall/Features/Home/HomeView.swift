@@ -89,12 +89,14 @@ public struct HomeView: View {
     private var header: some View {
         HStack(spacing: Spacing.s) {
             pill(systemImage: "checkmark.shield.fill", tint: Theme.success,
-                 text: vm.maskedNumber ?? "Not verified", opens: .number)
-                .accessibilityLabel("Your verified number, \(vm.maskedNumber ?? "not verified")")
+                 text: vm.maskedNumber ?? String(localized: "Not verified"), opens: .number)
+                .accessibilityLabel(vm.maskedNumber.map { String(localized: "Your verified number, \($0)") }
+                                    ?? String(localized: "Not verified"))
             Spacer(minLength: 0)
             pill(systemImage: "creditcard.fill",
                  tint: vm.hasCredits ? Color.secondary : Theme.destructive,
-                 text: vm.creditsAvailable == 1 ? "1 credit" : "\(vm.creditsAvailable) credits",
+                 text: vm.creditsAvailable == 1 ? String(localized: "1 credit")
+                    : String(localized: "\(vm.creditsAvailable) credits"),
                  opens: .credits)
                 .accessibilityLabel("\(vm.creditsAvailable) credits available")
         }
@@ -175,7 +177,7 @@ public struct HomeView: View {
     /// The "When" options as segments: the presets plus a Schedule entry.
     private var timingSegments: [SegmentItem] {
         TimingOption.presets.map { SegmentItem(id: $0.id, title: $0.shortTitle) }
-            + [SegmentItem(id: scheduleSegmentID, title: "Schedule")]
+            + [SegmentItem(id: scheduleSegmentID, title: String(localized: "Schedule"))]
     }
 
     private var selectedTimingID: String {

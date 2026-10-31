@@ -82,7 +82,7 @@ public struct CustomTemplateEditorView: View {
     }
 
     private var removeTitle: String {
-        vm.canReset ? "Reset to the original?" : "Delete this alibi?"
+        vm.canReset ? String(localized: "Reset to the original?") : String(localized: "Delete this alibi?")
     }
 
     // MARK: Steps
@@ -101,9 +101,9 @@ public struct CustomTemplateEditorView: View {
 
     private var whoStep: some View {
         VStack(alignment: .leading, spacing: Spacing.m) {
-            StepTitle("Who calls?", "The person your phone shows.")
+            StepTitle(String(localized: "Who calls?"), String(localized: "The person your phone shows."))
             ForEach(vm.personaGroups, id: \.title) { group in
-                SectionHeader(group.title)
+                SectionHeader(CustomTemplateEditorViewModel.groupTitle(group.title))
                 TileGrid(group.options.map { option in
                     Tile(id: option.code, title: vm.personaLabel(option.code))
                 }, selected: vm.draft.persona, onSelect: vm.choosePersona)
@@ -113,9 +113,9 @@ public struct CustomTemplateEditorView: View {
 
     private var whyStep: some View {
         VStack(alignment: .leading, spacing: Spacing.m) {
-            StepTitle("Why?", "What \(vm.personaPhrase) needs from you.")
+            StepTitle(String(localized: "Why?"), String(localized: "What \(vm.personaPhrase) needs from you."))
             ForEach(vm.reasonGroups, id: \.title) { group in
-                SectionHeader(group.title)
+                SectionHeader(CustomTemplateEditorViewModel.groupTitle(group.title))
                 TileGrid(group.options.map { option in
                     Tile(id: option.code, title: vm.reasonLabel(option.code))
                 }, selected: vm.draft.reason, onSelect: vm.chooseReason)
@@ -125,7 +125,7 @@ public struct CustomTemplateEditorView: View {
 
     private func urgencyStep(_ options: TemplateOptions) -> some View {
         VStack(alignment: .leading, spacing: Spacing.m) {
-            StepTitle("How urgent?", "How hard it pulls you out.")
+            StepTitle(String(localized: "How urgent?"), String(localized: "How hard it pulls you out."))
             TileGrid(options.urgencies.map { code in
                 let urgency = UrgencyCopy(code)
                 return Tile(id: code, title: urgency.title, subtitle: urgency.subtitle,
@@ -149,13 +149,13 @@ public struct CustomTemplateEditorView: View {
 
             VStack(alignment: .leading, spacing: Spacing.s) {
                 SectionHeader("Scenario")
-                AnswerRow(question: "Who calls?", answer: vm.personaLabel(vm.draft.persona)) {
+                AnswerRow(question: String(localized: "Who calls?"), answer: vm.personaLabel(vm.draft.persona)) {
                     vm.go(to: .who)
                 }
-                AnswerRow(question: "Why?", answer: vm.reasonLabel(vm.draft.reason)) {
+                AnswerRow(question: String(localized: "Why?"), answer: vm.reasonLabel(vm.draft.reason)) {
                     vm.go(to: .why)
                 }
-                AnswerRow(question: "How urgent?", answer: UrgencyCopy(vm.draft.urgency).title) {
+                AnswerRow(question: String(localized: "How urgent?"), answer: UrgencyCopy(vm.draft.urgency).title) {
                     vm.go(to: .urgency)
                 }
             }
@@ -178,7 +178,7 @@ public struct CustomTemplateEditorView: View {
                             Haptics.play(.impact)
                         } label: {
                             TileLabel(title: channel.title,
-                                      subtitle: channel == .call ? "Your phone rings" : "A message arrives",
+                                      subtitle: channel == .call ? String(localized: "Your phone rings") : String(localized: "A message arrives"),
                                       systemImage: channel.outlineSymbol, isSelected: on)
                         }
                         .buttonStyle(.plain)
@@ -226,18 +226,18 @@ public struct CustomTemplateEditorView: View {
     private func moreOptions(_ options: TemplateOptions) -> some View {
         Card {
             VStack(spacing: Spacing.s) {
-                optionMenu("Outcome", $vm.draft.outcome, options.outcomes)
-                optionMenu("Setting", $vm.draft.setting, options.settings)
-                codeMenu("Tone", $vm.draft.tone, options.tones)
-                codeMenu("Formality", $vm.draft.formality, options.formalities)
-                codeMenu("Detail", $vm.draft.detailProfile, options.detailProfiles)
-                codeMenu("Discretion", $vm.draft.discretionLevel, options.discretionLevels)
-                optionMenu("Expected reply", $vm.draft.expectedResponse, options.expectedResponses)
-                optionMenu("Follow-up", $vm.draft.followupBehavior, options.followupBehaviors)
-                codeMenu("Continuity", $vm.draft.continuityScope, options.continuityScopes)
+                optionMenu(String(localized: "Outcome"), $vm.draft.outcome, options.outcomes)
+                optionMenu(String(localized: "Setting"), $vm.draft.setting, options.settings)
+                codeMenu(String(localized: "Tone"), $vm.draft.tone, options.tones)
+                codeMenu(String(localized: "Formality"), $vm.draft.formality, options.formalities)
+                codeMenu(String(localized: "Detail"), $vm.draft.detailProfile, options.detailProfiles)
+                codeMenu(String(localized: "Discretion"), $vm.draft.discretionLevel, options.discretionLevels)
+                optionMenu(String(localized: "Expected reply"), $vm.draft.expectedResponse, options.expectedResponses)
+                optionMenu(String(localized: "Follow-up"), $vm.draft.followupBehavior, options.followupBehaviors)
+                codeMenu(String(localized: "Continuity"), $vm.draft.continuityScope, options.continuityScopes)
                 if vm.draft.channels.contains(.call) {
-                    codeMenu("Voice", $vm.draft.voiceStyle, options.voiceStyles)
-                    Stepper("Call length: \(vm.draft.callMaxSeconds)s",
+                    codeMenu(String(localized: "Voice"), $vm.draft.voiceStyle, options.voiceStyles)
+                    Stepper(String(localized: "Call length: \(vm.draft.callMaxSeconds) s"),
                             value: $vm.draft.callMaxSeconds,
                             in: options.callSecondsMin...options.callSecondsMax,
                             step: 10)
@@ -270,7 +270,7 @@ public struct CustomTemplateEditorView: View {
     }
 
     private func codeMenu(_ title: String, _ binding: Binding<String>, _ codes: [String]) -> some View {
-        menuRow(title, binding, codes.map { ($0, CustomTemplateEditorViewModel.humanized($0)) })
+        menuRow(title, binding, codes.map { ($0, vm.options?.labels[$0] ?? CustomTemplateEditorViewModel.humanized($0)) })
     }
 
     private func menuRow(_ title: String, _ binding: Binding<String>,
@@ -421,10 +421,10 @@ private struct UrgencyCopy {
 
     init(_ code: String) {
         switch code {
-        case "low": (title, subtitle, systemImage) = ("No rush", "Whenever you can", "tortoise")
-        case "high": (title, subtitle, systemImage) = ("Urgent", "Needs you soon", "exclamationmark.circle")
-        case "immediate": (title, subtitle, systemImage) = ("Right now", "Drop everything", "bolt")
-        default: (title, subtitle, systemImage) = ("Soon", "In the next minutes", "clock")
+        case "low": (title, subtitle, systemImage) = (String(localized: "No rush"), String(localized: "Whenever you can"), "tortoise")
+        case "high": (title, subtitle, systemImage) = (String(localized: "Urgent"), String(localized: "Needs you soon"), "exclamationmark.circle")
+        case "immediate": (title, subtitle, systemImage) = (String(localized: "Right now"), String(localized: "Drop everything"), "bolt")
+        default: (title, subtitle, systemImage) = (String(localized: "Soon"), String(localized: "In the next minutes"), "clock")
         }
     }
 }

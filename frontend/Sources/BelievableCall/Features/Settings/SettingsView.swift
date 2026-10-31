@@ -110,7 +110,7 @@ private extension SettingsView {
                 .onChange(of: editingName) { _, editing in
                     if !editing { Task { await vm.saveIfChanged() } }
                 }
-            Picker("Language", selection: $vm.locale) {
+            Picker("Call language", selection: $vm.locale) {
                 ForEach(locales, id: \.self) { code in
                     Text(code == "de" ? "Deutsch" : "English").tag(code)
                 }
@@ -131,7 +131,7 @@ private extension SettingsView {
                 }
             }
         } footer: {
-            Text("Calls and texts come to this number. The language is the one they are in.")
+            Text("Calls and texts come to this number. They, and your alibis, use the language you pick here.")
         }
     }
 

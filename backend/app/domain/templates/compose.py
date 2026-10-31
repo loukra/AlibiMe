@@ -268,6 +268,13 @@ def options(locale: str) -> dict:
         "call_seconds_min": MIN_CALL_SECONDS,
         "call_seconds_max": MAX_CALL_SECONDS,
         "call_seconds_default": DEFAULT_CALL_SECONDS,
+        # Labels for the options above that are sent as bare codes.
+        "labels": {
+            code: catalogs.option_label(code, locale)
+            for codes in (catalogs.DETAIL_PROFILES, catalogs.DISCRETION_LEVELS, catalogs.TONES,
+                          catalogs.FORMALITIES, catalogs.CONTINUITY_SCOPES, VOICE_STYLES)
+            for code in codes
+        },
         "profile": profile_options(locale),
     }
 

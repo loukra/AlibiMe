@@ -10,6 +10,9 @@ import PackageDescription
 // whole package compiles cross-platform.
 let package = Package(
     name: "BelievableCall",
+    // Lets Xcode extract the package's texts for the app's string catalog
+    // (App/BelievableCall/Localizable.xcstrings, see scripts/strings.sh).
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v17),
         .macOS(.v14),

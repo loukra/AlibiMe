@@ -207,7 +207,187 @@ PROFILE_OPTION_LABELS = {
         "one_week": "About a week",
         "two_weeks": "About two weeks",
     },
+    "de": {
+        # work
+        "office_admin": "Büro / Verwaltung",
+        "tech_product": "Tech",
+        "finance_business": "Finanzen / Wirtschaft",
+        "retail": "Einzelhandel",
+        "hospitality": "Hotel / Gastgewerbe",
+        "food_service": "Gastronomie",
+        "healthcare": "Gesundheitswesen",
+        "education": "Bildung",
+        "construction_trades": "Bau / Handwerk",
+        "manufacturing": "Produktion",
+        "warehouse_logistics": "Lager / Logistik",
+        "transport_driving": "Transport / Fahren",
+        "sales": "Vertrieb",
+        "media_creative": "Medien / Kreatives",
+        "public_service": "Öffentlicher Dienst",
+        "freelance_contractor": "Selbstständig",
+        "staff": "Teammitglied",
+        "coordinator": "Koordination",
+        "specialist": "Fachkraft",
+        "lead": "Teamleitung",
+        "manager": "Führungskraft",
+        "owner_founder": "Inhaber / Gründer",
+        "contractor": "Auftragnehmer",
+        "shift_worker": "Schichtarbeit",
+        "on_call_worker": "Auf Abruf",
+        "office": "Büro",
+        "remote": "Homeoffice",
+        "hybrid": "Hybrid",
+        "store_shopfloor": "Laden / Verkaufsfläche",
+        "restaurant_bar": "Restaurant / Bar",
+        "clinic_hospital": "Praxis / Klinik",
+        "school_campus": "Schule / Uni",
+        "site_field": "Vor Ort / im Außendienst",
+        "warehouse": "Lager",
+        "client_site": "Bei Kunden",
+        "regular_daytime": "Normal tagsüber",
+        "early_shift": "Frühschicht",
+        "late_shift": "Spätschicht",
+        "night_shift": "Nachtschicht",
+        "rotating_shift": "Wechselschicht",
+        "flexible": "Flexible Zeiten",
+        "on_call": "Bereitschaft",
+        "none": "Nein",
+        "local": "In der Stadt",
+        "regional": "In der Region",
+        "multi_day": "Mehrtägige Reisen",
+        "international": "Ins Ausland",
+        # home
+        "alone": "Allein",
+        "with_roommate": "In einer WG",
+        "with_partner": "Mit Partner",
+        "with_family": "Mit Familie",
+        "shared_house": "In einem geteilten Haus",
+        "deliveries": "Lieferungen",
+        "repairs": "Reparaturen",
+        "landlord_building": "Vermieter / Hausverwaltung",
+        "pets": "Haustiere",
+        "utilities": "Strom, Wasser, Internet",
+        "keys_access": "Schlüssel",
+        "visitors": "Besuch",
+        "moving_setup": "Einzug",
+        "dog": "Einen Hund",
+        "cat": "Eine Katze",
+        "multiple_pets": "Mehrere Haustiere",
+        "childcare": "Kinder",
+        "elder_support": "Einen älteren Angehörigen",
+        # family
+        "occasional_help": "Ab und zu",
+        "regular_support": "Regelmäßig",
+        "primary_support_contact": "Ich bin die Hauptperson",
+        "same_home": "Wir wohnen zusammen",
+        "same_city": "Gleiche Stadt",
+        "nearby": "In der Nähe",
+        "out_of_town": "Woanders",
+        # partner
+        "private": "Niemand",
+        "close_circle_knows": "Enge Freunde",
+        "mostly_public": "Alle",
+        "new": "Ganz frisch",
+        "developing": "Ein paar Monate",
+        "established": "Schon lange",
+        "low": "Details sind okay",
+        "medium": "Ein bisschen",
+        "high": "Lieber vage",
+        # recent changes
+        "new_job_recently": "Neuer Job",
+        "training_onboarding_phase": "In der Einarbeitung",
+        "moved_recently": "Gerade umgezogen",
+        "settling_new_place": "Neu eingelebt",
+        "more_travel_than_usual": "Mehr unterwegs als sonst",
+        "new_routine_phase": "Neuer Alltag",
+        "today_only": "Nur heute",
+        "few_days": "Ein paar Tage",
+        "one_week": "Etwa eine Woche",
+        "two_weeks": "Etwa zwei Wochen",
+    },
 }
+
+# What the custom-alibi editor shows for the coded options that have no
+# wording of their own. English is the humanized code unless listed here;
+# every code needs a German label.
+OPTION_LABELS = {
+    "en": {},
+    "de": {
+        # outcomes
+        "step_out_briefly": "Kurz rausgehen",
+        "leave_now": "Sofort gehen",
+        "leave_within_10m": "In 10 Minuten gehen",
+        "end_conversation": "Gespräch beenden",
+        "cancel_later_today": "Später heute absagen",
+        "unavailable_rest_of_day": "Den Rest des Tages weg",
+        "unavailable_overnight": "Über Nacht weg",
+        "unavailable_weekend": "Am Wochenende weg",
+        "unavailable_one_week": "Eine Woche weg",
+        "unavailable_two_weeks": "Zwei Wochen weg",
+        # settings
+        "date": "Date",
+        "casual_hangout": "Treffen mit Freunden",
+        "dinner": "Abendessen",
+        "party": "Party",
+        "work_meeting": "Meeting",
+        "team_event": "Teamevent",
+        "family_gathering": "Familienfeier",
+        "public_transit": "Unterwegs in Bus oder Bahn",
+        "online_call": "Videocall",
+        "at_home": "Zu Hause",
+        "bar_restaurant": "Bar / Restaurant",
+        "walking_outside": "Draußen unterwegs",
+        "waiting_room": "Wartezimmer",
+        # detail
+        "minimal": "Minimal",
+        "grounded": "Bodenständig",
+        "contextual": "Mit Kontext",
+        "continuity": "Mit Vorgeschichte",
+        # discretion
+        "public_safe": "Unauffällig",
+        "normal": "Normal",
+        "direct": "Direkt",
+        # tones
+        "warm": "Herzlich",
+        "casual": "Locker",
+        "professional": "Professionell",
+        "apologetic": "Entschuldigend",
+        "concerned": "Besorgt",
+        "firm": "Bestimmt",
+        "rushed": "In Eile",
+        "calm": "Ruhig",
+        # formality
+        "neutral": "Neutral",
+        # expected replies
+        "no_reply_needed": "Keine Antwort nötig",
+        "quick_acknowledgement": "Kurz bestätigen",
+        "say_call_back": "Zurückrufen",
+        "say_on_my_way": "Bin unterwegs",
+        "say_reply_later": "Später antworten",
+        "step_out_and_answer": "Rausgehen und antworten",
+        "confirm_tonight": "Heute Abend bestätigen",
+        # follow-up
+        "one_touch_only": "Nur einmal",
+        "one_reminder_if_ignored": "Eine Erinnerung, falls ignoriert",
+        "text_then_call": "Erst SMS, dann Anruf",
+        "call_then_text": "Erst Anruf, dann SMS",
+        "later_same_day_checkin": "Später am Tag nachfragen",
+        "recurring_next_few_days": "In den nächsten Tagen wiederholt",
+        # continuity
+        "one_off": "Einmalig",
+        "same_day": "Am selben Tag",
+        "overnight": "Über Nacht",
+        "weekend": "Wochenende",
+        "multi_day": "Mehrere Tage",
+        "one_week": "Eine Woche",
+        "two_weeks": "Zwei Wochen",
+        "recurring": "Wiederkehrend",
+    },
+}
+
+
+def option_label(code: str, locale: str = "en") -> str:
+    return OPTION_LABELS.get(locale, {}).get(code) or OPTION_LABELS["en"].get(code) or humanize(code)
 
 
 def profile_labeled(codes: list[str], locale: str = "en") -> list[dict]:
@@ -230,6 +410,6 @@ def labeled(codes: list[str], locale: str = "en", label_table: dict | None = Non
         if label_table is not None:
             label = rendering._label(label_table, locale, code)
         else:
-            label = humanize(code)
+            label = option_label(code, locale)
         out.append({"code": code, "label": label})
     return out

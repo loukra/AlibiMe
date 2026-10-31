@@ -64,11 +64,11 @@ public enum ErrorCopy {
         case let .api(code, message, _, _):
             return self.message(forCode: code, fallback: message)
         case .transport:
-            return "We couldn’t reach the network. Check your connection and try again."
+            return String(localized: "We couldn’t reach the network. Check your connection and try again.")
         case .decoding:
-            return "Something went wrong. Please try again."
+            return String(localized: "Something went wrong. Please try again.")
         case .unexpectedStatus:
-            return "Something went wrong. Please try again."
+            return String(localized: "Something went wrong. Please try again.")
         }
     }
 
@@ -76,36 +76,36 @@ public enum ErrorCopy {
     private static func message(forCode code: String, fallback: String?) -> String {
         switch code {
         case "unauthorized":
-            return "Please sign in to continue."
+            return String(localized: "Please sign in to continue.")
         case "session_expired":
-            return "Your session has expired. Please sign in again."
+            return String(localized: "Your session has expired. Please sign in again.")
         case "phone_not_verified":
-            return "Verify your phone number before sending a request."
+            return String(localized: "Verify your phone number before sending a request.")
         case "invalid_phone_number":
-            return "That phone number doesn’t look right. Please check it and try again."
+            return String(localized: "That phone number doesn’t look right. Please check it and try again.")
         case "unsupported_line_type":
-            return "We can’t use this type of phone line. Try a mobile number."
+            return String(localized: "We can’t use this type of phone line. Try a mobile number.")
         case "rate_limited":
-            return "You’re going a little fast. Please wait a moment and try again."
+            return String(localized: "You’re going a little fast. Please wait a moment and try again.")
         case "active_request_exists":
-            return "You’ve reached the limit of queued jobs. Cancel one to schedule another."
+            return String(localized: "You’ve reached the limit of queued jobs. Cancel one to schedule another.")
         case "template_channel_not_supported":
-            return "This alibi can’t be sent that way."
+            return String(localized: "This alibi can’t be sent that way.")
         case "insufficient_credits":
-            return "You’re out of credits. Add more to keep sending."
+            return String(localized: "You’re out of credits. Add more to keep sending.")
         case "invalid_schedule_window":
-            return "Pick a time within the next 24 hours."
+            return String(localized: "Pick a time within the next 24 hours.")
         case "request_not_cancelable":
-            return "This request can no longer be canceled."
+            return String(localized: "This request can no longer be canceled.")
         case "provider_unavailable":
-            return "The service is briefly unavailable. Please try again shortly."
+            return String(localized: "The service is briefly unavailable. Please try again shortly.")
         case "validation_failed":
-            return "Some details weren’t accepted. Please review and try again."
+            return String(localized: "Some details weren’t accepted. Please review and try again.")
         case "not_found":
-            return "We couldn’t find that. Please try again."
+            return String(localized: "We couldn’t find that. Please try again.")
         default:
             // Never leak a raw backend code; prefer a clean generic line.
-            return fallback?.isEmpty == false ? "Something went wrong. Please try again." : "Something went wrong. Please try again."
+            return String(localized: "Something went wrong. Please try again.")
         }
     }
 }

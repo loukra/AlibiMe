@@ -34,8 +34,8 @@ public enum QuickAlibiError: Error, Equatable {
 
     public var message: String {
         switch self {
-        case .signedOut: return "Open AlibiMe and sign in first."
-        case .notSetUp: return "Pick your quick alibi in AlibiMe's settings first."
+        case .signedOut: return String(localized: "Open AlibiMe and sign in first.")
+        case .notSetUp: return String(localized: "Pick your quick alibi in AlibiMe's settings first.")
         case let .failed(message): return message
         }
     }
@@ -91,11 +91,13 @@ public struct QuickAlibiRunner: Sendable {
     }
 
     static func confirmation(for alibi: QuickAlibi) -> String {
-        let thing = alibi.channel == .call ? "call" : "text"
-        switch alibi.timing {
-        case .in30Seconds: return "Your \(thing) comes in 30 seconds."
-        case .in5Minutes: return "Your \(thing) comes in 5 minutes."
-        default: return alibi.channel == .call ? "Calling you now." : "Texting you now."
+        switch (alibi.channel, alibi.timing) {
+        case (.call, .in30Seconds): return String(localized: "Your call comes in 30 seconds.")
+        case (.call, .in5Minutes): return String(localized: "Your call comes in 5 minutes.")
+        case (.text, .in30Seconds): return String(localized: "Your text comes in 30 seconds.")
+        case (.text, .in5Minutes): return String(localized: "Your text comes in 5 minutes.")
+        case (.call, _): return String(localized: "Calling you now.")
+        case (.text, _): return String(localized: "Texting you now.")
         }
     }
 }

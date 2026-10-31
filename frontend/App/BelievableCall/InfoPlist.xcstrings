@@ -1,0 +1,24 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSContactsUsageDescription" : {
+      "comment" : "Info.plist: why the app asks for contacts access",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lets you save the sender as a contact, for example as \"Mom\". This is optional."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit du den Absender als Kontakt sichern kannst, zum Beispiel als „Mama“. Das ist freiwillig."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
