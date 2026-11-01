@@ -2,6 +2,9 @@
 
 [![CI](https://github.com/loukra/AlibiMe/actions/workflows/ci.yml/badge.svg)](https://github.com/loukra/AlibiMe/actions/workflows/ci.yml)
 
+**Status:** in development, not launched yet. Real calls and texts went through in
+earlier testing; the agent evals have so far run against a mock model only.
+
 You're stuck at a dinner, a date or a meeting that won't end, and you need a
 way out. AlibiMe calls you. On the line is an AI voice agent playing your best
 friend, your boss or your roommate, with a reason why you have to go right now.
@@ -69,6 +72,9 @@ is, the tone, your local time, what the caller may mention and roughly how many
 turns to take for the length of the call. What it may mention comes from the
 optional Profile (work, home, family and so on), and you decide how much of it
 a caller can use.
+Laughing off the bot question is only acceptable because of who is on the
+line: AlibiMe only ever calls the user who booked the call, so the person
+hearing the agent always knows it is AlibiMe.
 
 `backend/evals` tests the agent against the same prompt real calls use. A
 scripted person on the other end cooperates, asks who's calling and whether
