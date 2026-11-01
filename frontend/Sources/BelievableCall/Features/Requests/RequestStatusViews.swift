@@ -76,13 +76,16 @@ public struct NextJobChip: View {
     let request: RequestSummary?
     let onCancel: () -> Void
     let onOpen: () -> Void
+    /// See `Card`: lets the chip take the height of the alibi card below it.
+    var minHeight: CGFloat?
     @State private var now = Date()
     @State private var pulsing = false
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    public init(request: RequestSummary?,
+    public init(request: RequestSummary?, minHeight: CGFloat? = nil,
                 onCancel: @escaping () -> Void, onOpen: @escaping () -> Void) {
         self.request = request
+        self.minHeight = minHeight
         self.onCancel = onCancel
         self.onOpen = onOpen
     }
@@ -98,6 +101,9 @@ public struct NextJobChip: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(Spacing.m)
+        .reportsCardHeight(minHeight != nil)
+        .frame(minHeight: minHeight)
+        .fixedSize(horizontal: false, vertical: true)
         // Tinted, not the white glass of the cards below: this is something
         // already running, not part of the form for a new alibi.
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))

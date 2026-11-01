@@ -2824,6 +2824,17 @@
         }
       }
     },
+    "Up next" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als Nächstes"
+          }
+        }
+      }
+    },
     "Upcoming" : {
       "extractionState" : "manual",
       "localizations" : {
